@@ -1,16 +1,33 @@
-import { WebSocketClient, WebSocketServer } from "https://deno.land/x/websocket@v0.1.3/mod.ts";
 import { SocketIncoming } from "./socket.types.ts";
 import { PlayerId } from "./types.ts";
 
-const sockets = new Map<PlayerId, WebSocketClient>();
+const sockets = new Map<PlayerId, WebSocket>();
 
-export function registerSocketHandlers(port: number) {
-  const webSocketServer = new WebSocketServer(port);
+interface SocketMessage {
+  type: SocketIncoming;
+}
 
-  webSocketServer.on(SocketIncoming.Connection, (socket: WebSocketClient) => {
+export function registerSocketHandlers(socket: WebSocket) {
+  socket.onopen = () => {
     const newPlayerId = crypto.randomUUID();
     sockets.set(newPlayerId, socket);
+    console.log("connected");
+  };
 
-    socket.on(SocketIncoming.PlayCard, () => {});
-  });
+  socket.onmessage = (msg: MessageEvent<string>) => {
+    const data: SocketMessage = JSON.parse(msg.data);
+
+    switch (data.type) {
+      case SocketIncoming.PlayCard:
+        break;
+      case SocketIncoming.SelectCard:
+        break;
+      case SocketIncoming.SelectPlayer:
+        break;
+      case SocketIncoming.SubmitSelection:
+        break;
+      case SocketIncoming.AcknowledgeAction:
+        break;
+    }
+  };
 }

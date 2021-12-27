@@ -4,5 +4,4 @@ export const enum SocketIncoming {
   SelectCard = "selectCard",
   SubmitSelection = "submitSelection",
   AcknowledgeAction = "acknowledgeAction",
-  Connection = "connection",
 }

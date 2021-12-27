@@ -1,4 +1,4 @@
-import { sample } from "./utils.ts";
+import { sample } from "./deps.ts";
 import type { RoomData, PlayerId, Player } from "./types.ts";
 
 export const Rooms = new Map<Readonly<string>, RoomData>();
@@ -7,7 +7,11 @@ function getNewRoomCode(): string {
   let newRoomCode = "";
 
   do {
-    newRoomCode = sample(alphabet, 4).join();
+    newRoomCode = "";
+
+    for (let i = 0; i < 4; i++) {
+      newRoomCode += sample(alphabet);
+    }
   } while (Rooms.has(newRoomCode));
 
   return newRoomCode;

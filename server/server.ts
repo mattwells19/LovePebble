@@ -1,15 +1,24 @@
-import { serve } from "https://deno.land/std@0.117.0/http/server.ts";
-import { config } from "https://deno.land/x/dotenv/mod.ts";
+import { config } from "./deps.ts";
 import { registerSocketHandlers } from "./socket.ts";
 import { createNewRoom, Rooms } from "./rooms.ts";
 
 const env = config();
 const PORT = Number(env.PORT) || 3001;
 
-registerSocketHandlers(PORT);
+async function handleConn(conn: Deno.Conn): Promise<void> {
+  const httpConn = Deno.serveHttp(conn);
+  for await (const e of httpConn) {
+    e.respondWith(handle(e.request));
+  }
+}
 
-serve(
-  (req) => {
+function handle(req: Request): Response {
+  if (req.headers.get("upgrade") === "websocket") {
+    const { socket, response } = Deno.upgradeWebSocket(req);
+    registerSocketHandlers(socket);
+
+    return response;
+  } else {
     if (req.method === "GET") {
       const url = new URL(req.url);
 
@@ -23,16 +32,6 @@ serve(
           return new Response(JSON.stringify(Rooms.has(roomCode)));
         }
         case "/api/newRoom": {
-          // is this where we'll get playerId?
-          const playerId = url.searchParams.get("playerId");
-          const playerName = url.searchParams.get("name");
-
-          if (!playerId) {
-            return new Response(null, { status: 400, statusText: "'playerId' was not provided." });
-          } else if (!playerName) {
-            return new Response(null, { status: 400, statusText: "'name' was not provided." });
-          }
-
           const roomCode = createNewRoom();
           return new Response(roomCode);
         }
@@ -40,7 +39,11 @@ serve(
     }
 
     return new Response(null, { status: 404 });
-  },
-  { addr: `0.0.0.0:${PORT}` },
-);
-console.log(`Server started on ${PORT}`);
+  }
+}
+
+const listener = Deno.listen({ port: PORT });
+console.log(`Listening on http://localhost:${PORT}`);
+for await (const conn of listener) {
+  handleConn(conn);
+}
