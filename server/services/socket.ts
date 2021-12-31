@@ -1,20 +1,20 @@
-import { SocketIncoming, SocketMessage, SocketOutgoing } from "./socket.types.ts";
-import { Player, PlayerId } from "./types.ts";
-import { removePlayerFromRoom, Rooms } from "./rooms.ts";
-
-export const sockets = new Map<PlayerId, WebSocket>();
+import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import { Player, PlayerId } from "../types/types.ts";
+import { removePlayerFromRoom } from "../services/rooms.ts";
+import { Sockets } from "../repositories/Sockets.ts";
+import { Rooms } from "../repositories/Rooms.ts";
 
 export function registerSocketHandlers(socket: WebSocket) {
   const playerId: PlayerId = crypto.randomUUID();
   let roomId: string | null = null;
 
   socket.onopen = () => {
-    sockets.set(playerId, socket);
+    Sockets.set(playerId, socket);
     sendToSocket<string>({ type: SocketOutgoing.Connected, data: playerId });
   };
 
   socket.onclose = () => {
-    sockets.delete(playerId);
+    Sockets.delete(playerId);
 
     if (roomId) {
       removePlayerFromRoom(roomId, playerId);
@@ -83,7 +83,7 @@ function sendMessageToRoom<TData>(roomCode: string, data: { type: SocketOutgoing
   const allPlayerIds = Array.from(room.players.keys());
 
   const allPlayerSockets: Array<WebSocket> = allPlayerIds
-    .map((playerId) => sockets.get(playerId))
+    .map((playerId) => Sockets.get(playerId))
     .filter((playerSocket): playerSocket is WebSocket => Boolean(playerSocket));
 
   allPlayerSockets.forEach((playerSocket) => {

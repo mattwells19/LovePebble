@@ -1,6 +1,6 @@
 import { config } from "./deps.ts";
-import { registerSocketHandlers } from "./socket.ts";
-import { createNewRoom, Rooms } from "./rooms.ts";
+import { registerSocketHandlers } from "./services/socket.ts";
+import { checkRoomCode, createNewRoom } from "./services/rooms.ts";
 
 const env = config();
 const PORT = Number(env.PORT) || 3001;
@@ -29,7 +29,7 @@ function handle(req: Request): Response {
             return new Response(null, { status: 400, statusText: "'roomCode' was not provided." });
           }
 
-          return new Response(JSON.stringify(Rooms.has(roomCode)));
+          return new Response(JSON.stringify(checkRoomCode(roomCode)));
         }
         case "/api/newRoom": {
           const roomCode = createNewRoom();

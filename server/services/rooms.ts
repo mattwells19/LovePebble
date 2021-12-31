@@ -1,7 +1,6 @@
-import { sample } from "./deps.ts";
-import type { RoomData, PlayerId, Player } from "./types.ts";
-
-export const Rooms = new Map<Readonly<string>, RoomData>();
+import { sample } from "../deps.ts";
+import { Rooms } from "../repositories/Rooms.ts";
+import type { PlayerId, Player } from "../types/types.ts";
 
 function getNewRoomCode(): string {
   let newRoomCode = "";
@@ -30,6 +29,10 @@ export function createNewRoom(): string {
   });
 
   return newRoomCode;
+}
+
+export function checkRoomCode(roomCode: string): boolean {
+  return Rooms.has(roomCode);
 }
 
 export function removePlayerFromRoom(roomCode: string, playerId: PlayerId) {
