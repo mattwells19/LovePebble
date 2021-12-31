@@ -5,6 +5,10 @@
     },
     {
       "path": "web"
+    },
+    {
+      "path": ".",
+      "name": "root"
     }
   ]
 }
