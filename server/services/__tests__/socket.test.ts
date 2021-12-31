@@ -1,38 +1,14 @@
-import { assert, assertExists, assertEquals } from "https://deno.land/std@0.119.0/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "https://deno.land/std@0.119.0/testing/asserts.ts";
 import { Sockets } from "../../repositories/Sockets.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { registerSocketHandlers } from "../socket.ts";
 import { createNewRoom } from "../rooms.ts";
 import { SocketIncoming, SocketOutgoing } from "../../types/socket.types.ts";
 import { Player, PlayerId } from "../../types/types.ts";
-
-const getMockWebSocket = (overrides?: Partial<WebSocket>): WebSocket => {
-  return {
-    binaryType: "arraybuffer",
-    bufferedAmount: 10,
-    extensions: "",
-    onclose: () => null,
-    onerror: () => null,
-    onmessage: () => null,
-    onopen: () => null,
-    protocol: "",
-    url: "",
-    CLOSED: 0,
-    CLOSING: 1,
-    CONNECTING: 2,
-    OPEN: 3,
-    addEventListener: () => null,
-    close: () => null,
-    dispatchEvent: () => true,
-    readyState: 1,
-    removeEventListener: () => null,
-    send: () => null,
-    ...overrides,
-  };
-};
+import { getMockWebSocket, testCleanup } from "../../test.utils.ts";
 
 Deno.test("Websocket connection is established", () => {
-  let value: { type: string; data: any } = { type: "", data: null };
+  let value = { type: "", data: null };
 
   assertEquals(Sockets.size, 0);
 
@@ -53,6 +29,9 @@ Deno.test("Websocket connection is established", () => {
 
   assertEquals(Sockets.size, 1);
   assert(Sockets.has(value.data));
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("cleans up after Websocket connection is closed", () => {
@@ -68,6 +47,9 @@ Deno.test("cleans up after Websocket connection is closed", () => {
   ws.onclose(new CloseEvent(""));
 
   assertEquals(Sockets.size, 0);
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("player can change rooms", () => {
@@ -144,4 +126,7 @@ Deno.test("player can change rooms", () => {
   const newRoom = Rooms.get(newRoomCode);
   assertExists(newRoom);
   assert(newRoom.players.has(playerId));
+
+  // Cleanup
+  testCleanup();
 });

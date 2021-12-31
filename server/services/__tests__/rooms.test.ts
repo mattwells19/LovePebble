@@ -1,5 +1,6 @@
-import { assert, assertExists, assertEquals } from "https://deno.land/std@0.119.0/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "https://deno.land/std@0.119.0/testing/asserts.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
+import { testCleanup } from "../../test.utils.ts";
 import { Player } from "../../types/types.ts";
 import { checkRoomCode, createNewRoom, removePlayerFromRoom } from "../rooms.ts";
 
@@ -8,15 +9,24 @@ Deno.test("can create 100 new, unique rooms", () => {
     const roomCode = createNewRoom();
     assertEquals(roomCode.length, 4);
   }
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("checkRoomCode returns true when room exists", () => {
   const roomCode = createNewRoom();
   assert(checkRoomCode(roomCode));
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("checkRoomCode returns false when room does not exist", () => {
   assert(!checkRoomCode("ABCD"));
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("player is removed from room", () => {
@@ -48,6 +58,9 @@ Deno.test("player is removed from room", () => {
   assertEquals(roomAgain.players.size, 1);
   assert(!room.players.has(mockPlayerId1));
   assert(room.players.has(mockPlayerId2));
+
+  // Cleanup
+  testCleanup();
 });
 
 Deno.test("room is removed if last player is removed from room", () => {
@@ -70,4 +83,7 @@ Deno.test("room is removed if last player is removed from room", () => {
 
   // verify Room is removed
   assertEquals(Rooms.size, 0);
+
+  // Cleanup
+  testCleanup();
 });

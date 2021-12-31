@@ -26,7 +26,10 @@ function handle(req: Request): Response {
         case "/api/checkRoom": {
           const roomCode = url.searchParams.get("roomCode");
           if (!roomCode) {
-            return new Response(null, { status: 400, statusText: "'roomCode' was not provided." });
+            return new Response(null, {
+              status: 400,
+              statusText: "'roomCode' was not provided.",
+            });
           }
 
           return new Response(JSON.stringify(checkRoomCode(roomCode)));

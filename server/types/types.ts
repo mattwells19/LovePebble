@@ -91,7 +91,11 @@ export type WaitingForChoice = {
 
 export type GameNotStarted = { started: false; playerTurnId: null };
 
-export type GameStarted = { started: true; playerTurnId: PlayerId; winningSpyPlayerId: PlayerId | null };
+export type GameStarted = {
+  started: true;
+  playerTurnId: PlayerId;
+  winningSpyPlayerId: PlayerId | null;
+};
 
 export type GameData =
   | GameNotStarted

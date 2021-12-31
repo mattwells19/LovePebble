@@ -1,6 +1,6 @@
 import { sample } from "../deps.ts";
 import { Rooms } from "../repositories/Rooms.ts";
-import type { PlayerId, Player } from "../types/types.ts";
+import type { Player, PlayerId } from "../types/types.ts";
 
 function getNewRoomCode(): string {
   let newRoomCode = "";
