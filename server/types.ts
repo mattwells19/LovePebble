@@ -1,4 +1,4 @@
-const enum Card {
+export const enum Card {
   Spy = 0,
   Guard,
   Priest,
@@ -11,9 +11,9 @@ const enum Card {
   Princess,
 }
 
-type PlayerId = Readonly<string>;
+export type PlayerId = Readonly<string>;
 
-interface Player {
+export interface Player {
   name: string;
   cards: Array<Card>;
   handmaidProtected: boolean;
@@ -21,14 +21,14 @@ interface Player {
   gameScore: number;
 }
 
-type SimplePlayerSelect = {
+export type SimplePlayerSelect = {
   chosenPlayerId: PlayerId | null;
   submitted: boolean;
 };
 
-type PlayedSpy = { cardPlayed: Card.Spy; details: null };
+export type PlayedSpy = { cardPlayed: Card.Spy; details: null };
 
-type PlayedGuard = {
+export type PlayedGuard = {
   cardPlayed: Card.Guard;
   details: {
     chosenPlayerId: PlayerId | null;
@@ -37,12 +37,12 @@ type PlayedGuard = {
   };
 };
 
-type PlayedPriest = {
+export type PlayedPriest = {
   cardPlayed: Card.Priest;
   details: SimplePlayerSelect;
 };
 
-type PlayedBaron = {
+export type PlayedBaron = {
   cardPlayed: Card.Baron;
   details: {
     chosenPlayerId: PlayerId | null;
@@ -51,17 +51,17 @@ type PlayedBaron = {
   };
 };
 
-type PlayedHandmaid = {
+export type PlayedHandmaid = {
   cardPlayed: Card.Handmaid;
   details: null;
 };
 
-type PlayedPrince = {
+export type PlayedPrince = {
   cardPlayed: Card.Prince;
   details: SimplePlayerSelect;
 };
 
-type PlayedChancellor = {
+export type PlayedChancellor = {
   cardPlayed: Card.Chancellor;
   details: {
     deckOptions: Array<Card>;
@@ -69,31 +69,31 @@ type PlayedChancellor = {
   };
 };
 
-type PlayedKing = {
+export type PlayedKing = {
   cardPlayed: Card.King;
   details: SimplePlayerSelect;
 };
 
-type PlayedCountess = {
+export type PlayedCountess = {
   cardPlayed: Card.Countess;
   details: null;
 };
 
-type PlayedPrincess = {
+export type PlayedPrincess = {
   cardPlayed: Card.Princess;
   details: null;
 };
 
-type WaitingForChoice = {
+export type WaitingForChoice = {
   cardPlayed: null;
   details: null;
 };
 
-type GameNotStarted = { started: false; playerTurnId: null };
+export type GameNotStarted = { started: false; playerTurnId: null };
 
-type GameStarted = { started: true; playerTurnId: PlayerId; winningSpyPlayerId: PlayerId | null };
+export type GameStarted = { started: true; playerTurnId: PlayerId; winningSpyPlayerId: PlayerId | null };
 
-type GameData =
+export type GameData =
   | GameNotStarted
   | (GameStarted &
       (
@@ -109,7 +109,7 @@ type GameData =
         | WaitingForChoice
       ));
 
-interface RoomData {
+export interface RoomData {
   deck: Array<Card>;
   players: Map<PlayerId, Player>;
   game: GameData;

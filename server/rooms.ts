@@ -32,6 +32,17 @@ export function createNewRoom(): string {
   return newRoomCode;
 }
 
+export function removePlayerFromRoom(roomCode: string, playerId: PlayerId) {
+  if (Rooms.has(roomCode)) {
+    const room = Rooms.get(roomCode)!;
+    room.players.delete(playerId);
+
+    if (room.players.size === 0) {
+      Rooms.delete(roomCode);
+    }
+  }
+}
+
 const alphabet: Array<string> = [
   "A",
   "B",
