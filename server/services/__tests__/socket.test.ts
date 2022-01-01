@@ -2,10 +2,9 @@ import { assert, assertEquals, assertExists } from "https://deno.land/std@0.119.
 import { Sockets } from "../../repositories/Sockets.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { registerSocketHandlers } from "../socket.ts";
-import { createNewRoom } from "../rooms.ts";
 import { SocketIncoming, SocketOutgoing } from "../../types/socket.types.ts";
 import { Player, PlayerId } from "../../types/types.ts";
-import { getMockWebSocket, testCleanup } from "../../test.utils.ts";
+import { getMockWebSocket, testCleanup, createNewRoom } from "../../test.utils.ts";
 
 Deno.test("Websocket connection is established", () => {
   let value = { type: "", data: null };

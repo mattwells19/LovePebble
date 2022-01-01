@@ -1,5 +1,6 @@
 import { Rooms } from "./repositories/Rooms.ts";
 import { Sockets } from "./repositories/Sockets.ts";
+import { getNewRoomCode } from "./services/rooms.ts";
 
 export function testCleanup() {
   Rooms.clear();
@@ -30,3 +31,18 @@ export const getMockWebSocket = (overrides?: Partial<WebSocket>): WebSocket => {
     ...overrides,
   };
 };
+
+export function createNewRoom(): string {
+  const newRoomCode = getNewRoomCode();
+
+  Rooms.set(newRoomCode, {
+    deck: [],
+    game: {
+      started: false,
+      playerTurnId: null,
+    },
+    players: new Map(),
+  });
+
+  return newRoomCode;
+}

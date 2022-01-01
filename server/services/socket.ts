@@ -1,6 +1,6 @@
 import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
 import { Player, PlayerId } from "../types/types.ts";
-import { removePlayerFromRoom } from "../services/rooms.ts";
+import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
 
@@ -18,6 +18,16 @@ export function registerSocketHandlers(socket: WebSocket) {
 
     if (roomId) {
       removePlayerFromRoom(roomId, playerId);
+
+      const room = Rooms.get(roomId);
+      if (room) {
+        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
+        sendMessageToRoom<(PlayerId | Player)[][]>(roomId, {
+          type: SocketOutgoing.PlayerUpdate,
+          data: updatedPlayerList,
+        });
+      }
+
       roomId = null;
     }
   };
@@ -29,11 +39,7 @@ export function registerSocketHandlers(socket: WebSocket) {
       case SocketIncoming.Join: {
         const { roomCode, playerName } = data;
 
-        const room = Rooms.get(roomCode);
-        if (!room) {
-          throw new Error(`No room exists with the code ${roomCode}.`);
-        }
-
+        const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
         if (roomId) {
           removePlayerFromRoom(roomId, playerId);
         }
