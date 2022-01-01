@@ -1,0 +1,32 @@
+name: Build and Lint Server
+
+on:
+  pull_request:
+    branches: [main]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: "Run yarn install"
+        run: "yarn install"
+
+      - name: Run Lint for Web
+        uses: wearerequired/lint-action@v1
+        with:
+          eslint: true
+          eslint_dir: web/
+          eslint_extensions: ts,tsx
+          continue_on_error: false
+          check_name: "${linter} ${dir}"
