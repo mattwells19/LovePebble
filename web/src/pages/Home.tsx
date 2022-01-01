@@ -3,6 +3,7 @@ import { Text, Box, PinInput, PinInputField, Collapse, Alert, AlertIcon, Button,
 import { useNavigate } from "react-router-dom";
 import { useAppbarText } from "../hooks/useAppbarText";
 import { useRouterContext } from "../contexts/RouterContext";
+import { get } from "../utils/get";
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -10,37 +11,44 @@ export const Home = () => {
   const { setNewRoomCode } = useRouterContext();
 
   const [roomCode, setRoomCode] = useState<string>("");
-  const [error, setError] = useState<boolean>(false);
+  const [error, setError] = useState<"invalidRoom" | "networkError" | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleRoomCodeChange = (code: string) => {
-    setError(false);
+    setError(null);
     setRoomCode(code.toUpperCase());
   };
 
   const handleNewRoomClick = () => {
     setLoading(true);
-    fetch("/api/newRoom")
-      .then((res) => res.text())
+    get<string>("/api/newRoom")
       .then((newRoomCode) => {
         setNewRoomCode(newRoomCode);
         navigate(`/room/${newRoomCode}`);
+      })
+      .catch((errMsg: string) => {
+        console.error(errMsg);
+        setError("networkError");
+        setLoading(false);
       });
   };
 
   useEffect(() => {
     if (roomCode.length === 4 && !error) {
       setLoading(true);
-      fetch(`/api/checkRoom?roomCode=${roomCode}`)
-        .then((res) => res.text())
-        .then((data) => {
-          const isValidRoom: boolean = JSON.parse(data);
+      get<boolean>(`/api/checkRoom?roomCode=${roomCode}`)
+        .then((isValidRoom) => {
           if (isValidRoom) {
             navigate(`/room/${roomCode}`);
           } else {
-            setError(!isValidRoom);
+            setError("invalidRoom");
             setLoading(false);
           }
+        })
+        .catch((errMsg: string) => {
+          console.error(errMsg);
+          setLoading(false);
+          setError("networkError");
         });
     }
   }, [roomCode]);
@@ -58,7 +66,7 @@ export const Home = () => {
             autoFocus
             onChange={handleRoomCodeChange}
             value={roomCode}
-            isInvalid={error}
+            isInvalid={Boolean(error)}
             size="lg"
             type="alphanumeric"
           >
@@ -68,10 +76,12 @@ export const Home = () => {
             <PinInputField aria-label="Room code, last letter." />
           </PinInput>
         </Box>
-        <Collapse in={error} animateOpacity>
-          <Alert status="warning" width="sm">
+        <Collapse in={Boolean(error)} animateOpacity>
+          <Alert status={error === "networkError" ? "error" : "warning"} width="sm">
             <AlertIcon />
-            There is no room with that room code. Try a different code or start a new room.
+            {error === "networkError"
+              ? "There was a problem communicating with the server."
+              : "There is no room with that room code. Try a different code or start a new room."}
           </Alert>
         </Collapse>
       </Box>
