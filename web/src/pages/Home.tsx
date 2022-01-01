@@ -4,10 +4,12 @@ import { useNavigate } from "react-router-dom";
 import { useAppbarText } from "../hooks/useAppbarText";
 import { useRouterContext } from "../contexts/RouterContext";
 import { get } from "../utils/get";
+import { useDocTitle } from "../hooks/useDocTitle";
 
 export const Home = () => {
   const navigate = useNavigate();
   useAppbarText("Love Pebble");
+  useDocTitle();
   const { setNewRoomCode } = useRouterContext();
 
   const [roomCode, setRoomCode] = useState<string>("");

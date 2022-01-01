@@ -2,10 +2,12 @@ import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input } from "@c
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppbarText } from "../hooks/useAppbarText";
+import { useDocTitle } from "../hooks/useDocTitle";
 
 export const PlayerName = () => {
   const navigate = useNavigate();
   useAppbarText("Player Name");
+  useDocTitle("Player Name");
   const [searchParams] = useSearchParams();
   const [playerName, setPlayerName] = useState<string>(localStorage.getItem("playerName") ?? "");
   const [error, setError] = useState<boolean>(false);
