@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Player, PlayerId } from "../../../server/types/types";
-import { SocketOutgoing } from "../../../server/types/socket.types";
+import { SocketIncoming, SocketOutgoing } from "../../../server/types/socket.types";
 
 interface UseWebSocketResult {
   players: Map<PlayerId, Player>;
@@ -22,7 +22,7 @@ export function useWebSocket(): UseWebSocketResult {
         JSON.stringify({
           playerName: localStorage.getItem("playerName"),
           roomCode,
-          type: "join",
+          type: SocketIncoming.Join,
         }),
       );
     });
