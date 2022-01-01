@@ -16,21 +16,6 @@ export function getNewRoomCode(): string {
   return newRoomCode;
 }
 
-export function createNewRoom(): string {
-  const newRoomCode = getNewRoomCode();
-
-  Rooms.set(newRoomCode, {
-    deck: [],
-    game: {
-      started: false,
-      playerTurnId: null,
-    },
-    players: new Map<PlayerId, Player>(),
-  });
-
-  return newRoomCode;
-}
-
 export function createRoomWithCode(roomCode: string): RoomData {
   if (Rooms.has(roomCode)) {
     throw new Error(`Cannot create a room with code ${roomCode} as a room with that code already exists.`);

@@ -1,14 +1,23 @@
 import { assert, assertEquals, assertExists } from "https://deno.land/std@0.119.0/testing/asserts.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
-import { testCleanup } from "../../test.utils.ts";
+import { testCleanup, createNewRoom } from "../../test.utils.ts";
 import { Player } from "../../types/types.ts";
-import { checkRoomCode, createNewRoom, removePlayerFromRoom } from "../rooms.ts";
+import { checkRoomCode, removePlayerFromRoom, createRoomWithCode, getNewRoomCode } from "../rooms.ts";
 
 Deno.test("can create 100 new, unique rooms", () => {
   for (let i = 0; i < 100; i++) {
     const roomCode = createNewRoom();
     assertEquals(roomCode.length, 4);
   }
+
+  // Cleanup
+  testCleanup();
+});
+
+Deno.test("rooms can be created with room code", () => {
+  const newRoomCode = getNewRoomCode();
+  createRoomWithCode(newRoomCode);
+  assert(Rooms.has(newRoomCode));
 
   // Cleanup
   testCleanup();
