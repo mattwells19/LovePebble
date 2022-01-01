@@ -1,4 +1,4 @@
-name: Build and Lint Server
+name: Lint Web
 
 on:
   pull_request:
