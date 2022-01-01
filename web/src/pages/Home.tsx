@@ -1,14 +1,17 @@
-import { FC, useEffect, useState } from "react";
-import { Text, Box, PinInput, PinInputField, Collapse, Alert, AlertIcon, Button } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Text, Box, PinInput, PinInputField, Collapse, Alert, AlertIcon, Button, Divider } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useAppbarText } from "../hooks/useAppbarText";
+import { useRouterContext } from "../contexts/RouterContext";
 
-export const Home: FC = () => {
+export const Home = () => {
   const navigate = useNavigate();
   useAppbarText("Love Pebble");
+  const { setNewRoomCode } = useRouterContext();
 
   const [roomCode, setRoomCode] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleRoomCodeChange = (code: string) => {
     setError(false);
@@ -16,15 +19,18 @@ export const Home: FC = () => {
   };
 
   const handleNewRoomClick = () => {
+    setLoading(true);
     fetch("/api/newRoom")
       .then((res) => res.text())
-      .then((roomCode) => {
-        navigate(`/room/${roomCode}`);
+      .then((newRoomCode) => {
+        setNewRoomCode(newRoomCode);
+        navigate(`/room/${newRoomCode}`);
       });
   };
 
   useEffect(() => {
     if (roomCode.length === 4 && !error) {
+      setLoading(true);
       fetch(`/api/checkRoom?roomCode=${roomCode}`)
         .then((res) => res.text())
         .then((data) => {
@@ -33,6 +39,7 @@ export const Home: FC = () => {
             navigate(`/room/${roomCode}`);
           } else {
             setError(!isValidRoom);
+            setLoading(false);
           }
         });
     }
@@ -43,9 +50,10 @@ export const Home: FC = () => {
       <Text textAlign="left" width="full">
         Content
       </Text>
+      <Divider />
       <Box display="flex" flexDirection="column" alignItems="center" gap="4">
         <Text>Already have a room code? Type/paste it here.</Text>
-        <Box>
+        <Box display="flex" gap="2">
           <PinInput
             autoFocus
             onChange={handleRoomCodeChange}
@@ -67,7 +75,14 @@ export const Home: FC = () => {
           </Alert>
         </Collapse>
       </Box>
-      <Button onClick={handleNewRoomClick}>Start a new room</Button>
+      <Box display="flex" width="full" alignItems="center" gap="3">
+        <Divider />
+        <Text>or</Text>
+        <Divider />
+      </Box>
+      <Button size="lg" isLoading={loading} onClick={handleNewRoomClick}>
+        Start a New Room
+      </Button>
     </>
   );
 };

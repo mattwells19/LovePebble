@@ -4,6 +4,7 @@ import { extendTheme, ChakraProvider } from "@chakra-ui/react";
 import { Layout } from "./Layout";
 import { BrowserRouter } from "react-router-dom";
 import { AppbarProvider } from "./contexts/AppbarContext";
+import { RouterProvider } from "./contexts/RouterContext";
 
 const theme = extendTheme({
   config: {
@@ -40,9 +41,11 @@ ReactDOM.render(
   <React.StrictMode>
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-        <AppbarProvider>
-          <Layout />
-        </AppbarProvider>
+        <RouterProvider>
+          <AppbarProvider>
+            <Layout />
+          </AppbarProvider>
+        </RouterProvider>
       </BrowserRouter>
     </ChakraProvider>
   </React.StrictMode>,

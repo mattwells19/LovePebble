@@ -1,28 +1,15 @@
-import { List, ListItem } from "@chakra-ui/react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { Game } from "../components/Game";
+import { Lobby } from "../components/Lobby";
 import { useAppbarText } from "../hooks/useAppbarText";
-import { useWebSocket } from "../hooks/useWebSocket";
+import { useDocTitle } from "../hooks/useDocTitle";
 
 export const Room = () => {
-  const navigate = useNavigate();
   const { roomCode = "" } = useParams();
-
-  if (roomCode === "") {
-    navigate("/");
-  }
-
-  const { players } = useWebSocket(roomCode);
   useAppbarText(roomCode);
+  useDocTitle(roomCode);
 
-  console.log(players);
+  const gameStarted = false;
 
-  return (
-    <>
-      <List>
-        {Array.from(players, ([playerId, player]) => (
-          <ListItem key={playerId}>{player.name}</ListItem>
-        ))}
-      </List>
-    </>
-  );
+  return gameStarted ? <Game /> : <Lobby roomCode={roomCode} />;
 };

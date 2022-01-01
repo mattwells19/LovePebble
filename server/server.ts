@@ -1,6 +1,6 @@
 import { config } from "./deps.ts";
 import { registerSocketHandlers } from "./services/socket.ts";
-import { checkRoomCode, createNewRoom } from "./services/rooms.ts";
+import { checkRoomCode, getNewRoomCode } from "./services/rooms.ts";
 
 const env = config();
 const PORT = Number(env.PORT) || 3001;
@@ -35,7 +35,7 @@ function handle(req: Request): Response {
           return new Response(JSON.stringify(checkRoomCode(roomCode)));
         }
         case "/api/newRoom": {
-          const roomCode = createNewRoom();
+          const roomCode = getNewRoomCode();
           return new Response(roomCode);
         }
       }
