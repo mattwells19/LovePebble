@@ -14,7 +14,6 @@
     }
   },
   "plugins": ["react"],
-  "ignorePatterns": "**/snowpack.config.js",
   "rules": {
     "react/prop-types": "off",
     "react/display-name": "off"
