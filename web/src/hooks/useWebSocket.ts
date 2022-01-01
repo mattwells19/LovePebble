@@ -20,9 +20,9 @@ export function useWebSocket(): UseWebSocketResult {
     websocket.addEventListener("open", () => {
       websocket.send(
         JSON.stringify({
-          type: "join",
-          roomCode,
           playerName: localStorage.getItem("playerName"),
+          roomCode,
+          type: "join",
         }),
       );
     });

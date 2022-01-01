@@ -7,18 +7,14 @@ import { AppbarProvider } from "./contexts/AppbarContext";
 import { RouterProvider } from "./contexts/RouterContext";
 
 const theme = extendTheme({
-  config: {
-    initialColorMode: "dark",
-    useSystemColorMode: false,
-  },
   colors: {
     main: {
       darkPurple: "#232131",
-      regularPurple: "#2C2A41",
-      lightPurple: "#383651",
-      greyText: "#B9B9B9",
       greyAccent: "#4E4C60",
+      greyText: "#B9B9B9",
+      lightPurple: "#383651",
       primaryOrange: "#ED9B60",
+      regularPurple: "#2C2A41",
     },
   },
   components: {
@@ -27,6 +23,10 @@ const theme = extendTheme({
         colorScheme: "orange",
       },
     },
+  },
+  config: {
+    initialColorMode: "dark",
+    useSystemColorMode: false,
   },
   styles: {
     global: {
