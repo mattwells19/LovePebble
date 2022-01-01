@@ -28,15 +28,14 @@ export function useWebSocket(): UseWebSocketResult {
     });
 
     websocket.addEventListener("message", (msg: MessageEvent<string>) => {
-      // TODO: need to setup proper types
-      const data: { type: string; data: any } = JSON.parse(msg.data);
+      const socketMsg: SocketMessage = JSON.parse(msg.data);
 
-      switch (data.type) {
+      switch (socketMsg.type) {
         case SocketOutgoing.Connected:
-          setCurrentPlayerId(data.data);
+          setCurrentPlayerId(socketMsg.data);
           break;
         case SocketOutgoing.PlayerUpdate:
-          setPlayers(new Map(data.data));
+          setPlayers(new Map(socketMsg.data));
           break;
       }
     });
@@ -52,3 +51,15 @@ export function useWebSocket(): UseWebSocketResult {
 
   return { currentPlayerId, players };
 }
+
+type SocketMessage = ConnectedEvent | PlayerUpdateEvent;
+
+type ConnectedEvent = {
+  type: SocketOutgoing.Connected;
+  data: PlayerId;
+};
+
+type PlayerUpdateEvent = {
+  type: SocketOutgoing.PlayerUpdate;
+  data: readonly [string, Player][];
+};

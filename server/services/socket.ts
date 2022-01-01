@@ -18,6 +18,16 @@ export function registerSocketHandlers(socket: WebSocket) {
 
     if (roomId) {
       removePlayerFromRoom(roomId, playerId);
+
+      const room = Rooms.get(roomId);
+      if (room) {
+        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
+        sendMessageToRoom<(PlayerId | Player)[][]>(roomId, {
+          type: SocketOutgoing.PlayerUpdate,
+          data: updatedPlayerList,
+        });
+      }
+
       roomId = null;
     }
   };
