@@ -11,6 +11,19 @@ export const enum Card {
   Princess,
 }
 
+export const StandardDeck: Array<Card> = [
+  ...Array(2).fill(Card.Spy),
+  ...Array(6).fill(Card.Guard),
+  ...Array(2).fill(Card.Priest),
+  ...Array(2).fill(Card.Baron),
+  ...Array(2).fill(Card.Handmaid),
+  ...Array(2).fill(Card.Prince),
+  ...Array(2).fill(Card.Chancellor),
+  ...Array(1).fill(Card.King),
+  ...Array(1).fill(Card.Countess),
+  ...Array(1).fill(Card.Princess),
+];
+
 export type PlayerId = Readonly<string>;
 
 export interface Player {

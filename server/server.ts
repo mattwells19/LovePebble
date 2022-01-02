@@ -56,7 +56,7 @@ function handle(req: Request): Response {
 }
 
 const listener = Deno.listen({ port: PORT });
-console.log(`Listening on http://localhost:${PORT}`);
+console.info(`Listening on http://localhost:${PORT}`);
 for await (const conn of listener) {
   handleConn(conn);
 }
