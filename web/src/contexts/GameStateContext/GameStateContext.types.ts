@@ -10,14 +10,10 @@ export type ConnectedEvent = {
 
 export type PlayerUpdateEvent = {
   type: SocketOutgoing.PlayerUpdate;
-  data: readonly [string, Player][];
+  data: [PlayerId, Player][];
 };
-
-export interface GameStateUpdateData extends Omit<OutgoingGameStateUpdate, "players"> {
-  players: readonly [string, Player][];
-}
 
 export type GameStateUpdate = {
   type: SocketOutgoing.GameUpdate;
-  data: GameStateUpdateData;
+  data: OutgoingGameStateUpdate;
 };

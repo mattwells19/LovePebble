@@ -1,36 +1,41 @@
 import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
-import { Card, GameData, Player, PlayerId, RoomData, StandardDeck } from "../types/types.ts";
+import { Player, PlayerId } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
-import { shuffle } from "../utils.ts";
-import { OutgoingGameStateUpdate } from "../types/socket.types.ts";
+import * as socketActions from "./socketActions.ts";
+
+export interface SocketData {
+  playerId: PlayerId;
+  roomId: string | null;
+}
 
 export function registerSocketHandlers(socket: WebSocket) {
-  const playerId: PlayerId = crypto.randomUUID();
-  let roomId: string | null = null;
+  const socketData: SocketData = {
+    playerId: crypto.randomUUID(),
+    roomId: null,
+  };
 
   socket.onopen = () => {
-    Sockets.set(playerId, socket);
-    sendToSocket<string>({ type: SocketOutgoing.Connected, data: playerId });
+    Sockets.set(socketData.playerId, socket);
+    sendToSocket<string>({ type: SocketOutgoing.Connected, data: socketData.playerId });
   };
 
   socket.onclose = () => {
-    Sockets.delete(playerId);
+    Sockets.delete(socketData.playerId);
 
-    if (roomId) {
-      removePlayerFromRoom(roomId, playerId);
+    if (socketData.roomId) {
+      removePlayerFromRoom(socketData.roomId, socketData.playerId);
 
-      const room = Rooms.get(roomId);
+      const room = Rooms.get(socketData.roomId);
       if (room) {
-        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
-        sendMessageToRoom<(PlayerId | Player)[][]>(roomId, {
+        sendMessageToRoom<[PlayerId, Player][]>(socketData.roomId, {
           type: SocketOutgoing.PlayerUpdate,
-          data: updatedPlayerList,
+          data: Array.from(room.players),
         });
       }
 
-      roomId = null;
+      socketData.roomId = null;
     }
   };
 
@@ -42,85 +47,25 @@ export function registerSocketHandlers(socket: WebSocket) {
         const { roomCode, playerName } = data;
 
         const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
-        if (roomId) {
-          removePlayerFromRoom(roomId, playerId);
+        if (socketData.roomId) {
+          removePlayerFromRoom(socketData.roomId, socketData.playerId);
         }
-        roomId = roomCode;
+        socketData.roomId = roomCode;
 
-        // add the new player to the room
-        const newPlayer: Player = {
-          cards: [],
-          gameScore: 0,
-          handmaidProtected: false,
-          name: playerName,
-          outOfRound: false,
-        };
-        room.players.set(playerId, newPlayer);
-
-        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
-        sendMessageToRoom<(PlayerId | Player)[][]>(roomCode, {
-          data: updatedPlayerList,
-          type: SocketOutgoing.PlayerUpdate,
-        });
+        const joinResult = socketActions.join(socketData, room, playerName);
+        sendMessageToRoom(roomCode, joinResult);
         break;
       }
-      case SocketIncoming.StartGame: {
-        const roomCode = roomId ?? "";
+      case SocketIncoming.StartGame:
+        const roomCode = socketData.roomId ?? "";
         const room = Rooms.get(roomCode);
         if (!room) {
-          throw new Error(`Room does not exist ${roomId}.`);
+          throw new Error(`Room does not exist ${socketData.roomId}.`);
         }
 
-        const updatedGameState: GameData = {
-          cardPlayed: null,
-          details: null,
-          playerTurnId: room.players.keys().next().value,
-          started: true,
-          winningSpyPlayerId: null,
-        };
-
-        const deck = shuffle(StandardDeck);
-
-        switch (room.players.size) {
-          case 2:
-            deck.pop();
-            deck.pop();
-          /* falls through */
-          default:
-            deck.pop();
-        }
-
-        const updatedPlayers = new Map(room.players);
-        updatedPlayers.forEach((player: Player, id: PlayerId) => {
-          const playerHand: Array<Card> = [];
-
-          // guaranteed to have enough cards so that pop is always safe here
-          playerHand.push(deck.pop()!);
-          if (updatedGameState.playerTurnId === id) playerHand.push(deck.pop()!);
-
-          room.players.set(id, {
-            ...player,
-            cards: playerHand,
-          });
-        });
-
-        const updatedRoomData: RoomData = {
-          deck,
-          game: updatedGameState,
-          players: updatedPlayers,
-        };
-
-        Rooms.set(roomCode, updatedRoomData);
-
-        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
-        const gameData: OutgoingGameStateUpdate = {
-          deckCount: deck.length,
-          game: updatedGameState,
-          players: updatedPlayerList,
-        };
-        sendMessageToRoom<OutgoingGameStateUpdate>(roomCode, { data: gameData, type: SocketOutgoing.GameUpdate });
+        const startGameResult = socketActions.startGame(roomCode, room);
+        sendMessageToRoom(roomCode, startGameResult);
         break;
-      }
       case SocketIncoming.PlayCard:
         break;
       case SocketIncoming.SelectCard:
