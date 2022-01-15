@@ -23,15 +23,15 @@ async function handleConn(conn: Deno.Conn): Promise<void> {
 }
 
 function handle(req: Request): Response {
-  if (req.headers.get("upgrade") === "websocket") {
+  const url = new URL(req.url);
+
+  if (url.pathname === "/socket" && req.headers.get("upgrade") === "websocket") {
     const { socket, response } = Deno.upgradeWebSocket(req);
     registerSocketHandlers(socket);
 
     return response;
   } else {
     if (req.method === "GET") {
-      const url = new URL(req.url);
-
       switch (url.pathname) {
         case "/api/checkRoom": {
           const roomCode = url.searchParams.get("roomCode");

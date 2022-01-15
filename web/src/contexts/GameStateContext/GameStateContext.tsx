@@ -32,7 +32,7 @@ export const GameStateProvider: FC = ({ children }) => {
   };
 
   useEffect(() => {
-    webscoketRef.current = new WebSocket("ws://localhost:3001");
+    webscoketRef.current = new WebSocket(`ws://${location.host}/socket`);
 
     webscoketRef.current.addEventListener("open", () => {
       webscoketRef.current?.send(
