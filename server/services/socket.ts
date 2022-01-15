@@ -56,7 +56,7 @@ export function registerSocketHandlers(socket: WebSocket) {
         sendMessageToRoom(roomCode, joinResult);
         break;
       }
-      case SocketIncoming.StartGame:
+      case SocketIncoming.StartGame: {
         const roomCode = socketData.roomId ?? "";
         const room = Rooms.get(roomCode);
         if (!room) {
@@ -66,6 +66,7 @@ export function registerSocketHandlers(socket: WebSocket) {
         const startGameResult = socketActions.startGame(roomCode, room);
         sendMessageToRoom(roomCode, startGameResult);
         break;
+      }
       case SocketIncoming.PlayCard:
         break;
       case SocketIncoming.SelectCard:
