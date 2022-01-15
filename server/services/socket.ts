@@ -3,32 +3,39 @@ import { Player, PlayerId } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
+import * as socketActions from "./socketActions.ts";
+
+export interface SocketData {
+  playerId: PlayerId;
+  roomId: string | null;
+}
 
 export function registerSocketHandlers(socket: WebSocket) {
-  const playerId: PlayerId = crypto.randomUUID();
-  let roomId: string | null = null;
+  const socketData: SocketData = {
+    playerId: crypto.randomUUID(),
+    roomId: null,
+  };
 
   socket.onopen = () => {
-    Sockets.set(playerId, socket);
-    sendToSocket<string>({ type: SocketOutgoing.Connected, data: playerId });
+    Sockets.set(socketData.playerId, socket);
+    sendToSocket<string>({ type: SocketOutgoing.Connected, data: socketData.playerId });
   };
 
   socket.onclose = () => {
-    Sockets.delete(playerId);
+    Sockets.delete(socketData.playerId);
 
-    if (roomId) {
-      removePlayerFromRoom(roomId, playerId);
+    if (socketData.roomId) {
+      removePlayerFromRoom(socketData.roomId, socketData.playerId);
 
-      const room = Rooms.get(roomId);
+      const room = Rooms.get(socketData.roomId);
       if (room) {
-        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
-        sendMessageToRoom<(PlayerId | Player)[][]>(roomId, {
+        sendMessageToRoom<[PlayerId, Player][]>(socketData.roomId, {
           type: SocketOutgoing.PlayerUpdate,
-          data: updatedPlayerList,
+          data: Array.from(room.players),
         });
       }
 
-      roomId = null;
+      socketData.roomId = null;
     }
   };
 
@@ -40,26 +47,24 @@ export function registerSocketHandlers(socket: WebSocket) {
         const { roomCode, playerName } = data;
 
         const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
-        if (roomId) {
-          removePlayerFromRoom(roomId, playerId);
+        if (socketData.roomId) {
+          removePlayerFromRoom(socketData.roomId, socketData.playerId);
         }
-        roomId = roomCode;
+        socketData.roomId = roomCode;
 
-        // add the new player to the room
-        const newPlayer: Player = {
-          cards: [],
-          gameScore: 0,
-          handmaidProtected: false,
-          name: playerName,
-          outOfRound: false,
-        };
-        room.players.set(playerId, newPlayer);
+        const joinResult = socketActions.join(socketData, room, playerName);
+        sendMessageToRoom(roomCode, joinResult);
+        break;
+      }
+      case SocketIncoming.StartGame: {
+        const roomCode = socketData.roomId ?? "";
+        const room = Rooms.get(roomCode);
+        if (!room) {
+          throw new Error(`Room does not exist ${socketData.roomId}.`);
+        }
 
-        const updatedPlayerList = Array.from(room.players, ([playerId, playerDetails]) => [playerId, playerDetails]);
-        sendMessageToRoom<(PlayerId | Player)[][]>(roomCode, {
-          type: SocketOutgoing.PlayerUpdate,
-          data: updatedPlayerList,
-        });
+        const startGameResult = socketActions.startGame(roomCode, room);
+        sendMessageToRoom(roomCode, startGameResult);
         break;
       }
       case SocketIncoming.PlayCard:

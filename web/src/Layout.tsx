@@ -1,6 +1,7 @@
 import { Box, Spinner } from "@chakra-ui/react";
 import { Route, Routes, Navigate, useParams } from "react-router-dom";
 import { Appbar } from "./components/Appbar";
+import { GameStateProvider } from "./contexts/GameStateContext";
 import { useValidateRoom } from "./hooks/useValidateRoom";
 import { Home } from "./pages/Home";
 import { PlayerName } from "./pages/PlayerName";
@@ -40,7 +41,14 @@ export const Layout = () => {
         <Routes>
           <Route index element={<Home />} />
           <Route path="/name" element={<PlayerName />} />
-          <Route path="/room/:roomCode" element={<RoomRouterSwitch />} />
+          <Route
+            path="/room/:roomCode"
+            element={
+              <GameStateProvider>
+                <RoomRouterSwitch />
+              </GameStateProvider>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Box>

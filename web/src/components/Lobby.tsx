@@ -13,8 +13,9 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { SocketIncoming } from "../../../server/types/socket.types";
+import { useGameState } from "../contexts/GameStateContext";
 import { useRouterContext } from "../contexts/RouterContext";
-import { useWebSocket } from "../hooks/useWebSocket";
 import EditIcon from "../icons/EditIcon";
 
 interface LobbyProps {
@@ -23,10 +24,11 @@ interface LobbyProps {
 
 export const Lobby = ({ roomCode }: LobbyProps) => {
   const { setNewRoomCode } = useRouterContext();
-  const { players, currentPlayerId } = useWebSocket();
+  const { players, currentPlayerId, sendGameUpdate } = useGameState();
 
   const handleStartGame = () => {
     setNewRoomCode(null);
+    sendGameUpdate({ type: SocketIncoming.StartGame });
   };
 
   return (

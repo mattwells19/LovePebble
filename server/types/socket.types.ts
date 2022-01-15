@@ -1,7 +1,8 @@
-import { Card, PlayerId } from "./types.ts";
+import { Card, GameData, Player, PlayerId } from "./types.ts";
 
 export const enum SocketIncoming {
   Join = "join",
+  StartGame = "startGame",
   PlayCard = "playCard", // when a user chooses a card to play on their turn
   SelectPlayer = "selectPlayer",
   SelectCard = "selectCard", // when user selects a card for an action
@@ -12,10 +13,21 @@ export const enum SocketIncoming {
 export const enum SocketOutgoing {
   PlayerUpdate = "playersUpdate",
   Connected = "connected",
+  GameUpdate = "gameUpdate",
+}
+
+export interface OutgoingGameStateUpdate {
+  deckCount: number;
+  players: [PlayerId, Player][];
+  game: GameData;
 }
 
 export interface SocketEvent {
   type: SocketIncoming;
+}
+
+export interface StartGameEvent extends SocketEvent {
+  type: SocketIncoming.StartGame;
 }
 
 export interface JoinEvent extends SocketEvent {
@@ -49,6 +61,7 @@ export interface AcknowledgeActionEvent extends SocketEvent {
 
 export type SocketMessage =
   | JoinEvent
+  | StartGameEvent
   | PlayCardEvent
   | SelectCardEvent
   | SelectPlayerEvent

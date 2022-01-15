@@ -2,8 +2,16 @@
   "env": {
     "browser": true
   },
-  "extends": ["plugin:react/recommended", "plugin:react/jsx-runtime", "../.eslintrc"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
     }
@@ -13,9 +21,15 @@
       "version": "detect"
     }
   },
-  "plugins": ["react"],
+  "plugins": ["react", "@typescript-eslint"],
   "rules": {
     "react/prop-types": "off",
-    "react/display-name": "off"
+    "react/display-name": "off",
+    "indent": ["error", 2, { "SwitchCase": 1, "ObjectExpression": 1, "ArrayExpression": 1, "ImportDeclaration": 1 }],
+    "quotes": ["error", "double"],
+    "semi": ["error", "always"],
+    "max-len": ["error", 120],
+    "sort-keys": ["error"],
+    "no-console": ["warn", { "allow": ["info", "error", "warn"] }]
   }
 }
