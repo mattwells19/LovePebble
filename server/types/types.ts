@@ -128,6 +128,7 @@ export type GameData =
 
 export interface RoomData {
   deck: Array<Card>;
+  discard: Array<Card>;
   players: Map<PlayerId, Player>;
   game: GameData;
 }

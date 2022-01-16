@@ -41,14 +41,17 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
   };
 
   const deck = shuffle(StandardDeck);
+  const discard: Array<Card> = [];
 
   switch (room.players.size) {
+    // since this is the start of the game, we are guaranteed to have enough cards
+    // for even the max number of players so pop is always safe here
     case 2:
-      deck.pop();
-      deck.pop();
+      discard.push(deck.pop()!);
+      discard.push(deck.pop()!);
     /* falls through */
     default:
-      deck.pop();
+      discard.push(deck.pop()!);
   }
 
   const updatedPlayers = new Map(room.players);
@@ -72,6 +75,7 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
 
   const updatedRoomData: RoomData = {
     deck,
+    discard,
     game: updatedGameState,
     players: updatedPlayers,
   };
@@ -79,6 +83,7 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
 
   const gameData: OutgoingGameStateUpdate = {
     deckCount: deck.length,
+    discard,
     game: updatedGameState,
     players: Array.from(updatedPlayers),
   };

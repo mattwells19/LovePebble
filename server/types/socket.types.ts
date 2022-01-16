@@ -18,6 +18,7 @@ export const enum SocketOutgoing {
 
 export interface OutgoingGameStateUpdate {
   deckCount: number;
+  discard: Array<Card>;
   players: [PlayerId, Player][];
   game: GameData;
 }
