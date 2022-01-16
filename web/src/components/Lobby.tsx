@@ -13,10 +13,10 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { SocketIncoming } from "../../../../server/types/socket.types";
-import { useGameState } from "../../contexts/GameStateContext";
-import { useRouterContext } from "../../contexts/RouterContext";
-import EditIcon from "../../icons/EditIcon";
+import { SocketIncoming } from "../../../server/types/socket.types";
+import { useGameState } from "../contexts/GameStateContext";
+import { useRouterContext } from "../contexts/RouterContext";
+import EditIcon from "../icons/EditIcon";
 
 interface LobbyProps {
   roomCode: string;
