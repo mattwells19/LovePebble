@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertExists } from "https://deno.land/std@0.119.0/testing/asserts.ts";
+import { assert, assertEquals, assertExists } from "../../deps.ts";
 import { Sockets } from "../../repositories/Sockets.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { registerSocketHandlers } from "../socket.ts";

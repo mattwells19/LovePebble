@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Box, Heading } from "@chakra-ui/react";
 import { useGameState } from "../../contexts/GameStateContext";
 import { CharacterCard } from "../../components/CharacterCard";
 import { Label } from "../../components/Label";
 import { Deck } from "../../components/Deck";
+import { DiscardDrawer } from "../../components/DiscardDrawer";
 
 export const Game = () => {
-  const { deckCount, currentPlayerId, gameState, players } = useGameState();
+  const { deckCount, currentPlayerId, gameState, players, discard } = useGameState();
+  const [showDiscardDrawer, setShowDiscardDrawer] = useState<boolean>(false);
 
   if (!gameState) throw new Error("No game state on the game screen.");
 
@@ -23,7 +26,12 @@ export const Game = () => {
         </Box>
         <Box display="flex" flexDirection="column" gap="1">
           <Label>Discard</Label>
-          <CharacterCard />
+          <CharacterCard
+            button
+            title="Show discard pile."
+            character={discard[0]}
+            onClick={() => setShowDiscardDrawer(true)}
+          />
         </Box>
       </Box>
       <Box display="flex" flexDirection="column" gap="1">
@@ -34,6 +42,7 @@ export const Game = () => {
           ))}
         </Box>
       </Box>
+      <DiscardDrawer open={showDiscardDrawer} onClose={() => setShowDiscardDrawer(false)} />
     </>
   );
 };

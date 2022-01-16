@@ -1,15 +1,13 @@
-import { createContext, FC, useContext, useEffect, useRef, useState } from "react";
+import { createContext, FC, useContext, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  SocketIncoming,
-  SocketOutgoing,
-  SocketMessage as OutboundSocketMessage,
-} from "../../../../server/types/socket.types";
-import { PlayerId, Player, GameData } from "../../../../server/types/types";
+import { SocketIncoming, SocketMessage as OutboundSocketMessage } from "../../../../server/types/socket.types";
+import { PlayerId, Player, GameData, Card } from "../../../../server/types/types";
 import { SocketMessage } from "./GameStateContext.types";
+import { useGameStateReducer } from "./useGameStateReducer";
 
 interface GameStateContextValue {
   players: Map<PlayerId, Player>;
+  discard: Array<Card | "Hidden">;
   currentPlayerId: PlayerId;
   sendGameUpdate: (msg: OutboundSocketMessage) => void;
   deckCount: number;
@@ -21,13 +19,15 @@ const GameStateContext = createContext<GameStateContextValue | null>(null);
 export const GameStateProvider: FC = ({ children }) => {
   const navigate = useNavigate();
   const { roomCode = "" } = useParams();
-  const [currentPlayerId, setCurrentPlayerId] = useState<PlayerId>("");
-  const [players, setPlayers] = useState<Map<PlayerId, Player>>(new Map());
-  const [deckCount, setDeckCount] = useState<number>(0);
-  const [gameState, setGameState] = useState<GameData | null>(null);
+  const [roomGameState, dispatch] = useGameStateReducer();
+  const roomSizeRef = useRef<number>(1);
   const webscoketRef = useRef<WebSocket | null>(null);
 
   const sendGameUpdate = (msg: OutboundSocketMessage) => {
+    if (msg.type === SocketIncoming.StartGame) {
+      roomSizeRef.current = roomGameState.players.size;
+    }
+
     webscoketRef.current?.send(JSON.stringify(msg));
   };
 
@@ -46,20 +46,7 @@ export const GameStateProvider: FC = ({ children }) => {
 
     webscoketRef.current.addEventListener("message", (msg: MessageEvent<string>) => {
       const socketMsg: SocketMessage = JSON.parse(msg.data);
-
-      switch (socketMsg.type) {
-        case SocketOutgoing.Connected:
-          setCurrentPlayerId(socketMsg.data);
-          break;
-        case SocketOutgoing.PlayerUpdate:
-          setPlayers(new Map(socketMsg.data));
-          break;
-        case SocketOutgoing.GameUpdate:
-          setPlayers(new Map(socketMsg.data.players));
-          setDeckCount(socketMsg.data.deckCount);
-          setGameState(socketMsg.data.game);
-          break;
-      }
+      dispatch(socketMsg);
     });
 
     webscoketRef.current.addEventListener("error", () => {
@@ -72,8 +59,32 @@ export const GameStateProvider: FC = ({ children }) => {
     };
   }, []);
 
+  /**
+   * We don't want to show which cards are auto-removed from the deck when a game starts.
+   * 2 players removes 3 cards; > 2 players removes 1 so replace the auto removed cards
+   * with "Hidden".
+   */
+  const discardWithHidden: Array<Card | "Hidden"> = roomGameState.discard
+    .map((card, index) => {
+      if (roomGameState.gameState?.started && roomSizeRef.current < 2) {
+        throw new Error("Game started with less than 2 players which should be impossible.");
+      }
+
+      if ((roomSizeRef.current === 2 && index < 3) || (roomSizeRef.current > 2 && index === 0)) {
+        return "Hidden";
+      } else {
+        return card;
+      }
+    })
+    /**
+     * Discard pile is reversed when sent from the backend so the most recent discard
+     * is on the bottom (last index). Reverse the order so that the top card is the most
+     * recently played. Makes it easier when displaying the discard pile
+     */
+    .reverse();
+
   return (
-    <GameStateContext.Provider value={{ currentPlayerId, deckCount, gameState, players, sendGameUpdate }}>
+    <GameStateContext.Provider value={{ ...roomGameState, discard: discardWithHidden, sendGameUpdate }}>
       {children}
     </GameStateContext.Provider>
   );

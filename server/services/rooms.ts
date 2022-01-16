@@ -22,6 +22,7 @@ export function createRoomWithCode(roomCode: string): RoomData {
   } else {
     Rooms.set(roomCode, {
       deck: [],
+      discard: [],
       game: {
         started: false,
         playerTurnId: null,
