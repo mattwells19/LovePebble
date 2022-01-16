@@ -40,7 +40,7 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
     winningSpyPlayerId: null,
   };
 
-  const deck = shuffle(StandardDeck);
+  const deck = shuffle(StandardDeck.slice());
   const discard: Array<Card> = [];
 
   switch (room.players.size) {

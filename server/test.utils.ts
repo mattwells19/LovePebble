@@ -37,6 +37,7 @@ export function createNewRoom(): string {
 
   Rooms.set(newRoomCode, {
     deck: [],
+    discard: [],
     game: {
       started: false,
       playerTurnId: null,

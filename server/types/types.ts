@@ -11,7 +11,7 @@ export const enum Card {
   Princess,
 }
 
-export const StandardDeck: Array<Card> = [
+export const StandardDeck: ReadonlyArray<Card> = [
   ...Array(2).fill(Card.Spy),
   ...Array(6).fill(Card.Guard),
   ...Array(2).fill(Card.Priest),
