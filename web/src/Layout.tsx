@@ -11,12 +11,14 @@ const RoomRouterSwitch = () => {
   const { roomCode = "" } = useParams();
   const validRoom = useValidateRoom(roomCode);
 
+  // make sure room exists; otherwise, redirect back to index page
   if (roomCode === "" || validRoom === "invalid") {
     return <Navigate to="/" />;
   } else if (validRoom === "pending") {
     return <Spinner />;
   }
 
+  // if player hasn't set a name redirect to PlayerName
   if (localStorage.getItem("playerName")) {
     return <Room />;
   } else {
