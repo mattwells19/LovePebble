@@ -7,7 +7,7 @@ import { Deck } from "../../components/Deck";
 import { DiscardDrawer } from "../../components/DiscardDrawer";
 
 export const Game = () => {
-  const { deckCount, currentPlayerId, gameState, players } = useGameState();
+  const { deckCount, currentPlayerId, gameState, players, discard } = useGameState();
   const [showDiscardDrawer, setShowDiscardDrawer] = useState<boolean>(false);
 
   if (!gameState) throw new Error("No game state on the game screen.");
@@ -26,7 +26,12 @@ export const Game = () => {
         </Box>
         <Box display="flex" flexDirection="column" gap="1">
           <Label>Discard</Label>
-          <CharacterCard button onClick={() => setShowDiscardDrawer(true)} />
+          <CharacterCard
+            button
+            title="Show discard pile."
+            character={discard[0]}
+            onClick={() => setShowDiscardDrawer(true)}
+          />
         </Box>
       </Box>
       <Box display="flex" flexDirection="column" gap="1">

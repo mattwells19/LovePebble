@@ -2,7 +2,11 @@ import { Box, BoxProps, Text } from "@chakra-ui/react";
 import { Card } from "../../../server/types/types";
 
 interface CharacterCardProps extends BoxProps {
-  character?: Card;
+  /**
+   * The character to show.
+   * @default "Hidden" which will show face down.
+   */
+  character?: Card | "Hidden";
   button?: boolean;
 }
 
@@ -19,7 +23,7 @@ const Characters = [
   "Princess",
 ];
 
-export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps) => {
+export const CharacterCard = ({ character = "Hidden", button, ...rest }: CharacterCardProps) => {
   return (
     <Box
       as={button ? "button" : undefined}
@@ -31,8 +35,7 @@ export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps
       placeItems="center"
       {...rest}
     >
-      {/* Need to be explicit since a Spy has a value of 0 which would be falsey */}
-      {character !== undefined ? (
+      {character !== "Hidden" ? (
         <Text fontWeight="bold" color="black">
           {Characters[character]} - {character}
         </Text>

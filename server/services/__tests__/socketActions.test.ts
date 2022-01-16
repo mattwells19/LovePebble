@@ -1,8 +1,8 @@
-import { assert, assertEquals, assertExists, assertObjectMatch, assertArrayIncludes, assertMatch } from "../../deps.ts";
+import { assert, assertEquals, assertExists, assertObjectMatch } from "../../deps.ts";
 import * as socketActions from "../socketActions.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { testCleanup } from "../../test.utils.ts";
-import { Card, Player, PlayerId, RoomData, StandardDeck } from "../../types/types.ts";
+import { Player, PlayerId, RoomData, StandardDeck } from "../../types/types.ts";
 import { SocketOutgoing } from "../../types/socket.types.ts";
 
 Deno.test("player can join a room", () => {

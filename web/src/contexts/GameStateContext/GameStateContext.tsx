@@ -62,19 +62,26 @@ export const GameStateProvider: FC = ({ children }) => {
   /**
    * We don't want to show which cards are auto-removed from the deck when a game starts.
    * 2 players removes 3 cards; > 2 players removes 1 so replace the auto removed cards
-   * with "Hidden"
+   * with "Hidden".
    */
-  const discardWithHidden: Array<Card | "Hidden"> = roomGameState.discard.map((card, index) => {
-    if (roomGameState.gameState?.started && roomSizeRef.current < 2) {
-      throw new Error("Game started with less than 2 players which should be impossible.");
-    }
+  const discardWithHidden: Array<Card | "Hidden"> = roomGameState.discard
+    .map((card, index) => {
+      if (roomGameState.gameState?.started && roomSizeRef.current < 2) {
+        throw new Error("Game started with less than 2 players which should be impossible.");
+      }
 
-    if ((roomSizeRef.current === 2 && index < 3) || (roomSizeRef.current > 2 && index === 0)) {
-      return "Hidden";
-    } else {
-      return card;
-    }
-  });
+      if ((roomSizeRef.current === 2 && index < 3) || (roomSizeRef.current > 2 && index === 0)) {
+        return "Hidden";
+      } else {
+        return card;
+      }
+    })
+    /**
+     * Discard pile is reversed when sent from the backend so the most recent discard
+     * is on the bottom (last index). Reverse the order so that the top card is the most
+     * recently played. Makes it easier when displaying the discard pile
+     */
+    .reverse();
 
   return (
     <GameStateContext.Provider value={{ ...roomGameState, discard: discardWithHidden, sendGameUpdate }}>
