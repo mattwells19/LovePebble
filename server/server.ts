@@ -1,10 +1,8 @@
-import { config } from "./deps.ts";
 import { registerSocketHandlers } from "./services/socket.ts";
 import { checkRoomCode, getNewRoomCode } from "./services/rooms.ts";
 import { serveStatic } from "./static.ts";
 
-const env = config();
-const PORT = Number(env.PORT) || 3001;
+const PORT = Number(Deno.env.get("PORT")) || 3001;
 
 async function handleConn(conn: Deno.Conn): Promise<void> {
   const httpConn = Deno.serveHttp(conn);
@@ -60,7 +58,7 @@ async function handle(req: Request): Promise<Response> {
 }
 
 const listener = Deno.listen({ port: PORT });
-console.info(`Listening on http://localhost:${PORT}`);
+console.info(`Listening on port ${PORT}`);
 for await (const conn of listener) {
   handleConn(conn);
 }
