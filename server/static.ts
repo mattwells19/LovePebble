@@ -8,6 +8,7 @@ export async function serveStatic(url: URL): Promise<Response | null> {
         },
       });
     } catch (e) {
+      console.error(e);
       return new Response(null, {
         status: 404,
       });
@@ -21,6 +22,7 @@ export async function serveStatic(url: URL): Promise<Response | null> {
         },
       });
     } catch (e) {
+      console.error(e);
       return new Response(null, {
         status: 404,
       });
