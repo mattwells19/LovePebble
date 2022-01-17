@@ -32,7 +32,8 @@ export const GameStateProvider: FC = ({ children }) => {
   };
 
   useEffect(() => {
-    webscoketRef.current = new WebSocket(`ws://${location.host}/socket`);
+    const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
+    webscoketRef.current = new WebSocket(`${wsProtocol}://${location.host}/socket`);
 
     webscoketRef.current.addEventListener("open", () => {
       webscoketRef.current?.send(

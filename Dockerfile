@@ -25,4 +25,4 @@ COPY --from=build /usr/app/server /usr/app
 WORKDIR /usr/app
 
 # Run prod command when running container
-CMD ["deno", "run", "--allow-net", "--allow-read=./build,.env,.env.defaults", "--allow-env", "server.ts"]
+CMD ["deno", "run", "--allow-net", "--allow-read=./build", "--allow-env", "server.ts"]
