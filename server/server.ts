@@ -1,6 +1,7 @@
 import { config } from "./deps.ts";
 import { registerSocketHandlers } from "./services/socket.ts";
 import { checkRoomCode, getNewRoomCode } from "./services/rooms.ts";
+import { serveStatic } from "./static.ts";
 
 const env = config();
 const PORT = Number(env.PORT) || 3001;
@@ -22,7 +23,7 @@ async function handleConn(conn: Deno.Conn): Promise<void> {
   }
 }
 
-function handle(req: Request): Response {
+async function handle(req: Request): Promise<Response> {
   const url = new URL(req.url);
 
   if (url.pathname === "/socket" && req.headers.get("upgrade") === "websocket") {
@@ -30,29 +31,32 @@ function handle(req: Request): Response {
     registerSocketHandlers(socket);
 
     return response;
-  } else {
-    if (req.method === "GET") {
-      switch (url.pathname) {
-        case "/api/checkRoom": {
-          const roomCode = url.searchParams.get("roomCode");
-          if (!roomCode) {
-            return new Response(null, {
-              status: 400,
-              statusText: "'roomCode' was not provided.",
-            });
-          }
-
-          return new Response(JSON.stringify(checkRoomCode(roomCode)));
-        }
-        case "/api/newRoom": {
-          const roomCode = getNewRoomCode();
-          return new Response(roomCode);
-        }
-      }
+  } else if (req.method === "GET") {
+    // check if request was for a static file
+    const staticFileResponse = await serveStatic(url);
+    if (staticFileResponse) {
+      return staticFileResponse;
     }
 
-    return new Response(null, { status: 404 });
+    switch (url.pathname) {
+      case "/api/checkRoom": {
+        const roomCode = url.searchParams.get("roomCode");
+        if (!roomCode) {
+          return new Response(null, {
+            status: 400,
+            statusText: "'roomCode' was not provided.",
+          });
+        }
+
+        return new Response(JSON.stringify(checkRoomCode(roomCode)));
+      }
+      case "/api/newRoom": {
+        const roomCode = getNewRoomCode();
+        return new Response(roomCode);
+      }
+    }
   }
+  return new Response(null, { status: 404 });
 }
 
 const listener = Deno.listen({ port: PORT });

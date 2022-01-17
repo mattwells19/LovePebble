@@ -49,7 +49,8 @@ export const GameStateProvider: FC = ({ children }) => {
       dispatch(socketMsg);
     });
 
-    webscoketRef.current.addEventListener("error", () => {
+    webscoketRef.current.addEventListener("error", (e) => {
+      console.error("WS Error: ", e);
       navigate("/");
     });
 

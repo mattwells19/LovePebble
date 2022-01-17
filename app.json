@@ -1,0 +1,11 @@
+{
+  "name": "Love Pebble",
+  "description": "A web-based, 6-player version of the popular board game Love Letter.",
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "stack": "container"
+}
