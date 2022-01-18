@@ -20,7 +20,11 @@ const RoomRouterSwitch = () => {
 
   // if player hasn't set a name redirect to PlayerName
   if (localStorage.getItem("playerName")) {
-    return <Room />;
+    return (
+      <GameStateProvider>
+        <Room />
+      </GameStateProvider>
+    );
   } else {
     return <Navigate to={`/name?roomCode=${roomCode}`} />;
   }
@@ -43,14 +47,7 @@ export const Layout = () => {
         <Routes>
           <Route index element={<Home />} />
           <Route path="/name" element={<PlayerName />} />
-          <Route
-            path="/room/:roomCode"
-            element={
-              <GameStateProvider>
-                <RoomRouterSwitch />
-              </GameStateProvider>
-            }
-          />
+          <Route path="/room/:roomCode" element={<RoomRouterSwitch />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Box>
