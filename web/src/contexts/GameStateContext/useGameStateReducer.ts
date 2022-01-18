@@ -3,7 +3,7 @@ import { SocketOutgoing } from "../../../../server/types/socket.types";
 import { PlayerId, Player, Card, GameData } from "../../../../server/types/types";
 import { SocketMessage } from "./GameStateContext.types";
 
-interface RoomGameState {
+export interface RoomGameState {
   currentPlayerId: PlayerId;
   players: Map<PlayerId, Player>;
   deckCount: number;
