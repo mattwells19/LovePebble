@@ -37,6 +37,7 @@ export function checkRoomCode(roomCode: string): boolean {
   return Rooms.has(roomCode);
 }
 
+// TODO: Issue #18: update game data if player leaves in the middle of a game
 export function removePlayerFromRoom(roomCode: string, playerId: PlayerId) {
   if (Rooms.has(roomCode)) {
     const room = Rooms.get(roomCode)!;

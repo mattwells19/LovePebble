@@ -1,41 +1,38 @@
-import { Rooms } from "../repositories/Rooms.ts";
-import { OutgoingGameStateUpdate, SocketOutgoing } from "../types/socket.types.ts";
 import { Card, GameData, Player, PlayerId, RoomData, StandardDeck } from "../types/types.ts";
 import { shuffle } from "../utils.ts";
-import { SocketData } from "./socket.ts";
 
-interface JoinResult {
-  type: SocketOutgoing.PlayerUpdate;
-  data: [PlayerId, Player][];
-}
+export function join(playerId: PlayerId, room: RoomData, playerName: string, oldPlayerId?: PlayerId): RoomData {
+  let playerData: Player | null = null;
+  const updatedPlayers = new Map(room.players);
 
-export function join(socketData: SocketData, room: RoomData, playerName: string): JoinResult {
-  // add the new player to the room
-  const newPlayer: Player = {
-    cards: [],
-    gameScore: 0,
-    handmaidProtected: false,
-    name: playerName,
-    outOfRound: false,
-  };
-  room.players.set(socketData.playerId, newPlayer);
+  if (oldPlayerId && updatedPlayers.has(oldPlayerId)) {
+    playerData = updatedPlayers.get(oldPlayerId)!;
+    updatedPlayers.delete(oldPlayerId);
+  } else {
+    // add the new player to the room
+    playerData = {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: playerName,
+      outOfRound: false,
+    };
+  }
+
+  updatedPlayers.set(playerId, playerData);
 
   return {
-    data: Array.from(room.players),
-    type: SocketOutgoing.PlayerUpdate,
+    ...room,
+    players: updatedPlayers,
   };
 }
 
-interface StartGameResult {
-  type: SocketOutgoing.GameUpdate;
-  data: OutgoingGameStateUpdate;
-}
-
-export function startGame(roomCode: string, room: RoomData): StartGameResult {
+export function startGame(room: RoomData): RoomData {
   const updatedGameState: GameData = {
     cardPlayed: null,
     details: null,
     playerTurnId: room.players.keys().next().value,
+    roomSizeOnStart: room.players.size,
     started: true,
     winningSpyPlayerId: null,
   };
@@ -73,20 +70,10 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
     });
   });
 
-  const updatedRoomData: RoomData = {
+  return {
     deck,
     discard,
     game: updatedGameState,
     players: updatedPlayers,
   };
-  Rooms.set(roomCode, updatedRoomData);
-
-  const gameData: OutgoingGameStateUpdate = {
-    deckCount: deck.length,
-    discard,
-    game: updatedGameState,
-    players: Array.from(updatedPlayers),
-  };
-
-  return { data: gameData, type: SocketOutgoing.GameUpdate };
 }

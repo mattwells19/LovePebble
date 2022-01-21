@@ -108,6 +108,7 @@ export type GameStarted = {
   started: true;
   playerTurnId: PlayerId;
   winningSpyPlayerId: PlayerId | null;
+  roomSizeOnStart: number;
 };
 
 export type GameData =

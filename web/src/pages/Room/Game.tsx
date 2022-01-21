@@ -10,14 +10,14 @@ export const Game = () => {
   const { deckCount, currentPlayerId, gameState, players, discard } = useGameState();
   const [showDiscardDrawer, setShowDiscardDrawer] = useState<boolean>(false);
 
-  if (!gameState) throw new Error("No game state on the game screen.");
+  if (!gameState || !gameState.started) throw new Error("No game state on the game screen.");
 
   return (
     <>
       <Heading as="h2" textAlign="center">
         {gameState.playerTurnId === currentPlayerId
           ? "It's your turn!"
-          : `It's ${players.get(currentPlayerId)?.name}'s turn.`}
+          : `It's ${players.get(gameState.playerTurnId)?.name}'s turn.`}
       </Heading>
       <Box display="flex" gap="3">
         <Box display="flex" flexDirection="column" gap="1">

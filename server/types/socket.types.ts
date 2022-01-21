@@ -18,7 +18,7 @@ export const enum SocketOutgoing {
 
 export interface OutgoingGameStateUpdate {
   deckCount: number;
-  discard: Array<Card>;
+  discard: Array<Card | "Hidden">;
   players: [PlayerId, Player][];
   game: GameData;
 }
@@ -35,6 +35,7 @@ export interface JoinEvent extends SocketEvent {
   type: SocketIncoming.Join;
   roomCode: string;
   playerName: string;
+  oldPlayerId?: string;
 }
 
 export interface PlayCardEvent extends SocketEvent {

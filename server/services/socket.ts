@@ -1,4 +1,4 @@
-import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import { OutgoingGameStateUpdate, SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
 import { Player, PlayerId } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
@@ -24,19 +24,14 @@ export function registerSocketHandlers(socket: WebSocket) {
   socket.onclose = () => {
     Sockets.delete(socketData.playerId);
 
-    if (socketData.roomId) {
-      removePlayerFromRoom(socketData.roomId, socketData.playerId);
-
-      const room = Rooms.get(socketData.roomId);
-      if (room) {
-        sendMessageToRoom<[PlayerId, Player][]>(socketData.roomId, {
-          type: SocketOutgoing.PlayerUpdate,
-          data: Array.from(room.players),
-        });
+    // give users a chance to reconnect to a room with a 5 second delay
+    setTimeout(() => {
+      if (socketData.roomId) {
+        removePlayerFromRoom(socketData.roomId, socketData.playerId);
+        sendGameUpdateToRoom();
+        socketData.roomId = null;
       }
-
-      socketData.roomId = null;
-    }
+    }, 5000);
   };
 
   socket.onmessage = (msg: MessageEvent<string>) => {
@@ -44,7 +39,7 @@ export function registerSocketHandlers(socket: WebSocket) {
 
     switch (data.type) {
       case SocketIncoming.Join: {
-        const { roomCode, playerName } = data;
+        const { roomCode, playerName, oldPlayerId } = data;
 
         const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
         if (socketData.roomId) {
@@ -52,8 +47,9 @@ export function registerSocketHandlers(socket: WebSocket) {
         }
         socketData.roomId = roomCode;
 
-        const joinResult = socketActions.join(socketData, room, playerName);
-        sendMessageToRoom(roomCode, joinResult);
+        const roomUpdate = socketActions.join(socketData.playerId, room, playerName, oldPlayerId);
+        Rooms.set(roomCode, roomUpdate);
+        sendGameUpdateToRoom();
         break;
       }
       case SocketIncoming.StartGame: {
@@ -63,8 +59,9 @@ export function registerSocketHandlers(socket: WebSocket) {
           throw new Error(`Room does not exist ${socketData.roomId}.`);
         }
 
-        const startGameResult = socketActions.startGame(roomCode, room);
-        sendMessageToRoom(roomCode, startGameResult);
+        const roomUpdate = socketActions.startGame(room);
+        Rooms.set(roomCode, roomUpdate);
+        sendGameUpdateToRoom();
         break;
       }
       case SocketIncoming.PlayCard:
@@ -83,21 +80,66 @@ export function registerSocketHandlers(socket: WebSocket) {
   function sendToSocket<TData>(data: { type: SocketOutgoing; data: TData }) {
     socket.send(JSON.stringify(data));
   }
-}
 
-function sendMessageToRoom<TData>(roomCode: string, data: { type: SocketOutgoing; data: TData }) {
-  const room = Rooms.get(roomCode);
-  if (!room) {
-    throw new Error(`No room exists with the code ${roomCode}.`);
+  function sendGameUpdateToRoom() {
+    if (!socketData.roomId) {
+      return;
+    }
+
+    const roomData = Rooms.get(socketData.roomId);
+    if (!roomData) {
+      return;
+    }
+
+    /**
+     * We don't want to show which cards are auto-removed from the deck when a game starts.
+     * 2 players removes 3 cards; > 2 players removes 1 so replace the auto removed cards
+     * with "Hidden".
+     */
+    const discardWithHidden = roomData.discard.map((card, index) => {
+      if (
+        roomData.game.started &&
+        ((roomData.game.roomSizeOnStart === 2 && index < 3) || (roomData.game.roomSizeOnStart > 2 && index === 0))
+      ) {
+        return "Hidden";
+      } else {
+        return card;
+      }
+    });
+
+    const allPlayerIds: Array<PlayerId> = Array.from(roomData.players.keys());
+
+    allPlayerIds.forEach((playerId) => {
+      const socket = Sockets.get(playerId as PlayerId);
+
+      if (socket) {
+        const playerPayload: [PlayerId, Player][] = Array.from(roomData.players, ([pId, playerData]) => {
+          if (playerId === pId) {
+            return [pId, playerData];
+          } else {
+            return [
+              pId,
+              {
+                ...playerData,
+                cards: [],
+              },
+            ];
+          }
+        });
+
+        socket.send(
+          JSON.stringify({
+            type: SocketOutgoing.GameUpdate,
+            data: {
+              deckCount: roomData.deck.length,
+              // reverse array so that most recent discard is on top (index 0)
+              discard: discardWithHidden.reverse(),
+              game: roomData.game,
+              players: playerPayload,
+            } as OutgoingGameStateUpdate,
+          }),
+        );
+      }
+    });
   }
-
-  const allPlayerIds = Array.from(room.players.keys());
-
-  const allPlayerSockets: Array<WebSocket> = allPlayerIds
-    .map((playerId) => Sockets.get(playerId))
-    .filter((playerSocket): playerSocket is WebSocket => Boolean(playerSocket));
-
-  allPlayerSockets.forEach((playerSocket) => {
-    playerSocket.send(JSON.stringify(data));
-  });
 }

@@ -14,6 +14,8 @@ export interface RoomGameState {
 function gameStateContextReducer(currentState: RoomGameState, action: SocketMessage): RoomGameState {
   switch (action.type) {
     case SocketOutgoing.Connected:
+      sessionStorage.setItem("playerId", action.data);
+
       return {
         ...currentState,
         currentPlayerId: action.data,
