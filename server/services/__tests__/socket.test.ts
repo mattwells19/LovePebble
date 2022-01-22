@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertExists } from "../../deps.ts";
+import { assert, assertEquals, assertExists, delay } from "../../deps.ts";
 import { Sockets } from "../../repositories/Sockets.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { registerSocketHandlers } from "../socket.ts";
@@ -33,7 +33,7 @@ Deno.test("Websocket connection is established", () => {
   testCleanup();
 });
 
-Deno.test("cleans up after Websocket connection is closed", () => {
+Deno.test("cleans up after Websocket connection is closed", async () => {
   const ws = getMockWebSocket();
   registerSocketHandlers(ws);
 
@@ -44,6 +44,8 @@ Deno.test("cleans up after Websocket connection is closed", () => {
 
   assertExists(ws.onclose);
   ws.onclose(new CloseEvent(""));
+
+  await delay(5100);
 
   assertEquals(Sockets.size, 0);
 
@@ -62,8 +64,8 @@ Deno.test("player can change rooms", () => {
         case SocketOutgoing.Connected:
           playerId = response.data;
           break;
-        case SocketOutgoing.PlayerUpdate:
-          players = new Map(response.data);
+        case SocketOutgoing.GameUpdate:
+          players = new Map(response.data.players);
       }
     },
   });
@@ -80,7 +82,7 @@ Deno.test("player can change rooms", () => {
   // join the room
   assertExists(ws.onmessage);
   ws.onmessage(
-    new MessageEvent("join", {
+    new MessageEvent(SocketIncoming.Join, {
       data: JSON.stringify({
         type: SocketIncoming.Join,
         roomCode,
@@ -129,3 +131,7 @@ Deno.test("player can change rooms", () => {
   // Cleanup
   testCleanup();
 });
+
+Deno.test("game updates send with hidden discard", () => {});
+Deno.test("game updates for current player include cards", () => {});
+Deno.test("game updates for other players do not include cards", () => {});
