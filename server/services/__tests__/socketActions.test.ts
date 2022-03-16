@@ -38,6 +38,14 @@ Deno.test("Join | Player can reconnect to a room", () => {
   ]);
   const mockRoomData: RoomData = {
     ...MockTwoPlayerRoomData,
+    game: {
+      started: true,
+      cardPlayed: null,
+      winningSpyPlayerId: "24680",
+      roomSizeOnStart: mockPlayers.size,
+      playerTurnId: "24680",
+      details: null,
+    },
     players: mockPlayers,
   };
 
@@ -55,6 +63,10 @@ Deno.test("Join | Player can reconnect to a room", () => {
     name: "Replace me",
     outOfRound: false,
   });
+
+  assert(result.game.started);
+  assertEquals(result.game.playerTurnId, newPlayerId);
+  assertEquals(result.game.winningSpyPlayerId, newPlayerId);
 
   // old player entry is removed
   assert(!result.players.has("24680"));
