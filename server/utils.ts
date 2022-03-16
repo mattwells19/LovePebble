@@ -2,6 +2,8 @@
 // https://deno.land/x/denodash@0.1.3
 // https://github.com/brianboyko/denodash
 
+import { PlayerId } from "./types/types.ts";
+
 export const randomOf = (max: number): number => Math.floor(Math.random() * max);
 
 export const sample = <T>(array: T[], sampleSize = 1): T[] => {
@@ -31,3 +33,28 @@ export const shuffle = <T>(array: T[]): T[] => {
   }
   return clone;
 };
+
+export function updateGameStateWithNewPlayerId(
+  origObj: Record<any, any>,
+  oldPlayerId: PlayerId,
+  newPlayerId: PlayerId,
+) {
+  const obj = { ...origObj };
+
+  for (const key in obj) {
+    if (obj[key] instanceof Array) {
+      obj[key] = obj[key].map((o: any) => {
+        if (typeof o === "object") {
+          return updateGameStateWithNewPlayerId(o, oldPlayerId, newPlayerId);
+        } else if (typeof o === "string" && o === oldPlayerId) {
+          return newPlayerId;
+        }
+      });
+    } else if (typeof obj[key] === "object") {
+      obj[key] = updateGameStateWithNewPlayerId(obj[key], oldPlayerId, newPlayerId);
+    } else if (typeof obj[key] === "string" && obj[key] === oldPlayerId) {
+      obj[key] = newPlayerId;
+    }
+  }
+  return obj;
+}

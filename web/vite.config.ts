@@ -10,10 +10,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/api": "http://localhost:3001",
+      "/api": "http://127.0.0.1:3001",
       "/socket": {
         secure: false,
-        target: "http://localhost:3001",
+        target: "http://127.0.0.1:3001",
         ws: true,
       },
     },

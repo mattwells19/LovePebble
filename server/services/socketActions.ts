@@ -1,13 +1,15 @@
 import { Card, GameData, Player, PlayerId, RoomData, StandardDeck } from "../types/types.ts";
-import { shuffle } from "../utils.ts";
+import { shuffle, updateGameStateWithNewPlayerId } from "../utils.ts";
 
 export function join(playerId: PlayerId, room: RoomData, playerName: string, oldPlayerId?: PlayerId): RoomData {
   let playerData: Player | null = null;
+  let updatedGameData: GameData = room.game;
   const updatedPlayers = new Map(room.players);
 
   if (oldPlayerId && updatedPlayers.has(oldPlayerId)) {
     playerData = updatedPlayers.get(oldPlayerId)!;
     updatedPlayers.delete(oldPlayerId);
+    updatedGameData = updateGameStateWithNewPlayerId(room.game, oldPlayerId, playerId) as GameData;
   } else {
     // add the new player to the room
     playerData = {
@@ -23,6 +25,7 @@ export function join(playerId: PlayerId, room: RoomData, playerName: string, old
 
   return {
     ...room,
+    game: updatedGameData,
     players: updatedPlayers,
   };
 }
