@@ -30,6 +30,7 @@ export interface Player {
   name: string;
   cards: Array<Card>;
   handmaidProtected: boolean;
+  playedSpy: boolean;
   outOfRound: boolean;
   gameScore: number;
 }
@@ -78,7 +79,7 @@ export type PlayedChancellor = {
   cardPlayed: Card.Chancellor;
   details: {
     deckOptions: Array<Card>;
-    chosenCard: Card;
+    chosenCard: Card | null;
   };
 };
 
@@ -107,7 +108,7 @@ export type GameNotStarted = { started: false; playerTurnId: null };
 export type GameStarted = {
   started: true;
   playerTurnId: PlayerId;
-  winningSpyPlayerId: PlayerId | null;
+  lastMoveDescription: string | null;
 };
 
 export type GameData = GameStarted &

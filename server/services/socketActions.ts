@@ -15,6 +15,7 @@ export function join(socketData: SocketData, room: RoomData | RoomDataGameNotSta
     cards: [],
     gameScore: 0,
     handmaidProtected: false,
+    playedSpy: false,
     name: playerName,
     outOfRound: false,
   };
@@ -32,7 +33,7 @@ export function startGame(roomCode: string, room: RoomDataGameNotStarted): Outgo
     details: null,
     playerTurnId: room.players.keys().next().value!,
     started: true,
-    winningSpyPlayerId: null,
+    lastMoveDescription: null,
   };
 
   const deck = shuffle(StandardDeck.slice());
@@ -86,6 +87,103 @@ export function startGame(roomCode: string, room: RoomDataGameNotStarted): Outgo
   return gameData;
 }
 
+export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed: Card): OutgoingGameStateUpdate {
+  const roomDataWithCardPlayed = (() => {
+    const player = roomData.players.get(roomData.game.playerTurnId);
+    if (!player) throw new Error("Where'd this player go??");
+
+    const updatedPlayer: Player = {
+      ...player,
+      cards: player.cards.filter((c) => c !== cardPlayed),
+    };
+    const updatedPlayers = new Map(roomData.players);
+    updatedPlayers.set(roomData.game.playerTurnId, updatedPlayer);
+
+    const newDiscard = [...roomData.discard, cardPlayed];
+
+    return {
+      ...roomData,
+      discard: newDiscard,
+      players: updatedPlayers,
+    };
+  })();
+
+  const genericRoomUpdates: GameData = {
+    ...roomDataWithCardPlayed.game,
+    lastMoveDescription: null,
+  };
+
+  const newGameData = (() => {
+    switch (cardPlayed) {
+      case Card.Guard:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            card: null,
+            chosenPlayerId: null,
+            submitted: false,
+          },
+        };
+      case Card.Baron:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            chosenPlayerId: null,
+            winningPlayerId: null,
+            submitted: false,
+          },
+        };
+      case Card.Chancellor:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            deckOptions: roomData.deck.slice(0, 2),
+            chosenCard: null,
+          },
+        };
+      // SimplePlayerSelect
+      case Card.Priest:
+      case Card.Prince:
+      case Card.King:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            chosenPlayerId: null,
+            submitted: false,
+          },
+        };
+      // No details needed
+      case Card.Spy:
+      case Card.Handmaid:
+      case Card.Countess:
+      case Card.Princess:
+        // TODO: this should call CardActionHandler
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: null,
+        };
+    }
+  })();
+
+  const updatedRoomData: RoomData = {
+    ...roomDataWithCardPlayed,
+    game: newGameData,
+  };
+  Rooms.set(roomCode, updatedRoomData);
+
+  return {
+    deckCount: roomDataWithCardPlayed.deck.length,
+    discard: roomDataWithCardPlayed.discard,
+    players: Array.from(roomDataWithCardPlayed.players),
+    game: newGameData,
+  };
+}
+
 export function handleSelectPlayer(
   roomCode: string,
   room: RoomData,
@@ -95,15 +193,17 @@ export function handleSelectPlayer(
     return null;
   }
 
+  const newGameData: GameData = {
+    ...room.game,
+    details: {
+      ...room.game.details,
+      chosenPlayerId: playerSelected,
+    },
+  };
+
   const updatedRoomData: RoomData = {
     ...room,
-    game: {
-      ...room.game,
-      details: {
-        ...room.game.details,
-        chosenPlayerId: playerSelected,
-      },
-    },
+    game: newGameData,
   };
 
   Rooms.set(roomCode, updatedRoomData);
@@ -116,90 +216,30 @@ export function handleSelectPlayer(
   };
 }
 
-/**
- * Removes card from the player's hand and adds it to the discard
- */
-const cardPlayed = (roomData: RoomData, card: Card): RoomData => {
-  const player = roomData.players.get(roomData.game.playerTurnId);
-  if (!player) throw new Error("Where'd this player go??");
+export function handleSelectCard(roomCode: string, room: RoomData, cardSelected: Card): OutgoingGameStateUpdate | null {
+  if (!room.game.details || room.game.cardPlayed !== Card.Guard) {
+    return null;
+  }
 
-  const updatedPlayer: Player = {
-    ...player,
-    cards: player.cards.filter((c) => c !== card),
+  const newGameData: GameData = {
+    ...room.game,
+    details: {
+      ...room.game.details,
+      card: cardSelected,
+    },
   };
-  const updatedPlayers = new Map(roomData.players);
-  updatedPlayers.set(roomData.game.playerTurnId, updatedPlayer);
 
-  const newDiscard = [...roomData.discard, card];
+  const updatedRoomData: RoomData = {
+    ...room,
+    game: newGameData,
+  };
+
+  Rooms.set(roomCode, updatedRoomData);
 
   return {
-    ...roomData,
-    discard: newDiscard,
-    players: updatedPlayers,
+    deckCount: updatedRoomData.deck.length,
+    discard: updatedRoomData.deck,
+    game: updatedRoomData.game,
+    players: Array.from(updatedRoomData.players),
   };
-};
-
-const getNextPlayerTurnId = (roomData: RoomData): string => {
-  const playerIds = Array.from(roomData.players.keys());
-  const currentPlayerTurnIdIndex = playerIds.indexOf(roomData.game.playerTurnId);
-  const newPlayerTurnId =
-    currentPlayerTurnIdIndex === playerIds.length - 1 ? playerIds.at(0) : playerIds.at(currentPlayerTurnIdIndex + 1);
-  if (!newPlayerTurnId) {
-    throw new Error("Idk whose turn is next");
-  }
-  return newPlayerTurnId;
-};
-
-export function handlePlayedSpy(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
-  const roomDataWithCardPlayed = cardPlayed(roomData, Card.Spy);
-
-  const newGameState: OutgoingGameStateUpdate = {
-    deckCount: roomDataWithCardPlayed.deck.length,
-    discard: roomDataWithCardPlayed.discard,
-    players: Array.from(roomDataWithCardPlayed.players),
-    game: {
-      ...roomDataWithCardPlayed.game,
-      playerTurnId: getNextPlayerTurnId(roomDataWithCardPlayed),
-      winningSpyPlayerId: roomDataWithCardPlayed.game.winningSpyPlayerId
-        ? null
-        : roomDataWithCardPlayed.game.playerTurnId,
-      cardPlayed: null,
-      details: null,
-    },
-  };
-
-  const updatedRoomData: RoomData = {
-    ...roomDataWithCardPlayed,
-    game: newGameState.game,
-  };
-  Rooms.set(roomCode, updatedRoomData);
-
-  return newGameState;
-}
-
-export function handlePlayedGuard(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
-  const roomDataWithCardPlayed = cardPlayed(roomData, Card.Guard);
-
-  const newGameState: OutgoingGameStateUpdate = {
-    deckCount: roomDataWithCardPlayed.deck.length,
-    discard: roomDataWithCardPlayed.discard,
-    players: Array.from(roomDataWithCardPlayed.players),
-    game: {
-      ...roomDataWithCardPlayed.game,
-      cardPlayed: Card.Guard,
-      details: {
-        card: null,
-        chosenPlayerId: null,
-        submitted: false,
-      },
-    },
-  };
-
-  const updatedRoomData: RoomData = {
-    ...roomDataWithCardPlayed,
-    game: newGameState.game,
-  };
-  Rooms.set(roomCode, updatedRoomData);
-
-  return newGameState;
 }

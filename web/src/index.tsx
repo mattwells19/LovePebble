@@ -32,6 +32,7 @@ const theme = extendTheme({
     global: {
       body: {
         backgroundColor: "main.regularPurple",
+        height: "100vh",
       },
     },
   },
@@ -41,7 +42,7 @@ const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
+    <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { position: "top-right" } }}>
       <BrowserRouter>
         <RouterProvider>
           <AppbarProvider>

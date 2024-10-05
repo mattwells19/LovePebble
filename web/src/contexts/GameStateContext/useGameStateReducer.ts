@@ -1,4 +1,4 @@
-import { Reducer, useReducer } from "react";
+import { useReducer } from "react";
 import { SocketOutgoing } from "../../../../server/types/socket.types";
 import { PlayerId, Player, Card, GameData } from "../../../../server/types/types";
 import { SocketMessage } from "./GameStateContext.types";
@@ -35,7 +35,7 @@ function gameStateContextReducer(currentState: RoomGameState, action: SocketMess
 }
 
 export function useGameStateReducer() {
-  return useReducer<Reducer<RoomGameState, SocketMessage>>(gameStateContextReducer, {
+  return useReducer<RoomGameState, [action: SocketMessage]>(gameStateContextReducer, {
     currentPlayerId: "",
     deckCount: 0,
     discard: [],

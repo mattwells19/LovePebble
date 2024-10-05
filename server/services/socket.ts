@@ -1,9 +1,10 @@
-import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
-import { Card, Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
+import type { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import type { Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
 import * as socketActions from "./socketActions.ts";
+import * as cardActionHandlers from "./card-action-handlers.ts";
 
 const gameIsStarted = (room: RoomData | RoomDataGameNotStarted): room is RoomData => room.game.started;
 
@@ -65,6 +66,8 @@ export function registerSocketHandlers(socket: WebSocket) {
           throw new Error(`Room does not exist ${socketData.roomId}.`);
         }
 
+        if (gameIsStarted(room)) break;
+
         const startGameResult = socketActions.startGame(roomCode, room as RoomDataGameNotStarted);
         sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: startGameResult });
         break;
@@ -78,19 +81,8 @@ export function registerSocketHandlers(socket: WebSocket) {
 
         if (!gameIsStarted(room)) break;
 
-        switch (data.cardPlayed) {
-          case Card.Spy: {
-            const cardPlayedEvent = socketActions.handlePlayedSpy(roomCode, room);
-            sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: cardPlayedEvent });
-            break;
-          }
-          case Card.Guard: {
-            const cardPlayedEvent = socketActions.handlePlayedGuard(roomCode, room);
-            sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: cardPlayedEvent });
-            break;
-          }
-        }
-
+        const cardPlayedEvent = socketActions.handlePlayCard(roomCode, room, data.cardPlayed);
+        sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: cardPlayedEvent });
         break;
       }
       case SocketIncoming.SelectCard: {
@@ -102,22 +94,11 @@ export function registerSocketHandlers(socket: WebSocket) {
 
         if (!gameIsStarted(room)) break;
 
-        const newRoomData: RoomData = {
-          ...room,
-          game: {
-            ...room.game,
-          },
-        };
-
-        if (newRoomData.game.started && newRoomData.game.details && "chosenCard" in newRoomData.game.details) {
-          newRoomData.game.details = {
-            ...newRoomData.game.details,
-            chosenCard: data.cardPlayed,
-          };
-          Rooms.set(roomCode, newRoomData);
+        const playerSelectedEvent = socketActions.handleSelectCard(roomCode, room, data.cardPlayed);
+        if (playerSelectedEvent) {
           sendMessageToRoom(roomCode, {
             type: SocketOutgoing.GameUpdate,
-            data: newRoomData,
+            data: playerSelectedEvent,
           });
         }
         break;
@@ -140,8 +121,20 @@ export function registerSocketHandlers(socket: WebSocket) {
         }
         break;
       }
-      case SocketIncoming.SubmitSelection:
+      case SocketIncoming.SubmitSelection: {
+        const roomCode = socketData.roomId ?? "";
+        const room = Rooms.get(roomCode);
+        if (!room) {
+          throw new Error(`Room does not exist ${socketData.roomId}.`);
+        }
+
+        if (!gameIsStarted(room)) break;
+
+        // switch(room.game.cardPlayed) {
+        //   case Card.Guard
+        // }
         break;
+      }
       case SocketIncoming.AcknowledgeAction:
         break;
     }

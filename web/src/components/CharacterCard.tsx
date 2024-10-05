@@ -10,7 +10,7 @@ interface CharacterCardProps extends BoxProps {
   button?: boolean;
 }
 
-const Characters = [
+export const Characters = [
   "Spy",
   "Guard",
   "Priest",
