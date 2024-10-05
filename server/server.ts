@@ -4,21 +4,17 @@ import { serveStatic } from "./static.ts";
 
 const PORT = Number(Deno.env.get("PORT")) || 3001;
 
-async function handleConn(conn: Deno.Conn): Promise<void> {
-  const httpConn = Deno.serveHttp(conn);
-  for await (const e of httpConn) {
-    let response = null;
-    try {
-      response = handle(e.request);
-    } catch (e) {
-      if (e instanceof Error) {
-        console.error(e);
-        response = new Response(JSON.stringify({ message: e.message }), { status: 500 });
-      }
-    } finally {
-      e.respondWith(response ?? new Response(null, { status: 404 }));
+function handleRequest(req: Request): Response | Promise<Response> {
+  try {
+    return handle(req);
+  } catch (e) {
+    if (e instanceof Error) {
+      console.error(e);
+      return new Response(JSON.stringify({ message: e.message }), { status: 500 });
     }
   }
+
+  return new Response(null, { status: 404 });
 }
 
 async function handle(req: Request): Promise<Response> {
@@ -57,8 +53,4 @@ async function handle(req: Request): Promise<Response> {
   return new Response(null, { status: 404 });
 }
 
-const listener = Deno.listen({ port: PORT });
-console.info(`Listening on port ${PORT}`);
-for await (const conn of listener) {
-  handleConn(conn);
-}
+Deno.serve({ port: PORT }, handleRequest);

@@ -1,4 +1,4 @@
-import { createContext, FC, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useState } from "react";
 
 interface RouterContextValue {
   newRoomCode: string | null;
@@ -7,7 +7,7 @@ interface RouterContextValue {
 
 const RouterContext = createContext<RouterContextValue | null>(null);
 
-export const RouterProvider: FC = ({ children }) => {
+export const RouterProvider = ({ children }: PropsWithChildren) => {
   const [newRoomCode, setNewRoomCode] = useState<string | null>(null);
 
   return <RouterContext.Provider value={{ newRoomCode, setNewRoomCode }}>{children}</RouterContext.Provider>;

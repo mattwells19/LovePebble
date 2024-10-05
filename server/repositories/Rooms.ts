@@ -1,3 +1,3 @@
-import { RoomData } from "../types/types.ts";
+import { RoomData, type RoomDataGameNotStarted } from "../types/types.ts";
 
-export const Rooms = new Map<Readonly<string>, RoomData>();
+export const Rooms = new Map<Readonly<string>, RoomData | RoomDataGameNotStarted>();

@@ -45,7 +45,7 @@ export type PlayedGuard = {
   cardPlayed: Card.Guard;
   details: {
     chosenPlayerId: PlayerId | null;
-    card: Card;
+    card: Card | null;
     submitted: boolean;
   };
 };
@@ -110,25 +110,31 @@ export type GameStarted = {
   winningSpyPlayerId: PlayerId | null;
 };
 
-export type GameData =
-  | GameNotStarted
-  | (GameStarted &
-      (
-        | PlayedSpy
-        | PlayedPriest
-        | PlayedBaron
-        | PlayedHandmaid
-        | PlayedPrince
-        | PlayedChancellor
-        | PlayedKing
-        | PlayedCountess
-        | PlayedPrincess
-        | WaitingForChoice
-      ));
+export type GameData = GameStarted &
+  (
+    | PlayedSpy
+    | PlayedGuard
+    | PlayedPriest
+    | PlayedBaron
+    | PlayedHandmaid
+    | PlayedPrince
+    | PlayedChancellor
+    | PlayedKing
+    | PlayedCountess
+    | PlayedPrincess
+    | WaitingForChoice
+  );
 
 export interface RoomData {
   deck: Array<Card>;
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
   game: GameData;
+}
+
+export interface RoomDataGameNotStarted {
+  deck: [];
+  discard: [];
+  players: Map<PlayerId, Player>;
+  game: GameNotStarted;
 }

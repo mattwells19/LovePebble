@@ -1,4 +1,4 @@
-import { createContext, FC, useContext, useState } from "react";
+import { createContext, PropsWithChildren, useContext, useState } from "react";
 
 interface AppbarContextValue {
   setAppbarText: (appbarText: string) => void;
@@ -7,7 +7,7 @@ interface AppbarContextValue {
 
 const AppbarContext = createContext<AppbarContextValue | null>(null);
 
-export const AppbarProvider: FC = ({ children }) => {
+export const AppbarProvider = ({ children }: PropsWithChildren) => {
   const [appBarText, setAppbarText] = useState<string>("");
 
   return <AppbarContext.Provider value={{ appBarText, setAppbarText }}>{children}</AppbarContext.Provider>;
