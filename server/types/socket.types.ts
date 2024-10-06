@@ -44,7 +44,7 @@ export interface PlayCardEvent extends SocketEvent {
 
 export interface SelectCardEvent extends SocketEvent {
   type: SocketIncoming.SelectCard;
-  cardPlayed: Card;
+  cardSelected: Card;
 }
 
 export interface SelectPlayerEvent extends SocketEvent {

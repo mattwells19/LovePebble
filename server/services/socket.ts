@@ -1,4 +1,4 @@
-import type { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
 import type { Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
@@ -94,7 +94,7 @@ export function registerSocketHandlers(socket: WebSocket) {
 
         if (!gameIsStarted(room)) break;
 
-        const playerSelectedEvent = socketActions.handleSelectCard(roomCode, room, data.cardPlayed);
+        const playerSelectedEvent = socketActions.handleSelectCard(roomCode, room, data.cardSelected);
         if (playerSelectedEvent) {
           sendMessageToRoom(roomCode, {
             type: SocketOutgoing.GameUpdate,

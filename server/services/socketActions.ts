@@ -210,7 +210,7 @@ export function handleSelectPlayer(
 
   return {
     deckCount: updatedRoomData.deck.length,
-    discard: updatedRoomData.deck,
+    discard: updatedRoomData.discard,
     game: updatedRoomData.game,
     players: Array.from(updatedRoomData.players),
   };
@@ -238,7 +238,7 @@ export function handleSelectCard(roomCode: string, room: RoomData, cardSelected:
 
   return {
     deckCount: updatedRoomData.deck.length,
-    discard: updatedRoomData.deck,
+    discard: updatedRoomData.discard,
     game: updatedRoomData.game,
     players: Array.from(updatedRoomData.players),
   };

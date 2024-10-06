@@ -21,7 +21,7 @@ export const Characters = [
   "King",
   "Countess",
   "Princess",
-];
+] as const;
 
 export const CharacterCard = ({ character = "Hidden", button, ...rest }: CharacterCardProps) => {
   return (
