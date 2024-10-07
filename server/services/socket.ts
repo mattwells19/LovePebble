@@ -4,7 +4,6 @@ import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
 import * as socketActions from "./socketActions.ts";
-import * as cardActionHandlers from "./card-action-handlers.ts";
 
 const gameIsStarted = (room: RoomData | RoomDataGameNotStarted): room is RoomData => room.game.started;
 
@@ -163,6 +162,8 @@ export function registerSocketHandlers(socket: WebSocket) {
       }
     } catch (err) {
       console.error(err);
+      console.info("Socket data", data);
+      console.info("Room data", Rooms.get(socketData.roomId ?? ""));
     }
   };
 

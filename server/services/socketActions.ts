@@ -102,6 +102,7 @@ export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed:
     const updatedPlayer: Player = {
       ...player,
       cards: player.cards.toSpliced(cardPlayedIndex, 1),
+      handmaidProtected: false,
     };
     const updatedPlayers = new Map(roomData.players);
     updatedPlayers.set(roomData.game.playerTurnId, updatedPlayer);
@@ -252,6 +253,8 @@ export function handleSubmitSelection(roomCode: string, room: RoomData): Outgoin
       return cardActionHandlers.handlePlayedPriest(roomCode, room);
     case Card.Baron:
       return cardActionHandlers.handlePlayedBaron(roomCode, room);
+    case Card.Handmaid:
+      return cardActionHandlers.handlePlayedHandmaid(roomCode, room);
     default:
       throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
   }

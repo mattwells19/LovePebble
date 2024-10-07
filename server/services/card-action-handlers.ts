@@ -5,6 +5,7 @@ import {
   type GameStarted,
   type PlayedBaron,
   type PlayedGuard,
+  type PlayedHandmaid,
   type PlayedPriest,
   type PlayedSpy,
   type PlayerId,
@@ -48,7 +49,10 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
   let updatedRoomData: RoomData | null = null;
 
   const cardGuessed = gameData.details.card;
-  if (playerBeingGuessed.cards.some((card) => card === cardGuessed)) {
+  if (cardGuessed === null) {
+    throw new Error(`Didn't guess a card when processing Guard action.`);
+  }
+  if (playerBeingGuessed.cards.includes(cardGuessed)) {
     // guessed correctly
     updatedRoomData = knockPlayerOutOfRound(roomData, playerIdBeingGuessed);
 
@@ -166,5 +170,32 @@ export function handlePlayedBaron(roomCode: string, roomData: RoomData): Outgoin
     discard: updatedRoomData.discard,
     game: updatedRoomData.game,
     players: Array.from(updatedRoomData.players),
+  };
+}
+
+export function handlePlayedHandmaid(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const gameData = roomData.game as GameStarted & PlayedHandmaid;
+
+  const updatedPlayers = updatePlayer(roomData.players, gameData.playerTurnId, { handmaidProtected: true });
+
+  const updatedRoomData: RoomData = {
+    deck: roomData.deck,
+    discard: roomData.discard,
+    players: updatedPlayers,
+    game: {
+      ...gameData,
+      lastMoveDescription: `${playingPlayer.name} played the Handmaind. Hands off!`,
+    },
+  };
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
   };
 }

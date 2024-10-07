@@ -66,7 +66,7 @@ export const prepRoomDataForNextTurn = (roomData: RoomData): RoomData => {
   }
 
   const { newDeck, cardDrawn } = drawCardFromDeck(roomData.deck);
-  if (!cardDrawn) {
+  if (cardDrawn === null) {
     // TODO: handle game over
     throw new Error("game over!");
   }
