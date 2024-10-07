@@ -112,7 +112,8 @@ export const PlayerPicker = ({ value }: { value: PlayerId | null }) => {
             onChange={(e) => (e.target.checked ? handleChange(playerId) : null)}
             checked={playerId === value}
             readOnly={currentPlayerId !== gameState?.playerTurnId}
-            disabled={gameState?.cardPlayed === Card.Guard && playerId === gameState.playerTurnId}
+            // You can only pick yourself when playing a Prince
+            disabled={playerId === gameState?.playerTurnId && gameState.cardPlayed !== Card.Prince}
             isOutOfRound={player.outOfRound}
             isProtected={player.handmaidProtected}
           >

@@ -11,6 +11,7 @@ import { BigSubmitButton } from "../../components/BigSubmitButton";
 import { SocketIncoming } from "../../../../server/types/socket.types";
 import { Card } from "../../../../server/types/types";
 import { CardPicker } from "../../components/CardPicker";
+import { SubmittedActionResult } from "../../components/SubmittedActionResult";
 
 export const Game = () => {
   const { deckCount, currentPlayerId, gameState, players, discard, sendGameUpdate } = useGameState();
@@ -33,6 +34,8 @@ export const Game = () => {
         return;
       }
       sendGameUpdate({ type: SocketIncoming.PlayCard, cardPlayed: parseInt(selectedCard, 10) });
+    } else if (gameState.details && "submitted" in gameState.details && gameState.details.submitted) {
+      sendGameUpdate({ type: SocketIncoming.AcknowledgeAction });
     } else {
       if (gameState.details && "chosenPlayerId" in gameState.details) {
         const playerSelect = formData.get("playerSelect")?.toString();
@@ -84,20 +87,34 @@ export const Game = () => {
         paddingBottom="20"
       >
         <Box display="flex" flexDirection="column" gap="1">
-          <Label>Your cards</Label>
-          <Box display="flex" gap="3" margin="auto">
-            <PlayerHand
-              isPlayersTurn={gameState.playerTurnId === currentPlayerId}
-              hasPlayedCard={!!gameState.cardPlayed}
-              playerCards={players.get(currentPlayerId)?.cards ?? []}
-            />
-          </Box>
+          {players.get(currentPlayerId)!.cards.length > 0 ? (
+            <>
+              <Label>Your cards</Label>
+              <Box display="flex" gap="3" margin="auto">
+                <PlayerHand
+                  isPlayersTurn={gameState.playerTurnId === currentPlayerId}
+                  hasPlayedCard={!!gameState.cardPlayed}
+                  playerCards={players.get(currentPlayerId)?.cards ?? []}
+                />
+              </Box>
+            </>
+          ) : (
+            <Label>{`Site tight. You're out of this round.`}</Label>
+          )}
         </Box>
-        {gameState.details && "chosenPlayerId" in gameState.details ? (
-          <PlayerPicker value={gameState.details.chosenPlayerId} />
-        ) : null}
-        {gameState.details && gameState.cardPlayed === Card.Guard ? (
-          <CardPicker value={gameState.details.card} />
+        {gameState.details ? (
+          <>
+            {"submitted" in gameState.details === false || gameState.details.submitted === false ? (
+              <>
+                {"chosenPlayerId" in gameState.details ? (
+                  <PlayerPicker value={gameState.details.chosenPlayerId} />
+                ) : null}
+                {"card" in gameState.details ? <CardPicker value={gameState.details.card} /> : null}
+              </>
+            ) : (
+              <SubmittedActionResult />
+            )}
+          </>
         ) : null}
         {currentPlayerId === gameState.playerTurnId ? <BigSubmitButton /> : null}
       </chakra.form>

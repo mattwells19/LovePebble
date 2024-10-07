@@ -37,7 +37,6 @@ export interface Player {
 
 export type SimplePlayerSelect = {
   chosenPlayerId: PlayerId | null;
-  submitted: boolean;
 };
 
 export type PlayedSpy = { cardPlayed: Card.Spy; details: null };
@@ -47,13 +46,12 @@ export type PlayedGuard = {
   details: {
     chosenPlayerId: PlayerId | null;
     card: Card | null;
-    submitted: boolean;
   };
 };
 
 export type PlayedPriest = {
   cardPlayed: Card.Priest;
-  details: SimplePlayerSelect;
+  details: SimplePlayerSelect & { submitted: boolean };
 };
 
 export type PlayedBaron = {
