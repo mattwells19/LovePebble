@@ -1,15 +1,37 @@
-import { useParams } from "react-router-dom";
+import { LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom";
+import { GameStateProvider, useGameState } from "../../contexts/GameStateContext";
+import { useSetAppbarText } from "../../contexts/AppbarContext";
+import { DocTitle } from "../../components/DocTitle";
 import { Game } from "./Game";
 import { Lobby } from "./Lobby";
-import { useGameState } from "../../contexts/GameStateContext";
-import { useAppbarText } from "../../hooks/useAppbarText";
-import { useDocTitle } from "../../hooks/useDocTitle";
 
-export const Room = () => {
-  const { roomCode = "" } = useParams();
-  const { gameState } = useGameState();
-  useAppbarText(roomCode);
-  useDocTitle(roomCode);
+export const roomLoader = ({ params }: LoaderFunctionArgs) => {
+  if (!params.roomCode) {
+    return redirect("/");
+  }
 
-  return gameState?.started ? <Game /> : <Lobby roomCode={roomCode} />;
+  if (!localStorage.getItem("playerName")) {
+    return redirect(`/name?roomCode=${params.roomCode}`);
+  }
+
+  return params.roomCode;
 };
+
+const RoomUnwrapped = () => {
+  const roomCode = useLoaderData() as string;
+  const { gameState } = useGameState();
+  useSetAppbarText(roomCode);
+
+  return (
+    <>
+      <DocTitle>{roomCode}</DocTitle>
+      {gameState?.started ? <Game /> : <Lobby roomCode={roomCode} />}
+    </>
+  );
+};
+
+export const Room = () => (
+  <GameStateProvider>
+    <RoomUnwrapped />
+  </GameStateProvider>
+);

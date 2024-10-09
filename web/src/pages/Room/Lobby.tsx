@@ -15,7 +15,6 @@ import {
 import { Link } from "react-router-dom";
 import { SocketIncoming } from "../../../../server/types/socket.types";
 import { useGameState } from "../../contexts/GameStateContext";
-import { useRouterContext } from "../../contexts/RouterContext";
 import EditIcon from "../../icons/EditIcon";
 
 interface LobbyProps {
@@ -23,11 +22,9 @@ interface LobbyProps {
 }
 
 export const Lobby = ({ roomCode }: LobbyProps) => {
-  const { setNewRoomCode } = useRouterContext();
   const { players, currentPlayerId, sendGameUpdate } = useGameState();
 
   const handleStartGame = () => {
-    setNewRoomCode(null);
     sendGameUpdate({ type: SocketIncoming.StartGame });
   };
 
@@ -68,7 +65,7 @@ export const Lobby = ({ roomCode }: LobbyProps) => {
       </List>
       <Divider />
       <FormControl display="flex" flexDirection="column">
-        <ButtonGroup direction="row" gap="2">
+        <ButtonGroup flexDirection="row" gap="2">
           <Button to="/" as={Link} variant="outline" flex="1">
             Leave Lobby
           </Button>

@@ -1,56 +1,73 @@
-import { Box, Button, FormControl, FormErrorMessage, FormLabel, Input } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAppbarText } from "../hooks/useAppbarText";
-import { useDocTitle } from "../hooks/useDocTitle";
+import { useEffect } from "react";
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  InputGroup,
+  useToast,
+  VisuallyHiddenInput,
+} from "@chakra-ui/react";
+import { ActionFunction, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData } from "react-router-dom";
+import { useSetAppbarText } from "../contexts/AppbarContext";
+import { DocTitle } from "../components/DocTitle";
+
+export const playerNameLoader = ({ request }: LoaderFunctionArgs) => {
+  const roomCode = new URL(request.url).searchParams.get("roomCode");
+  const defaultName = localStorage.getItem("playerName");
+  return { roomCode, defaultName };
+};
+
+export const playerNameAction: ActionFunction = async ({ request }) => {
+  const playerName = (await request.formData()).get("playerName")?.toString() ?? "";
+  const trimmedPlayerName = playerName.trim();
+
+  if (trimmedPlayerName.length === 0 || trimmedPlayerName.length > 15) {
+    return playerName;
+  }
+
+  localStorage.setItem("playerName", trimmedPlayerName);
+  const roomCode = new URL(request.url).searchParams.get("roomCode");
+  return redirect(roomCode ? `/room/${roomCode}` : "/");
+};
 
 export const PlayerName = () => {
-  const navigate = useNavigate();
-  useAppbarText("Player Name");
-  useDocTitle("Player Name");
-  const [searchParams] = useSearchParams();
-  const [playerName, setPlayerName] = useState<string>(localStorage.getItem("playerName") ?? "");
-  const [error, setError] = useState<boolean>(false);
+  const toast = useToast();
+  useSetAppbarText("Player Name");
+  const { defaultName, roomCode } = useLoaderData() as ReturnType<typeof playerNameLoader>;
+  const badName = useActionData() as string | undefined;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const roomCode = searchParams.get("roomCode");
-
-    const trimmedPlayerName = playerName.trim();
-    if (trimmedPlayerName.length === 0 || trimmedPlayerName.length > 15) setError(true);
-    else {
-      localStorage.setItem("playerName", trimmedPlayerName);
-      navigate(roomCode ? `/room/${roomCode}` : "/");
+  useEffect(() => {
+    if (typeof badName === "string") {
+      toast({
+        title: "Please enter a valid name. Max of 15 characters.",
+        status: "error",
+      });
     }
-  };
+  }, [badName]);
 
   return (
-    <Box as="form" marginX="auto" marginY="8" width="sm" onSubmit={handleSubmit}>
-      <FormControl isRequired isInvalid={error} id="name">
-        <FormLabel>Your Name</FormLabel>
-        <Box display="flex" gridGap="3">
-          <Input
-            autoFocus
-            value={playerName}
-            maxLength={15}
-            // placeholder=""
-            onChange={(e) => {
-              if (error) setError(false);
-              setPlayerName(e.target.value);
-            }}
-            textAlign="center"
-          />
-          <Button type="submit" width="24">
-            Save
-          </Button>
-        </Box>
-        <FormErrorMessage>
-          Please enter a valid name.
-          <br />
-          Max characters: 15
-        </FormErrorMessage>
-      </FormControl>
-    </Box>
+    <>
+      <DocTitle>Player Name</DocTitle>
+      <Box as={Form} method="post" marginX="auto" marginY="8" width="sm">
+        <FormControl isRequired id="playerName">
+          <FormLabel>Your Name</FormLabel>
+          <InputGroup gap="3">
+            <Input
+              autoFocus
+              defaultValue={badName ?? defaultName ?? undefined}
+              maxLength={15}
+              textAlign="center"
+              name="playerName"
+            />
+            {roomCode ? <VisuallyHiddenInput value={roomCode} name="roomCode" readOnly /> : null}
+            <Button type="submit" width="24">
+              Save
+            </Button>
+          </InputGroup>
+        </FormControl>
+      </Box>
+    </>
   );
 };
