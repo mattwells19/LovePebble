@@ -17,7 +17,7 @@ export const DiscardDrawer = ({ discard, ...drawerProps }: DiscardDrawerProps) =
           <Label>Top</Label>
         </DrawerHeader>
         {/* The most recently played card should show at the top of the list */}
-        <DrawerBody display="flex" flexDirection="column" gap="3" alignItems="center">
+        <DrawerBody display="flex" flexDirection="column" gap="3" alignItems="center" overflow="auto">
           {discard.map((character, index) => (
             <CharacterCard key={index} character={character} />
           ))}

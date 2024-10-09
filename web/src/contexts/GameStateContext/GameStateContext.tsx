@@ -70,7 +70,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
     return (
       roomGameState.discard
         .map((card, index) => {
-          if ((roomSize === 2 && index < 3) || (roomSize > 2 && index === 0)) {
+          if (index === 0) {
             return "Hidden";
           } else {
             return card;

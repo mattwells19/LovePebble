@@ -9,7 +9,6 @@ import PlayerHand from "../../components/PlayerHand";
 import { ActionHeading } from "../../components/ActionHeading";
 import { BigSubmitButton } from "../../components/BigSubmitButton";
 import { SocketIncoming } from "../../../../server/types/socket.types";
-import { Card } from "../../../../server/types/types";
 import { CardPicker } from "../../components/CardPicker";
 import { SubmittedActionResult } from "../../components/SubmittedActionResult";
 
@@ -37,30 +36,6 @@ export const Game = () => {
     } else if (gameState.details && "submitted" in gameState.details && gameState.details.submitted) {
       sendGameUpdate({ type: SocketIncoming.AcknowledgeAction });
     } else {
-      if (gameState.details && "chosenPlayerId" in gameState.details) {
-        const playerSelect = formData.get("playerSelect")?.toString();
-        if (!playerSelect) {
-          toast({
-            title: "Select a player",
-            variant: "solid",
-            status: "error",
-          });
-          return;
-        }
-      }
-
-      if (gameState.details && gameState.cardPlayed === Card.Guard) {
-        const cardSelect = formData.get("cardSelect")?.toString();
-        if (!cardSelect) {
-          toast({
-            title: "Select a character to guess",
-            variant: "solid",
-            status: "error",
-          });
-          return;
-        }
-      }
-
       sendGameUpdate({ type: SocketIncoming.SubmitSelection });
     }
   };

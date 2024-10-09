@@ -33,6 +33,7 @@ export const CharacterCard = ({ character = "Hidden", button, ...rest }: Charact
       background="gray.500"
       display="grid"
       placeItems="center"
+      flexShrink={0}
       {...rest}
     >
       {character !== "Hidden" ? (

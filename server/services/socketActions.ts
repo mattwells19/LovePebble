@@ -255,6 +255,8 @@ export function handleSubmitSelection(roomCode: string, room: RoomData): Outgoin
       return cardActionHandlers.handlePlayedBaron(roomCode, room);
     case Card.Handmaid:
       return cardActionHandlers.handlePlayedHandmaid(roomCode, room);
+    case Card.Prince:
+      return cardActionHandlers.handlePlayedPrince(roomCode, room);
     default:
       throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
   }

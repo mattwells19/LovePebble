@@ -1,4 +1,4 @@
-import type { Card, Player, PlayerId, RoomData } from "../types/types.ts";
+import { Card, type Player, type PlayerId, type RoomData } from "../types/types.ts";
 
 export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Player {
   const player = roomData.players.get(playerId);
@@ -14,7 +14,7 @@ export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Pl
  * @param card The card being validated
  * @returns The player ID and player object for the chosen player
  */
-export function validatePlayerSelection(roomData: RoomData, card: Card): [PlayerId, Player] {
+export function validatePlayerSelection(roomData: RoomData, card: Card): [PlayerId, Player] | [null, null] {
   if (roomData.game.cardPlayed !== card) {
     throw new Error(`Card played isn't a ${card}. Card played: ${roomData.game.cardPlayed}.`);
   }
@@ -24,12 +24,26 @@ export function validatePlayerSelection(roomData: RoomData, card: Card): [Player
   }
 
   const chosenPlayerId = roomData.game.details.chosenPlayerId;
-  if (!chosenPlayerId) {
-    throw new Error(`Missing chosenPlayerId processing ${card} action.`);
+
+  const choosablePlayerIds = roomData.players.entries().reduce((acc, [playerId, player]) => {
+    if (player.outOfRound || player.handmaidProtected) {
+      return acc;
+    }
+    if (playerId === roomData.game.playerTurnId && card !== Card.Prince) {
+      return acc;
+    }
+
+    return [...acc, playerId];
+  }, [] as Array<PlayerId>);
+
+  if (chosenPlayerId && !choosablePlayerIds.includes(chosenPlayerId)) {
+    throw new Error(`Not a valid player selection.`);
   }
 
-  if (roomData.game.playerTurnId === chosenPlayerId) {
-    throw new Error(`You can't choose yourself when playing ${card}.`);
+  if (!chosenPlayerId) {
+    if (choosablePlayerIds.length === 0) return [null, null];
+
+    throw new Error(`Missing chosenPlayerId processing ${card} action.`);
   }
 
   const chosenPlayer = validatePlayerExists(roomData, chosenPlayerId);
