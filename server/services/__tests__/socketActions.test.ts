@@ -2,8 +2,9 @@ import { assert, assertEquals, assertExists, assertObjectMatch } from "assert";
 import * as socketActions from "../socketActions.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { testCleanup } from "../../test.utils.ts";
-import { Player, PlayerId, RoomData, StandardDeck } from "../../types/types.ts";
+import { type Player, type PlayerId, StandardDeck } from "../../types/types.ts";
 import { SocketOutgoing } from "../../types/socket.types.ts";
+import type { RoomDataGameNotStarted } from "../../mod.ts";
 
 Deno.test("player can join a room", () => {
   const playerMap = new Map<PlayerId, Player>();
@@ -37,7 +38,7 @@ Deno.test("player can join a room", () => {
   testCleanup();
 });
 
-const MockTwoPlayerRoomData: RoomData = {
+const MockTwoPlayerRoomData: RoomDataGameNotStarted = {
   deck: [],
   discard: [],
   game: { started: false, playerTurnId: null },
@@ -48,6 +49,7 @@ const MockTwoPlayerRoomData: RoomData = {
       handmaidProtected: false,
       name: "Player 1",
       outOfRound: false,
+      playedSpy: false,
     }],
     ["24680", {
       cards: [],
@@ -55,6 +57,7 @@ const MockTwoPlayerRoomData: RoomData = {
       handmaidProtected: false,
       name: "Player 2",
       outOfRound: false,
+      playedSpy: false,
     }],
   ]),
 };
@@ -70,9 +73,7 @@ Deno.test("Start Game | Any players | First player in room is given the turn fir
   assertExists(actualRoomData.game.playerTurnId);
 
   assertEquals(actualRoomData.game.playerTurnId, firstPlayerIdInRoom);
-  assertEquals(result.data.game.playerTurnId, firstPlayerIdInRoom);
-
-  assert(result.type, SocketOutgoing.GameUpdate);
+  assertEquals(result.game.playerTurnId, firstPlayerIdInRoom);
 
   testCleanup();
 });
@@ -91,7 +92,7 @@ Deno.test("Start Game | 2 Players | Final deck count is correct", () => {
    */
   const expectedDeckCount = StandardDeck.length - 3 - 2 - 1;
   assertEquals(actualRoomData.deck.length, expectedDeckCount);
-  assertEquals(result.data.deckCount, expectedDeckCount);
+  assertEquals(result.deckCount, expectedDeckCount);
 
   testCleanup();
 });
@@ -108,12 +109,12 @@ Deno.test("Start Game | 2 Players | Discard is correct", () => {
    * a 2 player game discards 3 cards from the deck
    */
   assertEquals(actualRoomData.discard.length, 3);
-  assertEquals(result.data.discard.length, 3);
+  assertEquals(result.discard.length, 3);
 
   const reconstructedDeck = [
     ...actualRoomData.deck,
     ...actualRoomData.discard,
-    ...result.data.players.flatMap(([, player]) => player.cards),
+    ...result.players.flatMap(([, player]) => player.cards),
   ];
 
   assertEquals(reconstructedDeck.length, StandardDeck.length);
@@ -134,7 +135,7 @@ Deno.test("Start Game | 2 Players | Current player is given 2 cards and the othe
   Array.from(playersInRoom, ([playerId]) => {
     const actualPlayerData = actualRoomData.players.get(playerId);
     assertExists(actualPlayerData);
-    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)
+    const resultPlayerData = result.players.find((p) => p[0] === playerId)
       ?.[1];
     assertExists(resultPlayerData);
 
@@ -152,7 +153,7 @@ Deno.test("Start Game | 2 Players | Current player is given 2 cards and the othe
   testCleanup();
 });
 
-const MockThreePlayerRoomData: RoomData = {
+const MockThreePlayerRoomData: RoomDataGameNotStarted = {
   deck: [],
   discard: [],
   game: { started: false, playerTurnId: null },
@@ -163,6 +164,7 @@ const MockThreePlayerRoomData: RoomData = {
       handmaidProtected: false,
       name: "Player 1",
       outOfRound: false,
+      playedSpy: false,
     }],
     ["24680", {
       cards: [],
@@ -170,6 +172,7 @@ const MockThreePlayerRoomData: RoomData = {
       handmaidProtected: false,
       name: "Player 2",
       outOfRound: false,
+      playedSpy: false,
     }],
     ["13591", {
       cards: [],
@@ -177,6 +180,7 @@ const MockThreePlayerRoomData: RoomData = {
       handmaidProtected: false,
       name: "Player 3",
       outOfRound: false,
+      playedSpy: false,
     }],
   ]),
 };
@@ -195,7 +199,7 @@ Deno.test("Start Game | More than 2 players | Final deck count is correct", () =
    */
   const expectedDeckCount = StandardDeck.length - 1 - 2 - 1 - 1;
   assertEquals(actualRoomData.deck.length, expectedDeckCount);
-  assertEquals(result.data.deckCount, expectedDeckCount);
+  assertEquals(result.deckCount, expectedDeckCount);
 
   testCleanup();
 });
@@ -212,7 +216,7 @@ Deno.test("Start Game | More than 2 Players | Current player is given 2 cards an
   Array.from(playersInRoom, ([playerId]) => {
     const actualPlayerData = actualRoomData.players.get(playerId);
     assertExists(actualPlayerData);
-    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)
+    const resultPlayerData = result.players.find((p) => p[0] === playerId)
       ?.[1];
     assertExists(resultPlayerData);
 
@@ -242,12 +246,12 @@ Deno.test("Start Game | More than 2 Players | Discard is correct", () => {
    * a more than 2 player game discards 1 card from the deck
    */
   assertEquals(actualRoomData.discard.length, 1);
-  assertEquals(result.data.discard.length, 1);
+  assertEquals(result.discard.length, 1);
 
   const reconstructedDeck = [
     ...actualRoomData.deck,
     ...actualRoomData.discard,
-    ...result.data.players.flatMap(([, player]) => player.cards),
+    ...result.players.flatMap(([, player]) => player.cards),
   ];
 
   assertEquals(reconstructedDeck.length, StandardDeck.length);

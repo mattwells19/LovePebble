@@ -1,7 +1,7 @@
 import { assert, assertEquals, assertExists } from "assert";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { createNewRoom, testCleanup } from "../../test.utils.ts";
-import { Player } from "../../types/types.ts";
+import type { Player } from "../../types/types.ts";
 import { checkRoomCode, createRoomWithCode, getNewRoomCode, removePlayerFromRoom } from "../rooms.ts";
 
 Deno.test("can create 100 new, unique rooms", () => {
@@ -49,6 +49,7 @@ Deno.test("player is removed from room", () => {
     handmaidProtected: false,
     name: "test",
     outOfRound: false,
+    playedSpy: false,
   };
 
   const room = Rooms.get(roomCode);
@@ -82,6 +83,7 @@ Deno.test("room is removed if last player is removed from room", () => {
     handmaidProtected: false,
     name: "test",
     outOfRound: false,
+    playedSpy: false,
   };
 
   const room = Rooms.get(roomCode);
