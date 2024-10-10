@@ -1,3 +1,4 @@
+import { decode, encode } from "@msgpack/msgpack";
 import { SocketIncoming, type SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
 import type { Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
@@ -41,8 +42,8 @@ export function registerSocketHandlers(socket: WebSocket) {
     }
   };
 
-  socket.onmessage = (msg: MessageEvent<string>) => {
-    const data: SocketMessage = JSON.parse(msg.data);
+  socket.onmessage = (msg: MessageEvent<Uint8Array>) => {
+    const data = decode(msg.data) as SocketMessage;
 
     try {
       switch (data.type) {
@@ -168,7 +169,7 @@ export function registerSocketHandlers(socket: WebSocket) {
   };
 
   function sendToSocket<TData>(data: { type: SocketOutgoing; data: TData }) {
-    socket.send(JSON.stringify(data));
+    socket.send(encode(data));
   }
 }
 
@@ -184,7 +185,8 @@ function sendMessageToRoom<TData>(roomCode: string, data: { type: SocketOutgoing
     .map((playerId) => Sockets.get(playerId))
     .filter((playerSocket): playerSocket is WebSocket => Boolean(playerSocket));
 
+  const serializedData = encode(data);
   allPlayerSockets.forEach((playerSocket) => {
-    playerSocket.send(JSON.stringify(data));
+    playerSocket.send(serializedData);
   });
 }

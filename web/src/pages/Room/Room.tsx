@@ -1,9 +1,9 @@
-import { LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom";
-import { GameStateProvider, useGameState } from "../../contexts/GameStateContext";
-import { useSetAppbarText } from "../../contexts/AppbarContext";
-import { DocTitle } from "../../components/DocTitle";
-import { Game } from "./Game";
-import { Lobby } from "./Lobby";
+import { type LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom";
+import { GameStateProvider, useGameState } from "../../contexts/GameStateContext/index.ts";
+import { useSetAppbarText } from "../../contexts/AppbarContext.tsx";
+import { DocTitle } from "../../components/DocTitle.tsx";
+import { Game } from "./Game.tsx";
+import { Lobby } from "./Lobby.tsx";
 
 export const roomLoader = ({ params }: LoaderFunctionArgs) => {
   if (!params.roomCode) {

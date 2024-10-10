@@ -1,10 +1,14 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@std/assert@1.0.6": "1.0.6",
+    "jsr:@std/collections@1.0.7": "1.0.7",
+    "jsr:@std/internal@^1.0.4": "1.0.4",
     "jsr:@std/path@*": "1.0.6",
     "npm:@chakra-ui/react@2.10.1": "2.10.1_@emotion+react@11.13.3__react@18.3.1_@emotion+styled@11.13.0__@emotion+react@11.13.3___react@18.3.1__react@18.3.1_framer-motion@11.11.1__react@18.3.1__react-dom@18.3.1___react@18.3.1_react@18.3.1_react-dom@18.3.1__react@18.3.1_@chakra-ui+styled-system@2.11.1__react@18.3.1",
     "npm:@emotion/react@11.13.3": "11.13.3_react@18.3.1",
     "npm:@emotion/styled@11.13.0": "11.13.0_@emotion+react@11.13.3__react@18.3.1_react@18.3.1",
+    "npm:@msgpack/msgpack@2.8.0": "2.8.0",
     "npm:@vitejs/plugin-react@4.3.2": "4.3.2_vite@5.4.8_@babel+core@7.25.7",
     "npm:concurrently@9.0.1": "9.0.1",
     "npm:framer-motion@11.11.1": "11.11.1_react@18.3.1_react-dom@18.3.1__react@18.3.1",
@@ -16,6 +20,18 @@
     "npm:vite@5.4.8": "5.4.8"
   },
   "jsr": {
+    "@std/assert@1.0.6": {
+      "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/collections@1.0.7": {
+      "integrity": "6cff6949907372564735e25a5c6a7945d67cc31913b1b4d1278d08c2a5a3291d"
+    },
+    "@std/internal@1.0.4": {
+      "integrity": "62e8e4911527e5e4f307741a795c0b0a9e6958d0b3790716ae71ce085f755422"
+    },
     "@std/path@1.0.6": {
       "integrity": "ab2c55f902b380cf28e0eec501b4906e4c1960d13f00e11cfbcd21de15f18fed"
     }
@@ -435,6 +451,9 @@
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
       ]
+    },
+    "@msgpack/msgpack@2.8.0": {
+      "integrity": "sha512-h9u4u/jiIRKbq25PM+zymTyW6bhTzELvOoUd+AvYriWOAKpLGnIamaET3pnHYoI5iYphAHBI4ayx0MehR+VVPQ=="
     },
     "@popperjs/core@2.11.8": {
       "integrity": "sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A=="
@@ -1256,7 +1275,8 @@
     "members": {
       "server": {
         "dependencies": [
-          "jsr:@std/assert@1.0.6"
+          "jsr:@std/assert@1.0.6",
+          "npm:@msgpack/msgpack@2.8.0"
         ]
       },
       "web": {
@@ -1264,6 +1284,7 @@
           "npm:@chakra-ui/react@2.10.1",
           "npm:@emotion/react@11.13.3",
           "npm:@emotion/styled@11.13.0",
+          "npm:@msgpack/msgpack@2.8.0",
           "npm:@vitejs/plugin-react@4.3.2",
           "npm:framer-motion@11.11.1",
           "npm:react-dom@19.0.0-rc-1460d67c-20241003",

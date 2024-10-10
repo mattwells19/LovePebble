@@ -1,5 +1,6 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { decodeAsync, encode } from "@msgpack/msgpack";
 import { type Card, SocketIncoming, type SocketMessage as OutboundSocketMessage } from "@lovepebble/server";
 import type { SocketMessage } from "./GameStateContext.types.ts";
 import { type RoomGameState, useGameStateReducer } from "./useGameStateReducer.ts";
@@ -18,7 +19,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
   const webscoketRef = useRef<WebSocket | null>(null);
 
   const sendGameUpdate = (msg: OutboundSocketMessage) => {
-    webscoketRef.current?.send(JSON.stringify(msg));
+    webscoketRef.current?.send(encode(msg));
   };
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
 
     webscoketRef.current.addEventListener("open", () => {
       webscoketRef.current?.send(
-        JSON.stringify({
+        encode({
           playerName: localStorage.getItem("playerName"),
           roomCode,
           type: SocketIncoming.Join,
@@ -39,9 +40,10 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
       );
     });
 
-    webscoketRef.current.addEventListener("message", (msg: MessageEvent<string>) => {
-      const socketMsg: SocketMessage = JSON.parse(msg.data);
-      dispatch(socketMsg);
+    webscoketRef.current.addEventListener("message", (msg: MessageEvent<Blob>) => {
+      decodeAsync(msg.data.stream()).then((socketMsg) => {
+        dispatch(socketMsg as SocketMessage);
+      });
     });
 
     webscoketRef.current.addEventListener("error", (e) => {

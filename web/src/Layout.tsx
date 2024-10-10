@@ -1,10 +1,10 @@
 import { chakra } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { AppbarProvider } from "./contexts/AppbarContext";
-import { Home } from "./pages/Home";
-import { PlayerName, playerNameAction, playerNameLoader } from "./pages/PlayerName";
-import { Room, roomLoader } from "./pages/Room";
-import { Appbar } from "./components/Appbar";
+import { AppbarProvider } from "./contexts/AppbarContext.tsx";
+import { Appbar } from "./components/Appbar.tsx";
+import { Home } from "./pages/Home.tsx";
+import { PlayerName, playerNameAction, playerNameLoader } from "./pages/PlayerName.tsx";
+import { Room, roomLoader } from "./pages/Room/index.ts";
 
 const router = createBrowserRouter([
   {
