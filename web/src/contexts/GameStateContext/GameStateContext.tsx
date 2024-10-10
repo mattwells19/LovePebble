@@ -1,9 +1,8 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { SocketIncoming, SocketMessage as OutboundSocketMessage } from "../../../../server/types/socket.types";
-import { Card } from "../../../../server/types/types";
-import { SocketMessage } from "./GameStateContext.types";
-import { RoomGameState, useGameStateReducer } from "./useGameStateReducer";
+import { type Card, SocketIncoming, type SocketMessage as OutboundSocketMessage } from "@lovepebble/server";
+import type { SocketMessage } from "./GameStateContext.types.ts";
+import { type RoomGameState, useGameStateReducer } from "./useGameStateReducer.ts";
 
 interface GameStateContextValue extends Omit<RoomGameState, "discard"> {
   discard: Array<Card | "Hidden">;

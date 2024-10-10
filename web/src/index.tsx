@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
-import { extendTheme, ChakraProvider } from "@chakra-ui/react";
-import { Layout } from "./Layout";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { Layout } from "./Layout.tsx";
 
 const theme = extendTheme({
   colors: {
@@ -39,7 +39,10 @@ const root = createRoot(document.getElementById("root")!);
 
 root.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme} toastOptions={{ defaultOptions: { position: "top-right" } }}>
+    <ChakraProvider
+      theme={theme}
+      toastOptions={{ defaultOptions: { position: "top-right" } }}
+    >
       <Layout />
     </ChakraProvider>
   </React.StrictMode>,

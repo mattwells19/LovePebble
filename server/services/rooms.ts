@@ -1,4 +1,4 @@
-import { sample } from "../deps.ts";
+import { sample } from "jsr:@std/collections@1.0.7";
 import { Rooms } from "../repositories/Rooms.ts";
 import type { Player, PlayerId, RoomDataGameNotStarted } from "../types/types.ts";
 

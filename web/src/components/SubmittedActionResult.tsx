@@ -1,9 +1,9 @@
-import { ReactElement } from "react";
+import type { ReactElement } from "react";
 import { Box } from "@chakra-ui/react";
-import { useGameState } from "../contexts/GameStateContext";
-import { Card } from "../../../server/types/types";
-import { Label } from "./Label";
-import { CharacterCard } from "./CharacterCard";
+import { useGameState } from "../contexts/GameStateContext/index.ts";
+import { Card } from "@lovepebble/server";
+import { Label } from "./Label.tsx";
+import { CharacterCard } from "./CharacterCard.tsx";
 
 export const SubmittedActionResult = (): ReactElement | null => {
   const { currentPlayerId, gameState, players } = useGameState();
@@ -33,7 +33,9 @@ export const SubmittedActionResult = (): ReactElement | null => {
   ) {
     return (
       <Box display="flex" flexDirection="column" gap="1">
-        <Label>{gameState.details.winningPlayerId === currentPlayerId ? "You won!" : "You lost."}</Label>
+        <Label>
+          {gameState.details.winningPlayerId === currentPlayerId ? "You won!" : "You lost."}
+        </Label>
         <Box display="flex" gap="3" margin="auto">
           <CharacterCard character={currentPlayer.cards[0]} />
           <CharacterCard character={chosenPlayer.cards[0]} />

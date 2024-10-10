@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useState } from "react";
 
 const AppbarTextContext = createContext<string | null>(null);
 const SetAppbarTextContext = createContext<React.Dispatch<React.SetStateAction<string>> | null>(null);
@@ -8,7 +8,9 @@ export const AppbarProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <SetAppbarTextContext.Provider value={setAppbarText}>
-      <AppbarTextContext.Provider value={appBarText}>{children}</AppbarTextContext.Provider>
+      <AppbarTextContext.Provider value={appBarText}>
+        {children}
+      </AppbarTextContext.Provider>
     </SetAppbarTextContext.Provider>
   );
 };

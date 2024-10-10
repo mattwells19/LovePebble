@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertExists, assertObjectMatch } from "../../deps.ts";
+import { assert, assertEquals, assertExists, assertObjectMatch } from "assert";
 import * as socketActions from "../socketActions.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { testCleanup } from "../../test.utils.ts";
@@ -10,7 +10,12 @@ Deno.test("player can join a room", () => {
 
   const result = socketActions.join(
     { playerId: "12345", roomId: null },
-    { deck: [], discard: [], game: { started: false, playerTurnId: null }, players: playerMap },
+    {
+      deck: [],
+      discard: [],
+      game: { started: false, playerTurnId: null },
+      players: playerMap,
+    },
     "test",
   );
 
@@ -37,8 +42,20 @@ const MockTwoPlayerRoomData: RoomData = {
   discard: [],
   game: { started: false, playerTurnId: null },
   players: new Map<PlayerId, Player>([
-    ["12345", { cards: [], gameScore: 0, handmaidProtected: false, name: "Player 1", outOfRound: false }],
-    ["24680", { cards: [], gameScore: 0, handmaidProtected: false, name: "Player 2", outOfRound: false }],
+    ["12345", {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: "Player 1",
+      outOfRound: false,
+    }],
+    ["24680", {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: "Player 2",
+      outOfRound: false,
+    }],
   ]),
 };
 
@@ -117,7 +134,8 @@ Deno.test("Start Game | 2 Players | Current player is given 2 cards and the othe
   Array.from(playersInRoom, ([playerId]) => {
     const actualPlayerData = actualRoomData.players.get(playerId);
     assertExists(actualPlayerData);
-    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)?.[1];
+    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)
+      ?.[1];
     assertExists(resultPlayerData);
 
     if (playerId === actualRoomData.game.playerTurnId) {
@@ -139,9 +157,27 @@ const MockThreePlayerRoomData: RoomData = {
   discard: [],
   game: { started: false, playerTurnId: null },
   players: new Map<PlayerId, Player>([
-    ["12345", { cards: [], gameScore: 0, handmaidProtected: false, name: "Player 1", outOfRound: false }],
-    ["24680", { cards: [], gameScore: 0, handmaidProtected: false, name: "Player 2", outOfRound: false }],
-    ["13591", { cards: [], gameScore: 0, handmaidProtected: false, name: "Player 3", outOfRound: false }],
+    ["12345", {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: "Player 1",
+      outOfRound: false,
+    }],
+    ["24680", {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: "Player 2",
+      outOfRound: false,
+    }],
+    ["13591", {
+      cards: [],
+      gameScore: 0,
+      handmaidProtected: false,
+      name: "Player 3",
+      outOfRound: false,
+    }],
   ]),
 };
 
@@ -176,7 +212,8 @@ Deno.test("Start Game | More than 2 Players | Current player is given 2 cards an
   Array.from(playersInRoom, ([playerId]) => {
     const actualPlayerData = actualRoomData.players.get(playerId);
     assertExists(actualPlayerData);
-    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)?.[1];
+    const resultPlayerData = result.data.players.find((p) => p[0] === playerId)
+      ?.[1];
     assertExists(resultPlayerData);
 
     if (playerId === actualRoomData.game.playerTurnId) {

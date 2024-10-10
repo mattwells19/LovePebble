@@ -1,8 +1,8 @@
-import { assert, assertEquals, assertExists } from "../../deps.ts";
+import { assert, assertEquals, assertExists } from "assert";
 import { Rooms } from "../../repositories/Rooms.ts";
-import { testCleanup, createNewRoom } from "../../test.utils.ts";
+import { createNewRoom, testCleanup } from "../../test.utils.ts";
 import { Player } from "../../types/types.ts";
-import { checkRoomCode, removePlayerFromRoom, createRoomWithCode, getNewRoomCode } from "../rooms.ts";
+import { checkRoomCode, createRoomWithCode, getNewRoomCode, removePlayerFromRoom } from "../rooms.ts";
 
 Deno.test("can create 100 new, unique rooms", () => {
   for (let i = 0; i < 100; i++) {

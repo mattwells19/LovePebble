@@ -12,7 +12,7 @@ import {
   type PlayerId,
   type RoomData,
 } from "../types/types.ts";
-import { updatePlayer, prepRoomDataForNextTurn, knockPlayerOutOfRound, drawCardFromDeck } from "./gameFlow.ts";
+import { drawCardFromDeck, knockPlayerOutOfRound, prepRoomDataForNextTurn, updatePlayer } from "./gameFlow.ts";
 import * as validators from "./validators.ts";
 
 export function handlePlayedSpy(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
@@ -67,7 +67,8 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
         players: updatedRoomData.players,
         game: {
           ...gameData,
-          lastMoveDescription: `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
+          lastMoveDescription:
+            `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
         },
       };
     } else {
@@ -78,7 +79,8 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
         players: roomData.players,
         game: {
           ...gameData,
-          lastMoveDescription: `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
+          lastMoveDescription:
+            `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
         },
       };
     }
@@ -90,7 +92,8 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
       players: roomData.players,
       game: {
         ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
       },
     };
   }
@@ -124,7 +127,8 @@ export function handlePlayedPriest(roomCode: string, roomData: RoomData): Outgoi
           ...gameData.details,
           submitted: true,
         },
-        lastMoveDescription: `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
       },
     };
   } else {
@@ -134,7 +138,8 @@ export function handlePlayedPriest(roomCode: string, roomData: RoomData): Outgoi
       players: roomData.players,
       game: {
         ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
       },
     };
 
@@ -194,7 +199,8 @@ export function handlePlayedBaron(roomCode: string, roomData: RoomData): Outgoin
           winningPlayerId,
           submitted: true,
         },
-        lastMoveDescription: `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
       },
     };
   } else {
@@ -204,7 +210,8 @@ export function handlePlayedBaron(roomCode: string, roomData: RoomData): Outgoin
       players: roomData.players,
       game: {
         ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
       },
     };
 
@@ -269,7 +276,8 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
         players: updatedRoomData.players,
         game: {
           ...gameData,
-          lastMoveDescription: `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
+          lastMoveDescription:
+            `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
         },
       };
     } else {
@@ -299,7 +307,9 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
         players: updatedPlayers,
         game: {
           ...gameData,
-          lastMoveDescription: `${playingPlayer.name} played the Prince, and made ${choseThemself ? "themselves" : chosenPlayer.name} discard their ${cardToDiscard}.`,
+          lastMoveDescription: `${playingPlayer.name} played the Prince, and made ${
+            choseThemself ? "themselves" : chosenPlayer.name
+          } discard their ${cardToDiscard}.`,
         },
       };
     }
@@ -310,7 +320,8 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
       players: roomData.players,
       game: {
         ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
+        lastMoveDescription:
+          `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
       },
     };
   }

@@ -1,4 +1,4 @@
-import { Card, GameData, Player, PlayerId } from "./types.ts";
+import type { Card, GameData, Player, PlayerId } from "./types.ts";
 
 export const enum SocketIncoming {
   Join = "join",

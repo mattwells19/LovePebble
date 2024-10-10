@@ -9,9 +9,16 @@ import {
   useToast,
   VisuallyHiddenInput,
 } from "@chakra-ui/react";
-import { ActionFunction, Form, LoaderFunctionArgs, redirect, useActionData, useLoaderData } from "react-router-dom";
-import { useSetAppbarText } from "../contexts/AppbarContext";
-import { DocTitle } from "../components/DocTitle";
+import {
+  type ActionFunction,
+  Form,
+  type LoaderFunctionArgs,
+  redirect,
+  useActionData,
+  useLoaderData,
+} from "react-router-dom";
+import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
+import { DocTitle } from "../components/DocTitle.tsx";
 
 export const playerNameLoader = ({ request }: LoaderFunctionArgs) => {
   const roomCode = new URL(request.url).searchParams.get("roomCode");
@@ -61,7 +68,15 @@ export const PlayerName = () => {
               textAlign="center"
               name="playerName"
             />
-            {roomCode ? <VisuallyHiddenInput value={roomCode} name="roomCode" readOnly /> : null}
+            {roomCode
+              ? (
+                <VisuallyHiddenInput
+                  value={roomCode}
+                  name="roomCode"
+                  readOnly
+                />
+              )
+              : null}
             <Button type="submit" width="24">
               Save
             </Button>

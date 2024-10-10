@@ -1,11 +1,11 @@
 import { Box, Text, VisuallyHiddenInput } from "@chakra-ui/react";
-import { InputHTMLAttributes, ReactElement } from "react";
+
+import type { InputHTMLAttributes, ReactElement } from "react";
 import { css } from "@emotion/react";
-import { SocketIncoming } from "../../../server/types/socket.types";
-import { Card } from "../../../server/types/types";
-import { useGameState } from "../contexts/GameStateContext";
-import { Characters } from "./CharacterCard";
-import { Label } from "./Label";
+import { Card, SocketIncoming } from "@lovepebble/server";
+import { useGameState } from "../contexts/GameStateContext/index.ts";
+import { Characters } from "./CharacterCard.tsx";
+import { Label } from "./Label.tsx";
 
 const cardOptionClass = css`
   cursor: pointer;
@@ -71,7 +71,13 @@ const CardOption = ({ children, ...inputProps }: InputHTMLAttributes<HTMLInputEl
   })();
 
   return (
-    <Box as="label" fontSize="large" htmlFor={inputProps.id} css={cardOptionClass} tabIndex={0}>
+    <Box
+      as="label"
+      fontSize="large"
+      htmlFor={inputProps.id}
+      css={cardOptionClass}
+      tabIndex={0}
+    >
       <VisuallyHiddenInput
         type="radio"
         tabIndex={-1}
@@ -80,7 +86,13 @@ const CardOption = ({ children, ...inputProps }: InputHTMLAttributes<HTMLInputEl
       />
       <Box padding="1" display="flex" justifyContent="space-between">
         <Box display="flex" gap="3">
-          <Box display="grid" placeItems="center" backgroundColor={color} borderRadius="md" width="25px">
+          <Box
+            display="grid"
+            placeItems="center"
+            backgroundColor={color}
+            borderRadius="md"
+            width="25px"
+          >
             <Text as="span" color="whiteAlpha.900">
               {inputProps.value}
             </Text>

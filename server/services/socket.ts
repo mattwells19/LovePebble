@@ -1,4 +1,4 @@
-import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import { SocketIncoming, type SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
 import type { Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";

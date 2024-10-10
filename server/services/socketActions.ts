@@ -1,8 +1,16 @@
 import { Rooms } from "../repositories/Rooms.ts";
-import { OutgoingGameStateUpdate, SocketOutgoing } from "../types/socket.types.ts";
-import { Card, GameData, Player, PlayerId, RoomData, StandardDeck, RoomDataGameNotStarted } from "../types/types.ts";
+import { type OutgoingGameStateUpdate, SocketOutgoing } from "../types/socket.types.ts";
+import {
+  Card,
+  type GameData,
+  type Player,
+  type PlayerId,
+  type RoomData,
+  type RoomDataGameNotStarted,
+  StandardDeck,
+} from "../types/types.ts";
 import { shuffle } from "../utils.ts";
-import { SocketData } from "./socket.ts";
+import type { SocketData } from "./socket.ts";
 import * as cardActionHandlers from "./card-action-handlers.ts";
 import { knockPlayerOutOfRound, prepRoomDataForNextTurn } from "./gameFlow.ts";
 import { validatePlayerExists } from "./validators.ts";
@@ -266,10 +274,9 @@ export function handleAcknowledgeAction(roomCode: string, room: RoomData): Outgo
   let updatedRoomData = room;
 
   if (room.game.cardPlayed === Card.Baron) {
-    const losingplayerId =
-      room.game.details.winningPlayerId === room.game.playerTurnId
-        ? room.game.details.chosenPlayerId
-        : room.game.playerTurnId;
+    const losingplayerId = room.game.details.winningPlayerId === room.game.playerTurnId
+      ? room.game.details.chosenPlayerId
+      : room.game.playerTurnId;
     if (!losingplayerId) {
       throw new Error(`No losing player to update ?`);
     }

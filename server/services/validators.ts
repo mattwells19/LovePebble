@@ -9,7 +9,6 @@ export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Pl
 }
 
 /**
- *
  * @param roomData The current state of the room
  * @param card The card being validated
  * @returns The player ID and player object for the chosen player
@@ -50,7 +49,9 @@ export function validatePlayerSelection(roomData: RoomData, card: Card): [Player
 
   if (chosenPlayer.handmaidProtected || chosenPlayer.outOfRound) {
     throw new Error(
-      `Cannot choose someone who is handmaid protected or who's not in the round. Card: ${card}, Chosen player: ${JSON.stringify(chosenPlayer)}`,
+      `Cannot choose someone who is handmaid protected or who's not in the round. Card: ${card}, Chosen player: ${
+        JSON.stringify(chosenPlayer)
+      }`,
     );
   }
 

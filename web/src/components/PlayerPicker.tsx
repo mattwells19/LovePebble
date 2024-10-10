@@ -1,10 +1,9 @@
 import { Box, Text, VisuallyHiddenInput } from "@chakra-ui/react";
-import { InputHTMLAttributes, ReactElement } from "react";
+import type { InputHTMLAttributes, ReactElement } from "react";
 import { css } from "@emotion/react";
-import { SocketIncoming } from "../../../server/types/socket.types";
-import { Card, PlayerId } from "../../../server/types/types";
-import { useGameState } from "../contexts/GameStateContext";
-import { Label } from "./Label";
+import { Card, type PlayerId, SocketIncoming } from "@lovepebble/server";
+import { useGameState } from "../contexts/GameStateContext/index.ts";
+import { Label } from "./Label.tsx";
 
 const playerOpionClass = css`
   cursor: pointer;
@@ -56,7 +55,13 @@ interface PlayerOptionProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const PlayerOption = ({ children, isOutOfRound, isProtected, ...inputProps }: PlayerOptionProps): ReactElement => {
   return (
-    <Box as="label" fontSize="large" htmlFor={inputProps.id} css={playerOpionClass} tabIndex={0}>
+    <Box
+      as="label"
+      fontSize="large"
+      htmlFor={inputProps.id}
+      css={playerOpionClass}
+      tabIndex={0}
+    >
       <VisuallyHiddenInput
         type="radio"
         tabIndex={-1}
@@ -64,14 +69,30 @@ const PlayerOption = ({ children, isOutOfRound, isProtected, ...inputProps }: Pl
         disabled={inputProps.disabled || isOutOfRound || isProtected}
       />
       <Box paddingY="1" position="relative">
-        <Text as="span" aria-hidden="true" role="presentation" css={playerOptionStatusIconClass}>
-          {isOutOfRound ? (
-            "💀"
-          ) : isProtected ? (
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-              <path d="M3.78307 2.82598L12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598Z"></path>
-            </svg>
-          ) : null}
+        <Text
+          as="span"
+          aria-hidden="true"
+          role="presentation"
+          css={playerOptionStatusIconClass}
+        >
+          {isOutOfRound
+            ? (
+              "💀"
+            )
+            : isProtected
+            ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
+                <path d="M3.78307 2.82598L12 1L20.2169 2.82598C20.6745 2.92766 21 3.33347 21 3.80217V13.7889C21 15.795 19.9974 17.6684 18.3282 18.7812L12 23L5.6718 18.7812C4.00261 17.6684 3 15.795 3 13.7889V3.80217C3 3.33347 3.32553 2.92766 3.78307 2.82598Z">
+                </path>
+              </svg>
+            )
+            : null}
         </Text>
         {children}
       </Box>

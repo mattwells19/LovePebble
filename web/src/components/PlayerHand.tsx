@@ -1,8 +1,8 @@
 import type { ReactElement } from "react";
 import { css } from "@emotion/react";
 import { Box, Text, VisuallyHiddenInput } from "@chakra-ui/react";
-import type { Card } from "../../../server/types/types";
-import { CharacterCard, Characters } from "./CharacterCard";
+import type { Card } from "@lovepebble/server";
+import { CharacterCard, Characters } from "./CharacterCard.tsx";
 
 interface PlayerHandProps {
   isPlayersTurn: boolean;
@@ -30,9 +30,7 @@ const PlayerHand = ({ isPlayersTurn, hasPlayedCard, playerCards }: PlayerHandPro
   if (!isPlayersTurn || hasPlayedCard) {
     return (
       <>
-        {playerCards.map((card) => (
-          <CharacterCard key={card} character={card} />
-        ))}
+        {playerCards.map((card) => <CharacterCard key={card} character={card} />)}
       </>
     );
   }

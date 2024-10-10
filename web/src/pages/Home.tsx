@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Text, Box, PinInput, PinInputField, Collapse, Alert, AlertIcon, Button, Divider } from "@chakra-ui/react";
+import { Alert, AlertIcon, Box, Button, Collapse, Divider, PinInput, PinInputField, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useSetAppbarText } from "../contexts/AppbarContext";
-import { get } from "../utils/get";
-import { DocTitle } from "../components/DocTitle";
+import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
+import { get } from "../utils/get.ts";
+import { DocTitle } from "../components/DocTitle.tsx";
 
 export const Home = () => {
   const navigate = useNavigate();
@@ -67,14 +67,29 @@ export const Home = () => {
             size="lg"
             type="alphanumeric"
           >
-            <PinInputField aria-label="Room code, first letter." textTransform="uppercase" />
-            <PinInputField aria-label="Room code, second letter." textTransform="uppercase" />
-            <PinInputField aria-label="Room code, third letter." textTransform="uppercase" />
-            <PinInputField aria-label="Room code, last letter." textTransform="uppercase" />
+            <PinInputField
+              aria-label="Room code, first letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, second letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, third letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, last letter."
+              textTransform="uppercase"
+            />
           </PinInput>
         </Box>
         <Collapse in={Boolean(error)} animateOpacity>
-          <Alert status={error === "networkError" ? "error" : "warning"} width="sm">
+          <Alert
+            status={error === "networkError" ? "error" : "warning"}
+            width="sm"
+          >
             <AlertIcon />
             {error === "networkError"
               ? "There was a problem communicating with the server."

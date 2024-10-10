@@ -1,8 +1,7 @@
-import type { RoomData, PlayerId, Player, Card } from "../types/types.ts";
+import type { Card, Player, PlayerId, RoomData } from "../types/types.ts";
 import { validatePlayerExists } from "./validators.ts";
 
 /**
- *
  * @param players The current Map of players in the Room
  * @param currentPlayerTurnId The current player ID for the Room
  * @returns The ID of the next valid player who can take a turn. Will return the `currentPlayerTurnId` if they're the only va;id player in the round.
@@ -30,16 +29,18 @@ export const updatePlayer = (
 
   const updatedPlayers = new Map(players);
 
-  updatedPlayers.set(playerId, {
-    ...player,
-    ...playerUpdates,
-  } satisfies Player);
+  updatedPlayers.set(
+    playerId,
+    {
+      ...player,
+      ...playerUpdates,
+    } satisfies Player,
+  );
 
   return updatedPlayers;
 };
 
 /**
- *
  * @param deck The current deck for the room
  * @returns The new deck with the card removed and the card that was drawn. Card drawn will be NULL if the deck is empty.
  */
@@ -50,12 +51,14 @@ export const drawCardFromDeck = (deck: RoomData["deck"]): { newDeck: RoomData["d
 };
 
 /**
- *
  * @param roomData The current state of the Room
  * @returns The updated room with the turn updated, card drawn for the new player's turn, and game reset. Will call game over if conditions are met.
  */
 export const prepRoomDataForNextTurn = (roomData: RoomData): RoomData => {
   const nextPlayerTurnId = getNextPlayerTurnId(roomData.players, roomData.game.playerTurnId);
+
+  // TODO: check if new player is the only one left in the round
+
   if (nextPlayerTurnId === roomData.game.playerTurnId) {
     // TODO: handle game over
     throw new Error("game over!");
@@ -88,7 +91,6 @@ export const prepRoomDataForNextTurn = (roomData: RoomData): RoomData => {
 };
 
 /**
- *
  * @param roomData The current state of the Room
  * @param playerId The ID of the player to knock out of the current round
  * @returns The updated room state with the discard and player updated.

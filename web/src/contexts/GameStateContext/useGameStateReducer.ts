@@ -1,7 +1,6 @@
 import { useReducer } from "react";
-import { SocketOutgoing } from "../../../../server/types/socket.types";
-import { PlayerId, Player, Card, GameData } from "../../../../server/types/types";
-import { SocketMessage } from "./GameStateContext.types";
+import { type Card, type GameData, type Player, type PlayerId, SocketOutgoing } from "@lovepebble/server";
+import type { SocketMessage } from "./GameStateContext.types.ts";
 
 export interface RoomGameState {
   currentPlayerId: PlayerId;

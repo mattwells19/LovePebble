@@ -1,8 +1,0 @@
-{
-  "name": "server",
-  "version": "1.0.0",
-  "license": "MIT",
-  "scripts": {
-    "start": "deno run --allow-net --allow-read=./build --allow-env --watch server.ts"
-  }
-}

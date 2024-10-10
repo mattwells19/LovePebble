@@ -109,8 +109,9 @@ export type GameStarted = {
   lastMoveDescription: string | null;
 };
 
-export type GameData = GameStarted &
-  (
+export type GameData =
+  & GameStarted
+  & (
     | PlayedSpy
     | PlayedGuard
     | PlayedPriest

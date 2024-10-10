@@ -1,0 +1,27 @@
+{
+  "name": "@lovepebble/web",
+  "version": "1.0.0",
+  "exports": "./src/index.tsx",
+  "tasks": {
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "imports": {
+    "@chakra-ui/react": "npm:@chakra-ui/react@2.10.1",
+    "@emotion/react": "npm:@emotion/react@11.13.3",
+    "@emotion/styled": "npm:@emotion/styled@11.13.0",
+    "framer-motion": "npm:framer-motion@11.11.1",
+    "react": "npm:react@19.0.0-rc-1460d67c-20241003",
+    "react-dom": "npm:react-dom@19.0.0-rc-1460d67c-20241003",
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
+    "react-router-dom": "npm:react-router-dom@6.26.2",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@4.3.2",
+    "vite": "npm:vite@5.4.8"
+  },
+  "fmt": {
+    "singleQuote": false,
+    "lineWidth": 120
+  }
+}
