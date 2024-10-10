@@ -1,20 +1,32 @@
 import { Rooms } from "../repositories/Rooms.ts";
-import { OutgoingGameStateUpdate, SocketOutgoing } from "../types/socket.types.ts";
-import { Card, GameData, Player, PlayerId, RoomData, StandardDeck } from "../types/types.ts";
+import { type OutgoingGameStateUpdate, SocketOutgoing } from "../types/socket.types.ts";
+import {
+  Card,
+  type GameData,
+  type Player,
+  type PlayerId,
+  type RoomData,
+  type RoomDataGameNotStarted,
+  StandardDeck,
+} from "../types/types.ts";
 import { shuffle } from "../utils.ts";
-import { SocketData } from "./socket.ts";
+import type { SocketData } from "./socket.ts";
+import * as cardActionHandlers from "./card-action-handlers.ts";
+import { knockPlayerOutOfRound, prepRoomDataForNextTurn } from "./gameFlow.ts";
+import { validatePlayerExists } from "./validators.ts";
 
 interface JoinResult {
   type: SocketOutgoing.PlayerUpdate;
   data: [PlayerId, Player][];
 }
 
-export function join(socketData: SocketData, room: RoomData, playerName: string): JoinResult {
+export function join(socketData: SocketData, room: RoomData | RoomDataGameNotStarted, playerName: string): JoinResult {
   // add the new player to the room
   const newPlayer: Player = {
     cards: [],
     gameScore: 0,
     handmaidProtected: false,
+    playedSpy: false,
     name: playerName,
     outOfRound: false,
   };
@@ -26,18 +38,13 @@ export function join(socketData: SocketData, room: RoomData, playerName: string)
   };
 }
 
-interface StartGameResult {
-  type: SocketOutgoing.GameUpdate;
-  data: OutgoingGameStateUpdate;
-}
-
-export function startGame(roomCode: string, room: RoomData): StartGameResult {
+export function startGame(roomCode: string, room: RoomDataGameNotStarted): OutgoingGameStateUpdate {
   const updatedGameState: GameData = {
     cardPlayed: null,
     details: null,
-    playerTurnId: room.players.keys().next().value,
+    playerTurnId: room.players.keys().next().value!,
     started: true,
-    winningSpyPlayerId: null,
+    lastMoveDescription: null,
   };
 
   const deck = shuffle(StandardDeck.slice());
@@ -88,5 +95,202 @@ export function startGame(roomCode: string, room: RoomData): StartGameResult {
     players: Array.from(updatedPlayers),
   };
 
-  return { data: gameData, type: SocketOutgoing.GameUpdate };
+  return gameData;
+}
+
+export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed: Card): OutgoingGameStateUpdate {
+  const roomDataWithCardPlayed: RoomData = (() => {
+    const player = validatePlayerExists(roomData, roomData.game.playerTurnId);
+
+    const cardPlayedIndex = player.cards.findIndex((card) => card === cardPlayed);
+    if (cardPlayedIndex === -1) {
+      throw new Error(`Player did not have ${cardPlayed} in hand. Hand: ${player.cards.join(", ")}`);
+    }
+
+    const updatedPlayer: Player = {
+      ...player,
+      cards: player.cards.toSpliced(cardPlayedIndex, 1),
+      handmaidProtected: false,
+    };
+    const updatedPlayers = new Map(roomData.players);
+    updatedPlayers.set(roomData.game.playerTurnId, updatedPlayer);
+
+    const newDiscard = [...roomData.discard, cardPlayed];
+
+    return {
+      ...roomData,
+      discard: newDiscard,
+      players: updatedPlayers,
+    };
+  })();
+
+  const newGameData: GameData = (() => {
+    const genericRoomUpdates: GameData = {
+      ...roomDataWithCardPlayed.game,
+      lastMoveDescription: null,
+    };
+
+    switch (cardPlayed) {
+      case Card.Guard:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            card: null,
+            chosenPlayerId: null,
+            submitted: false,
+          },
+        };
+      case Card.Baron:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            chosenPlayerId: null,
+            winningPlayerId: null,
+            submitted: false,
+          },
+        };
+      case Card.Chancellor:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            deckOptions: roomDataWithCardPlayed.deck.slice(0, 2),
+            chosenCard: null,
+          },
+        };
+      // SimplePlayerSelect
+      case Card.Priest:
+      case Card.Prince:
+      case Card.King:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: {
+            chosenPlayerId: null,
+            submitted: false,
+          },
+        };
+      // No details needed
+      case Card.Spy:
+      case Card.Handmaid:
+      case Card.Countess:
+      case Card.Princess:
+        return {
+          ...genericRoomUpdates,
+          cardPlayed,
+          details: null,
+        };
+    }
+  })();
+
+  const updatedRoomData: RoomData = {
+    ...roomDataWithCardPlayed,
+    game: newGameData,
+  };
+
+  if (updatedRoomData.game.details === null) {
+    // if there are no details to add, go ahead and play the card
+    return handleSubmitSelection(roomCode, updatedRoomData);
+  }
+
+  Rooms.set(roomCode, updatedRoomData);
+
+  return {
+    deckCount: roomDataWithCardPlayed.deck.length,
+    discard: roomDataWithCardPlayed.discard,
+    players: Array.from(roomDataWithCardPlayed.players),
+    game: newGameData,
+  };
+}
+
+export function handleSelectPlayer(roomCode: string, room: RoomData, playerSelected: string): OutgoingGameStateUpdate {
+  const roomCopy = structuredClone(room);
+
+  if (!roomCopy.game.details || "chosenPlayerId" in roomCopy.game.details === false) {
+    throw new Error(`Details didn't ask for chosenPlayerId. Game state: ${JSON.stringify(room.game)}`);
+  }
+
+  roomCopy.game.details.chosenPlayerId = playerSelected;
+  Rooms.set(roomCode, roomCopy);
+
+  return {
+    deckCount: roomCopy.deck.length,
+    discard: roomCopy.discard,
+    game: roomCopy.game,
+    players: Array.from(roomCopy.players),
+  };
+}
+
+export function handleSelectCard(roomCode: string, room: RoomData, cardSelected: Card): OutgoingGameStateUpdate {
+  if (!room.game.details || room.game.cardPlayed !== Card.Guard) {
+    throw new Error(`Either no details or card played wasn't Guard. Game state: ${JSON.stringify(room.game)}`);
+  }
+
+  const newGameData: GameData = {
+    ...room.game,
+    details: {
+      ...room.game.details,
+      card: cardSelected,
+    },
+  };
+
+  const updatedRoomData: RoomData = {
+    ...room,
+    game: newGameData,
+  };
+
+  Rooms.set(roomCode, updatedRoomData);
+
+  return {
+    deckCount: updatedRoomData.deck.length,
+    discard: updatedRoomData.discard,
+    game: updatedRoomData.game,
+    players: Array.from(updatedRoomData.players),
+  };
+}
+
+export function handleSubmitSelection(roomCode: string, room: RoomData): OutgoingGameStateUpdate {
+  switch (room.game.cardPlayed) {
+    case Card.Spy:
+      return cardActionHandlers.handlePlayedSpy(roomCode, room);
+    case Card.Guard:
+      return cardActionHandlers.handlePlayedGuard(roomCode, room);
+    case Card.Priest:
+      return cardActionHandlers.handlePlayedPriest(roomCode, room);
+    case Card.Baron:
+      return cardActionHandlers.handlePlayedBaron(roomCode, room);
+    case Card.Handmaid:
+      return cardActionHandlers.handlePlayedHandmaid(roomCode, room);
+    case Card.Prince:
+      return cardActionHandlers.handlePlayedPrince(roomCode, room);
+    default:
+      throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
+  }
+}
+
+export function handleAcknowledgeAction(roomCode: string, room: RoomData): OutgoingGameStateUpdate {
+  let updatedRoomData = room;
+
+  if (room.game.cardPlayed === Card.Baron) {
+    const losingplayerId = room.game.details.winningPlayerId === room.game.playerTurnId
+      ? room.game.details.chosenPlayerId
+      : room.game.playerTurnId;
+    if (!losingplayerId) {
+      throw new Error(`No losing player to update ?`);
+    }
+
+    updatedRoomData = knockPlayerOutOfRound(room, losingplayerId);
+  }
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
+  };
 }

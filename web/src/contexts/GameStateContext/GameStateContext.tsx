@@ -1,9 +1,9 @@
-import { createContext, FC, useContext, useEffect, useMemo, useRef } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { SocketIncoming, SocketMessage as OutboundSocketMessage } from "../../../../server/types/socket.types";
-import { Card } from "../../../../server/types/types";
-import { SocketMessage } from "./GameStateContext.types";
-import { RoomGameState, useGameStateReducer } from "./useGameStateReducer";
+import { decodeAsync, encode } from "@msgpack/msgpack";
+import { type Card, SocketIncoming, type SocketMessage as OutboundSocketMessage } from "@lovepebble/server";
+import type { SocketMessage } from "./GameStateContext.types.ts";
+import { type RoomGameState, useGameStateReducer } from "./useGameStateReducer.ts";
 
 interface GameStateContextValue extends Omit<RoomGameState, "discard"> {
   discard: Array<Card | "Hidden">;
@@ -12,23 +12,27 @@ interface GameStateContextValue extends Omit<RoomGameState, "discard"> {
 
 const GameStateContext = createContext<GameStateContextValue | null>(null);
 
-export const GameStateProvider: FC = ({ children }) => {
+export const GameStateProvider = ({ children }: PropsWithChildren) => {
   const navigate = useNavigate();
   const { roomCode = "" } = useParams();
   const [roomGameState, dispatch] = useGameStateReducer();
   const webscoketRef = useRef<WebSocket | null>(null);
 
   const sendGameUpdate = (msg: OutboundSocketMessage) => {
-    webscoketRef.current?.send(JSON.stringify(msg));
+    webscoketRef.current?.send(encode(msg));
   };
 
   useEffect(() => {
+    if (webscoketRef.current) {
+      return;
+    }
+
     const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
     webscoketRef.current = new WebSocket(`${wsProtocol}://${location.host}/socket`);
 
     webscoketRef.current.addEventListener("open", () => {
       webscoketRef.current?.send(
-        JSON.stringify({
+        encode({
           playerName: localStorage.getItem("playerName"),
           roomCode,
           type: SocketIncoming.Join,
@@ -36,14 +40,14 @@ export const GameStateProvider: FC = ({ children }) => {
       );
     });
 
-    webscoketRef.current.addEventListener("message", (msg: MessageEvent<string>) => {
-      const socketMsg: SocketMessage = JSON.parse(msg.data);
-      dispatch(socketMsg);
+    webscoketRef.current.addEventListener("message", (msg: MessageEvent<Blob>) => {
+      decodeAsync(msg.data.stream()).then((socketMsg) => {
+        dispatch(socketMsg as SocketMessage);
+      });
     });
 
     webscoketRef.current.addEventListener("error", (e) => {
       console.error("WS Error: ", e);
-      navigate("/");
     });
 
     return () => {
@@ -67,7 +71,7 @@ export const GameStateProvider: FC = ({ children }) => {
     return (
       roomGameState.discard
         .map((card, index) => {
-          if ((roomSize === 2 && index < 3) || (roomSize > 2 && index === 0)) {
+          if (index === 0) {
             return "Hidden";
           } else {
             return card;
@@ -80,7 +84,7 @@ export const GameStateProvider: FC = ({ children }) => {
          */
         .reverse()
     );
-  }, [Boolean(roomGameState.gameState?.started)]);
+  }, [Boolean(roomGameState.gameState?.started), roomGameState.discard]);
 
   return (
     <GameStateContext.Provider value={{ ...roomGameState, discard: discardWithHidden, sendGameUpdate }}>

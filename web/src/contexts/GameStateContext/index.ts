@@ -1,2 +1,2 @@
-export * from "./GameStateContext";
-export * from "./GameStateContext.types";
+export * from "./GameStateContext.tsx";
+export * from "./GameStateContext.types.ts";

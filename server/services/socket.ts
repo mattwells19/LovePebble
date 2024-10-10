@@ -1,9 +1,12 @@
-import { SocketIncoming, SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
-import { Player, PlayerId } from "../types/types.ts";
+import { decode, encode } from "@msgpack/msgpack";
+import { SocketIncoming, type SocketMessage, SocketOutgoing } from "../types/socket.types.ts";
+import type { Player, PlayerId, RoomData, RoomDataGameNotStarted } from "../types/types.ts";
 import { createRoomWithCode, removePlayerFromRoom } from "../services/rooms.ts";
 import { Sockets } from "../repositories/Sockets.ts";
 import { Rooms } from "../repositories/Rooms.ts";
 import * as socketActions from "./socketActions.ts";
+
+const gameIsStarted = (room: RoomData | RoomDataGameNotStarted): room is RoomData => room.game.started;
 
 export interface SocketData {
   playerId: PlayerId;
@@ -39,49 +42,134 @@ export function registerSocketHandlers(socket: WebSocket) {
     }
   };
 
-  socket.onmessage = (msg: MessageEvent<string>) => {
-    const data: SocketMessage = JSON.parse(msg.data);
+  socket.onmessage = (msg: MessageEvent<Uint8Array>) => {
+    const data = decode(msg.data) as SocketMessage;
 
-    switch (data.type) {
-      case SocketIncoming.Join: {
-        const { roomCode, playerName } = data;
+    try {
+      switch (data.type) {
+        case SocketIncoming.Join: {
+          const { roomCode, playerName } = data;
 
-        const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
-        if (socketData.roomId) {
-          removePlayerFromRoom(socketData.roomId, socketData.playerId);
+          const room = Rooms.get(roomCode) ?? createRoomWithCode(roomCode);
+          if (socketData.roomId) {
+            removePlayerFromRoom(socketData.roomId, socketData.playerId);
+          }
+          socketData.roomId = roomCode;
+
+          const joinResult = socketActions.join(socketData, room, playerName);
+          sendMessageToRoom(roomCode, joinResult);
+          break;
         }
-        socketData.roomId = roomCode;
+        case SocketIncoming.StartGame: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
 
-        const joinResult = socketActions.join(socketData, room, playerName);
-        sendMessageToRoom(roomCode, joinResult);
-        break;
-      }
-      case SocketIncoming.StartGame: {
-        const roomCode = socketData.roomId ?? "";
-        const room = Rooms.get(roomCode);
-        if (!room) {
-          throw new Error(`Room does not exist ${socketData.roomId}.`);
+          if (gameIsStarted(room)) break;
+
+          const startGameResult = socketActions.startGame(roomCode, room as RoomDataGameNotStarted);
+          sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: startGameResult });
+          break;
         }
+        case SocketIncoming.PlayCard: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
 
-        const startGameResult = socketActions.startGame(roomCode, room);
-        sendMessageToRoom(roomCode, startGameResult);
-        break;
+          if (!gameIsStarted(room)) break;
+
+          const cardPlayedEvent = socketActions.handlePlayCard(roomCode, room, data.cardPlayed);
+          if (cardPlayedEvent) {
+            sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: cardPlayedEvent });
+          }
+          break;
+        }
+        case SocketIncoming.SelectCard: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
+
+          if (!gameIsStarted(room)) break;
+
+          const playerSelectedEvent = socketActions.handleSelectCard(roomCode, room, data.cardSelected);
+          if (playerSelectedEvent) {
+            sendMessageToRoom(roomCode, {
+              type: SocketOutgoing.GameUpdate,
+              data: playerSelectedEvent,
+            });
+          }
+          break;
+        }
+        case SocketIncoming.SelectPlayer: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
+
+          if (!gameIsStarted(room)) break;
+
+          const playerSelectedEvent = socketActions.handleSelectPlayer(roomCode, room, data.playerSelected);
+          if (playerSelectedEvent) {
+            sendMessageToRoom(roomCode, {
+              type: SocketOutgoing.GameUpdate,
+              data: playerSelectedEvent,
+            });
+          }
+          break;
+        }
+        case SocketIncoming.SubmitSelection: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
+
+          if (!gameIsStarted(room)) break;
+
+          const submittedSelectionResult = socketActions.handleSubmitSelection(roomCode, room);
+          if (submittedSelectionResult) {
+            sendMessageToRoom(roomCode, {
+              type: SocketOutgoing.GameUpdate,
+              data: submittedSelectionResult,
+            });
+          }
+          break;
+        }
+        case SocketIncoming.AcknowledgeAction: {
+          const roomCode = socketData.roomId ?? "";
+          const room = Rooms.get(roomCode);
+          if (!room) {
+            throw new Error(`Room does not exist ${socketData.roomId}.`);
+          }
+
+          if (!gameIsStarted(room)) break;
+
+          const acknowledgedActionResult = socketActions.handleAcknowledgeAction(roomCode, room);
+          if (acknowledgedActionResult) {
+            sendMessageToRoom(roomCode, {
+              type: SocketOutgoing.GameUpdate,
+              data: acknowledgedActionResult,
+            });
+          }
+          break;
+        }
       }
-      case SocketIncoming.PlayCard:
-        break;
-      case SocketIncoming.SelectCard:
-        break;
-      case SocketIncoming.SelectPlayer:
-        break;
-      case SocketIncoming.SubmitSelection:
-        break;
-      case SocketIncoming.AcknowledgeAction:
-        break;
+    } catch (err) {
+      console.error(err);
+      console.info("Socket data", data);
+      console.info("Room data", Rooms.get(socketData.roomId ?? ""));
     }
   };
 
   function sendToSocket<TData>(data: { type: SocketOutgoing; data: TData }) {
-    socket.send(JSON.stringify(data));
+    socket.send(encode(data));
   }
 }
 
@@ -97,7 +185,8 @@ function sendMessageToRoom<TData>(roomCode: string, data: { type: SocketOutgoing
     .map((playerId) => Sockets.get(playerId))
     .filter((playerSocket): playerSocket is WebSocket => Boolean(playerSocket));
 
+  const serializedData = encode(data);
   allPlayerSockets.forEach((playerSocket) => {
-    playerSocket.send(JSON.stringify(data));
+    playerSocket.send(serializedData);
   });
 }

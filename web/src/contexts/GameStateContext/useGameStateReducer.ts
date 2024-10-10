@@ -1,7 +1,6 @@
-import { Reducer, useReducer } from "react";
-import { SocketOutgoing } from "../../../../server/types/socket.types";
-import { PlayerId, Player, Card, GameData } from "../../../../server/types/types";
-import { SocketMessage } from "./GameStateContext.types";
+import { useReducer } from "react";
+import { type Card, type GameData, type Player, type PlayerId, SocketOutgoing } from "@lovepebble/server";
+import type { SocketMessage } from "./GameStateContext.types.ts";
 
 export interface RoomGameState {
   currentPlayerId: PlayerId;
@@ -35,7 +34,7 @@ function gameStateContextReducer(currentState: RoomGameState, action: SocketMess
 }
 
 export function useGameStateReducer() {
-  return useReducer<Reducer<RoomGameState, SocketMessage>>(gameStateContextReducer, {
+  return useReducer<RoomGameState, [action: SocketMessage]>(gameStateContextReducer, {
     currentPlayerId: "",
     deckCount: 0,
     discard: [],

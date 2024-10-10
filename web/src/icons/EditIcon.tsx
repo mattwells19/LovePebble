@@ -1,8 +1,10 @@
-/* eslint-disable max-len */
-import React from "react";
-
 const EditIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({ ...props }) => (
-  <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+  <svg
+    viewBox="0 0 80 80"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
     <path
       fillRule="evenodd"
       clipRule="evenodd"

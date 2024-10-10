@@ -1,0 +1,42 @@
+{
+  "workspace": [
+    "./server",
+    "./web"
+  ],
+  "tasks": {
+    "web:start": "deno task --cwd web start",
+    "server:start": "deno task --cwd server dev",
+    "start": "concurrently --kill-others-on-fail \"deno task server:start\"  \"deno task web:start\"",
+    "web:build": "deno task --cwd web build",
+    "build": "deno task web:build",
+    "lint": "deno fmt --check"
+  },
+  "imports": {
+    "concurrently": "npm:concurrently@9.0.1"
+  },
+  "nodeModulesDir": "auto",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": [
+      "./react.d.ts"
+    ],
+    "lib": [
+      "deno.window",
+      "dom",
+      "dom.iterable"
+    ]
+  },
+  "fmt": {
+    "singleQuote": false,
+    "lineWidth": 120,
+    "include": [
+      "./server",
+      "./web"
+    ],
+    "exclude": [
+      "**/.vite",
+      "**/node_modules",
+      "**/build"
+    ]
+  }
+}

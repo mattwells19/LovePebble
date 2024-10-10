@@ -1,5 +1,5 @@
-import { Box, BoxProps, Text } from "@chakra-ui/react";
-import { Card } from "../../../server/types/types";
+import { Box, type BoxProps, Text } from "@chakra-ui/react";
+import type { Card } from "@lovepebble/server";
 
 interface CharacterCardProps extends BoxProps {
   /**
@@ -10,7 +10,7 @@ interface CharacterCardProps extends BoxProps {
   button?: boolean;
 }
 
-const Characters = [
+export const Characters = [
   "Spy",
   "Guard",
   "Priest",
@@ -21,7 +21,7 @@ const Characters = [
   "King",
   "Countess",
   "Princess",
-];
+] as const;
 
 export const CharacterCard = ({ character = "Hidden", button, ...rest }: CharacterCardProps) => {
   return (
@@ -33,13 +33,16 @@ export const CharacterCard = ({ character = "Hidden", button, ...rest }: Charact
       background="gray.500"
       display="grid"
       placeItems="center"
+      flexShrink={0}
       {...rest}
     >
-      {character !== "Hidden" ? (
-        <Text fontWeight="bold" color="black">
-          {Characters[character]} - {character}
-        </Text>
-      ) : null}
+      {character !== "Hidden"
+        ? (
+          <Text fontWeight="bold" color="black">
+            {Characters[character]} - {character}
+          </Text>
+        )
+        : null}
     </Box>
   );
 };

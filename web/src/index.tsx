@@ -1,10 +1,7 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { extendTheme, ChakraProvider } from "@chakra-ui/react";
-import { Layout } from "./Layout";
-import { BrowserRouter } from "react-router-dom";
-import { AppbarProvider } from "./contexts/AppbarContext";
-import { RouterProvider } from "./contexts/RouterContext";
+import { createRoot } from "react-dom/client";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { Layout } from "./Layout.tsx";
 
 const theme = extendTheme({
   colors: {
@@ -32,22 +29,21 @@ const theme = extendTheme({
     global: {
       body: {
         backgroundColor: "main.regularPurple",
+        height: "100vh",
       },
     },
   },
 });
 
-ReactDOM.render(
+const root = createRoot(document.getElementById("root")!);
+
+root.render(
   <React.StrictMode>
-    <ChakraProvider theme={theme}>
-      <BrowserRouter>
-        <RouterProvider>
-          <AppbarProvider>
-            <Layout />
-          </AppbarProvider>
-        </RouterProvider>
-      </BrowserRouter>
+    <ChakraProvider
+      theme={theme}
+      toastOptions={{ defaultOptions: { position: "top-right" } }}
+    >
+      <Layout />
     </ChakraProvider>
   </React.StrictMode>,
-  document.getElementById("root"),
 );

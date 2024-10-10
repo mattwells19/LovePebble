@@ -1,7 +1,9 @@
-import { SocketOutgoing, OutgoingGameStateUpdate } from "../../../../server/types/socket.types";
-import { PlayerId, Player } from "../../../../server/types/types";
+import type { OutgoingGameStateUpdate, Player, PlayerId, SocketOutgoing } from "@lovepebble/server";
 
-export type SocketMessage = ConnectedEvent | PlayerUpdateEvent | GameStateUpdate;
+export type SocketMessage =
+  | ConnectedEvent
+  | PlayerUpdateEvent
+  | GameStateUpdate;
 
 export type ConnectedEvent = {
   type: SocketOutgoing.Connected;

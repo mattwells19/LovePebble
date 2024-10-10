@@ -30,13 +30,13 @@ export interface Player {
   name: string;
   cards: Array<Card>;
   handmaidProtected: boolean;
+  playedSpy: boolean;
   outOfRound: boolean;
   gameScore: number;
 }
 
 export type SimplePlayerSelect = {
   chosenPlayerId: PlayerId | null;
-  submitted: boolean;
 };
 
 export type PlayedSpy = { cardPlayed: Card.Spy; details: null };
@@ -45,14 +45,13 @@ export type PlayedGuard = {
   cardPlayed: Card.Guard;
   details: {
     chosenPlayerId: PlayerId | null;
-    card: Card;
-    submitted: boolean;
+    card: Card | null;
   };
 };
 
 export type PlayedPriest = {
   cardPlayed: Card.Priest;
-  details: SimplePlayerSelect;
+  details: SimplePlayerSelect & { submitted: boolean };
 };
 
 export type PlayedBaron = {
@@ -78,7 +77,7 @@ export type PlayedChancellor = {
   cardPlayed: Card.Chancellor;
   details: {
     deckOptions: Array<Card>;
-    chosenCard: Card;
+    chosenCard: Card | null;
   };
 };
 
@@ -107,28 +106,35 @@ export type GameNotStarted = { started: false; playerTurnId: null };
 export type GameStarted = {
   started: true;
   playerTurnId: PlayerId;
-  winningSpyPlayerId: PlayerId | null;
+  lastMoveDescription: string | null;
 };
 
 export type GameData =
-  | GameNotStarted
-  | (GameStarted &
-      (
-        | PlayedSpy
-        | PlayedPriest
-        | PlayedBaron
-        | PlayedHandmaid
-        | PlayedPrince
-        | PlayedChancellor
-        | PlayedKing
-        | PlayedCountess
-        | PlayedPrincess
-        | WaitingForChoice
-      ));
+  & GameStarted
+  & (
+    | PlayedSpy
+    | PlayedGuard
+    | PlayedPriest
+    | PlayedBaron
+    | PlayedHandmaid
+    | PlayedPrince
+    | PlayedChancellor
+    | PlayedKing
+    | PlayedCountess
+    | PlayedPrincess
+    | WaitingForChoice
+  );
 
 export interface RoomData {
   deck: Array<Card>;
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
   game: GameData;
+}
+
+export interface RoomDataGameNotStarted {
+  deck: [];
+  discard: [];
+  players: Map<PlayerId, Player>;
+  game: GameNotStarted;
 }

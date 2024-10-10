@@ -1,31 +1,25 @@
-import { useEffect, useState } from "react";
-import { Text, Box, PinInput, PinInputField, Collapse, Alert, AlertIcon, Button, Divider } from "@chakra-ui/react";
+import { useState } from "react";
+import { Alert, AlertIcon, Box, Button, Collapse, Divider, PinInput, PinInputField, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { useAppbarText } from "../hooks/useAppbarText";
-import { useRouterContext } from "../contexts/RouterContext";
-import { get } from "../utils/get";
-import { useDocTitle } from "../hooks/useDocTitle";
+import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
+import { get } from "../utils/get.ts";
+import { DocTitle } from "../components/DocTitle.tsx";
 
 export const Home = () => {
   const navigate = useNavigate();
-  useAppbarText("Love Pebble");
-  useDocTitle();
-  const { setNewRoomCode } = useRouterContext();
+  useSetAppbarText("Love Pebble");
 
-  const [roomCode, setRoomCode] = useState<string>("");
   const [error, setError] = useState<"invalidRoom" | "networkError" | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleRoomCodeChange = (code: string) => {
+  const handleRoomCodeChange = () => {
     setError(null);
-    setRoomCode(code.toUpperCase());
   };
 
   const handleNewRoomClick = () => {
     setLoading(true);
     get<string>("/api/newRoom")
       .then((newRoomCode) => {
-        setNewRoomCode(newRoomCode);
         navigate(`/room/${newRoomCode}`);
       })
       .catch((errMsg: string) => {
@@ -35,13 +29,13 @@ export const Home = () => {
       });
   };
 
-  useEffect(() => {
+  const handleCompleteCode = (roomCode: string) => {
     if (roomCode.length === 4 && !error) {
       setLoading(true);
-      get<boolean>(`/api/checkRoom?roomCode=${roomCode}`)
+      get<boolean>(`/api/checkRoom?roomCode=${roomCode.toUpperCase()}`)
         .then((isValidRoom) => {
           if (isValidRoom) {
-            navigate(`/room/${roomCode}`);
+            navigate(`/room/${roomCode.toUpperCase()}`);
           } else {
             setError("invalidRoom");
             setLoading(false);
@@ -53,10 +47,11 @@ export const Home = () => {
           setError("networkError");
         });
     }
-  }, [roomCode]);
+  };
 
   return (
     <>
+      <DocTitle />
       <Text textAlign="left" width="full">
         Content
       </Text>
@@ -67,19 +62,34 @@ export const Home = () => {
           <PinInput
             autoFocus
             onChange={handleRoomCodeChange}
-            value={roomCode}
+            onComplete={handleCompleteCode}
             isInvalid={Boolean(error)}
             size="lg"
             type="alphanumeric"
           >
-            <PinInputField aria-label="Room code, first letter." />
-            <PinInputField aria-label="Room code, second letter." />
-            <PinInputField aria-label="Room code, third letter." />
-            <PinInputField aria-label="Room code, last letter." />
+            <PinInputField
+              aria-label="Room code, first letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, second letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, third letter."
+              textTransform="uppercase"
+            />
+            <PinInputField
+              aria-label="Room code, last letter."
+              textTransform="uppercase"
+            />
           </PinInput>
         </Box>
         <Collapse in={Boolean(error)} animateOpacity>
-          <Alert status={error === "networkError" ? "error" : "warning"} width="sm">
+          <Alert
+            status={error === "networkError" ? "error" : "warning"}
+            width="sm"
+          >
             <AlertIcon />
             {error === "networkError"
               ? "There was a problem communicating with the server."

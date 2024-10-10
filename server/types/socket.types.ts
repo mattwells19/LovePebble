@@ -1,4 +1,4 @@
-import { Card, GameData, Player, PlayerId } from "./types.ts";
+import type { Card, GameData, Player, PlayerId } from "./types.ts";
 
 export const enum SocketIncoming {
   Join = "join",
@@ -44,7 +44,7 @@ export interface PlayCardEvent extends SocketEvent {
 
 export interface SelectCardEvent extends SocketEvent {
   type: SocketIncoming.SelectCard;
-  cardPlayed: Card;
+  cardSelected: Card;
 }
 
 export interface SelectPlayerEvent extends SocketEvent {

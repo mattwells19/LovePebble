@@ -1,10 +1,11 @@
-import { assert, assertEquals, assertExists } from "../../deps.ts";
+import { assert, assertEquals, assertExists } from "assert";
+import { decode, encode } from "@msgpack/msgpack";
 import { Sockets } from "../../repositories/Sockets.ts";
 import { Rooms } from "../../repositories/Rooms.ts";
 import { registerSocketHandlers } from "../socket.ts";
 import { SocketIncoming, SocketOutgoing } from "../../types/socket.types.ts";
-import { Player, PlayerId } from "../../types/types.ts";
-import { getMockWebSocket, testCleanup, createNewRoom } from "../../test.utils.ts";
+import type { Player, PlayerId } from "../../types/types.ts";
+import { createNewRoom, getMockWebSocket, testCleanup } from "../../test.utils.ts";
 
 Deno.test("Websocket connection is established", () => {
   let value = { type: "", data: null };
@@ -12,8 +13,8 @@ Deno.test("Websocket connection is established", () => {
   assertEquals(Sockets.size, 0);
 
   const ws = getMockWebSocket({
-    send: (msg: string) => {
-      value = JSON.parse(msg);
+    send: (msg: any) => {
+      value = decode(msg) as typeof value;
     },
   });
 
@@ -56,8 +57,8 @@ Deno.test("player can change rooms", () => {
   let playerId: PlayerId | null = null;
 
   const ws = getMockWebSocket({
-    send: (msg: string) => {
-      const response = JSON.parse(msg);
+    send: (msg: any) => {
+      const response = decode(msg) as { type: string; data: any };
       switch (response.type) {
         case SocketOutgoing.Connected:
           playerId = response.data;
@@ -81,7 +82,7 @@ Deno.test("player can change rooms", () => {
   assertExists(ws.onmessage);
   ws.onmessage(
     new MessageEvent("join", {
-      data: JSON.stringify({
+      data: encode({
         type: SocketIncoming.Join,
         roomCode,
         playerName: "test",
@@ -108,7 +109,7 @@ Deno.test("player can change rooms", () => {
   assertExists(ws.onmessage);
   ws.onmessage(
     new MessageEvent("join", {
-      data: JSON.stringify({
+      data: encode({
         type: SocketIncoming.Join,
         roomCode: newRoomCode,
         playerName: "test",
