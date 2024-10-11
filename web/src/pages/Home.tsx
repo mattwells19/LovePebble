@@ -1,53 +1,51 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { type ActionFunction, Form, redirect, useActionData, useNavigation, useSubmit } from "react-router-dom";
 import { Alert, AlertIcon, Box, Button, Collapse, Divider, PinInput, PinInputField, Text } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
 import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
 import { get } from "../utils/get.ts";
 import { DocTitle } from "../components/DocTitle.tsx";
 
-export const Home = () => {
-  const navigate = useNavigate();
-  useSetAppbarText("Love Pebble");
+export const homeAction: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
 
-  const [error, setError] = useState<"invalidRoom" | "networkError" | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  try {
+    if (formData.get("intent")?.toString() === "createRoom") {
+      const newRoomCode = await get<string>("/api/newRoom");
+      return redirect(`/room/${newRoomCode}`);
+    } else {
+      const roomCode = [
+        formData.get("roomCode-1")?.toString(),
+        formData.get("roomCode-2")?.toString(),
+        formData.get("roomCode-3")?.toString(),
+        formData.get("roomCode-4")?.toString(),
+      ].join("").toUpperCase();
 
-  const handleRoomCodeChange = () => {
-    setError(null);
-  };
-
-  const handleNewRoomClick = () => {
-    setLoading(true);
-    get<string>("/api/newRoom")
-      .then((newRoomCode) => {
-        navigate(`/room/${newRoomCode}`);
-      })
-      .catch((errMsg: string) => {
-        console.error(errMsg);
-        setError("networkError");
-        setLoading(false);
-      });
-  };
-
-  const handleCompleteCode = (roomCode: string) => {
-    if (roomCode.length === 4 && !error) {
-      setLoading(true);
-      get<boolean>(`/api/checkRoom?roomCode=${roomCode.toUpperCase()}`)
-        .then((isValidRoom) => {
-          if (isValidRoom) {
-            navigate(`/room/${roomCode.toUpperCase()}`);
-          } else {
-            setError("invalidRoom");
-            setLoading(false);
-          }
-        })
-        .catch((errMsg: string) => {
-          console.error(errMsg);
-          setLoading(false);
-          setError("networkError");
-        });
+      const isValidRoom = await get<boolean>(`/api/checkRoom?roomCode=${roomCode}`);
+      return isValidRoom
+        ? redirect(`/room/${roomCode}`)
+        : `There is no room with that room code. Try a different code or start a new room.`;
     }
-  };
+  } catch (errMsg) {
+    console.error(errMsg);
+    return "There was a problem communicating with the server.";
+  }
+};
+
+export const Home = () => {
+  const submit = useSubmit();
+  const actionResponse = useActionData() as string | undefined;
+  const { state } = useNavigation();
+
+  useSetAppbarText("Love Pebble");
+  const formRef = useRef<HTMLFormElement | null>(null);
+
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (state === "idle") {
+      setError(actionResponse ?? null);
+    }
+  }, [state === "idle", actionResponse]);
 
   return (
     <>
@@ -58,11 +56,13 @@ export const Home = () => {
       <Divider />
       <Box display="flex" flexDirection="column" alignItems="center" gap="4">
         <Text>Already have a room code? Type/paste it here.</Text>
-        <Box display="flex" gap="2">
+        <Box as={Form} ref={formRef} display="flex" gap="2">
           <PinInput
             autoFocus
-            onChange={handleRoomCodeChange}
-            onComplete={handleCompleteCode}
+            onChange={() => setError(null)}
+            onComplete={() => {
+              submit(formRef.current, { method: "post" });
+            }}
             isInvalid={Boolean(error)}
             size="lg"
             type="alphanumeric"
@@ -70,18 +70,22 @@ export const Home = () => {
             <PinInputField
               aria-label="Room code, first letter."
               textTransform="uppercase"
+              name="roomCode-1"
             />
             <PinInputField
               aria-label="Room code, second letter."
               textTransform="uppercase"
+              name="roomCode-2"
             />
             <PinInputField
               aria-label="Room code, third letter."
               textTransform="uppercase"
+              name="roomCode-3"
             />
             <PinInputField
               aria-label="Room code, last letter."
               textTransform="uppercase"
+              name="roomCode-4"
             />
           </PinInput>
         </Box>
@@ -91,9 +95,7 @@ export const Home = () => {
             width="sm"
           >
             <AlertIcon />
-            {error === "networkError"
-              ? "There was a problem communicating with the server."
-              : "There is no room with that room code. Try a different code or start a new room."}
+            {error}
           </Alert>
         </Collapse>
       </Box>
@@ -102,7 +104,13 @@ export const Home = () => {
         <Text>or</Text>
         <Divider />
       </Box>
-      <Button size="lg" isLoading={loading} onClick={handleNewRoomClick}>
+      <Button
+        size="lg"
+        disabled={state === "submitting"}
+        formMethod="post"
+        name="intent"
+        value="createRoom"
+      >
         Start a New Room
       </Button>
     </>
