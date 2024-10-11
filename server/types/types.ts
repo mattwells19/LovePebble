@@ -75,10 +75,12 @@ export type PlayedPrince = {
 
 export type PlayedChancellor = {
   cardPlayed: Card.Chancellor;
+  // if there are no cards in the deck to choose from playing this card has no effect
   details: {
     deckOptions: Array<Card>;
-    chosenCard: Card | null;
-  };
+    card: Card | null;
+    submitted: boolean;
+  } | null;
 };
 
 export type PlayedKing = {

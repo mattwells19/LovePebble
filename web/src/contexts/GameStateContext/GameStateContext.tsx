@@ -1,5 +1,5 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { decodeAsync, encode } from "@msgpack/msgpack";
 import { type Card, SocketIncoming, type SocketMessage as OutboundSocketMessage } from "@lovepebble/server";
 import type { SocketMessage } from "./GameStateContext.types.ts";
@@ -13,7 +13,6 @@ interface GameStateContextValue extends Omit<RoomGameState, "discard"> {
 const GameStateContext = createContext<GameStateContextValue | null>(null);
 
 export const GameStateProvider = ({ children }: PropsWithChildren) => {
-  const navigate = useNavigate();
   const { roomCode = "" } = useParams();
   const [roomGameState, dispatch] = useGameStateReducer();
   const webscoketRef = useRef<WebSocket | null>(null);

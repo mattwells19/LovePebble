@@ -34,7 +34,7 @@ export const ActionHeading = (): ReactElement | null => {
             </>
           )
           : (
-            `It's ${players.get(gameState.playerTurnId ?? "")?.name}'s turn.`
+            `It's ${playerName}'s turn.`
           )}
       </Heading>
     </>

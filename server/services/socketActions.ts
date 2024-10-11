@@ -151,15 +151,20 @@ export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed:
             submitted: false,
           },
         };
-      case Card.Chancellor:
+      case Card.Chancellor: {
+        const deckOptions = roomDataWithCardPlayed.deck.slice(0, 2);
         return {
           ...genericRoomUpdates,
           cardPlayed,
-          details: {
-            deckOptions: roomDataWithCardPlayed.deck.slice(0, 2),
-            chosenCard: null,
-          },
+          details: deckOptions
+            ? {
+              deckOptions: deckOptions,
+              card: null,
+              submitted: false,
+            }
+            : null,
         };
+      }
       // SimplePlayerSelect
       case Card.Priest:
       case Card.Prince:
@@ -224,17 +229,31 @@ export function handleSelectPlayer(roomCode: string, room: RoomData, playerSelec
 }
 
 export function handleSelectCard(roomCode: string, room: RoomData, cardSelected: Card): OutgoingGameStateUpdate {
-  if (!room.game.details || room.game.cardPlayed !== Card.Guard) {
-    throw new Error(`Either no details or card played wasn't Guard. Game state: ${JSON.stringify(room.game)}`);
+  if (!room.game.details || "card" in room.game.details === false) {
+    throw new Error(`Did not ask for card selection.`);
   }
 
-  const newGameData: GameData = {
-    ...room.game,
-    details: {
-      ...room.game.details,
-      card: cardSelected,
-    },
-  };
+  let newGameData: GameData | null = null;
+
+  if (room.game.cardPlayed === Card.Guard) {
+    newGameData = {
+      ...room.game,
+      details: {
+        ...room.game.details,
+        card: cardSelected,
+      },
+    };
+  } else if (room.game.cardPlayed === Card.Chancellor) {
+    newGameData = {
+      ...room.game,
+      details: {
+        ...room.game.details,
+        card: cardSelected,
+      },
+    };
+  } else {
+    throw new Error(`Card selection wasn't for a Guard or Chancellor.`);
+  }
 
   const updatedRoomData: RoomData = {
     ...room,
@@ -265,6 +284,8 @@ export function handleSubmitSelection(roomCode: string, room: RoomData): Outgoin
       return cardActionHandlers.handlePlayedHandmaid(roomCode, room);
     case Card.Prince:
       return cardActionHandlers.handlePlayedPrince(roomCode, room);
+    case Card.Chancellor:
+      return cardActionHandlers.handlePlayedChancellor(roomCode, room);
     default:
       throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
   }

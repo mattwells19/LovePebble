@@ -107,7 +107,11 @@ const CardOption = ({ children, ...inputProps }: InputHTMLAttributes<HTMLInputEl
   );
 };
 
-export const CardPicker = ({ value }: { value: Card | null }) => {
+interface CardPickerProps {
+  value: Card | null;
+}
+
+export const CardPicker = ({ value }: CardPickerProps) => {
   const { sendGameUpdate, currentPlayerId, gameState } = useGameState();
 
   const handleChange = (selectedCard: Card) => {

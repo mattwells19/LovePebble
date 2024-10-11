@@ -4,6 +4,7 @@ import {
   Card,
   type GameStarted,
   type PlayedBaron,
+  type PlayedChancellor,
   type PlayedGuard,
   type PlayedHandmaid,
   type PlayedPriest,
@@ -322,6 +323,67 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
         ...gameData,
         lastMoveDescription:
           `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
+      },
+    };
+  }
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
+  };
+}
+
+export function handlePlayedChancellor(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const gameData = roomData.game as GameStarted & PlayedChancellor;
+
+  let updatedRoomData: RoomData | null = null;
+
+  // details will be null if there were no deck options to choose from.
+  // in that case this card should have no effect
+
+  if (gameData.details) {
+    const cardOptions = [...gameData.details.deckOptions, ...playingPlayer.cards];
+
+    const chosenCard = gameData.details.card;
+    if (chosenCard === null) {
+      throw new Error(`Didn't choose a card when processing Chancellor action.`);
+    }
+    if (!cardOptions.includes(chosenCard)) {
+      throw new Error(`Chosen card was not one of the options. ${chosenCard} - ${cardOptions.join(", ")}`);
+    }
+
+    let newDeck = [...roomData.deck];
+    if (gameData.details.deckOptions.includes(chosenCard)) {
+      // if they chose a card from the deck, remove the chosen card and add the card from their hand
+      const cardDeckIndex = newDeck.indexOf(chosenCard);
+      newDeck = newDeck.toSpliced(cardDeckIndex, 1, playingPlayer.cards[0]);
+    }
+
+    const updatedPlayers = updatePlayer(roomData.players, gameData.playerTurnId, { cards: [chosenCard] });
+
+    updatedRoomData = {
+      deck: newDeck,
+      discard: roomData.discard,
+      players: updatedPlayers,
+      game: {
+        ...gameData,
+        lastMoveDescription: `${playingPlayer.name} played the Chancellor.`,
+      },
+    };
+  } else {
+    updatedRoomData = {
+      deck: roomData.deck,
+      discard: roomData.discard,
+      players: roomData.players,
+      game: {
+        ...gameData,
+        lastMoveDescription: `${playingPlayer.name} played the Chancellor. The deck was empty so there is no effect.`,
       },
     };
   }
