@@ -106,6 +106,13 @@ export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed:
     if (cardPlayedIndex === -1) {
       throw new Error(`Player did not have ${cardPlayed} in hand. Hand: ${player.cards.join(", ")}`);
     }
+    if (
+      player.cards.includes(Card.Countess) &&
+      (player.cards.includes(Card.Prince) || player.cards.includes(Card.King)) &&
+      cardPlayed !== Card.Countess
+    ) {
+      throw new Error(`If you have the Countess and the King or a Prince, you must play the Countess.`);
+    }
 
     const updatedPlayer: Player = {
       ...player,
@@ -286,6 +293,12 @@ export function handleSubmitSelection(roomCode: string, room: RoomData): Outgoin
       return cardActionHandlers.handlePlayedPrince(roomCode, room);
     case Card.Chancellor:
       return cardActionHandlers.handlePlayedChancellor(roomCode, room);
+    case Card.King:
+      return cardActionHandlers.handlePlayedKing(roomCode, room);
+    case Card.Countess:
+      return cardActionHandlers.handlePlayedCountess(roomCode, room);
+    case Card.Princess:
+      return cardActionHandlers.handlePlayedPrincess(roomCode, room);
     default:
       throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
   }

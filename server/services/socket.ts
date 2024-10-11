@@ -69,7 +69,7 @@ export function registerSocketHandlers(socket: WebSocket) {
 
           if (gameIsStarted(room)) break;
 
-          const startGameResult = socketActions.startGame(roomCode, room as RoomDataGameNotStarted);
+          const startGameResult = socketActions.startGame(roomCode, room);
           sendMessageToRoom(roomCode, { type: SocketOutgoing.GameUpdate, data: startGameResult });
           break;
         }

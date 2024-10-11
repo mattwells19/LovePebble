@@ -56,12 +56,12 @@ export const Home = () => {
       <Divider />
       <Box display="flex" flexDirection="column" alignItems="center" gap="4">
         <Text>Already have a room code? Type/paste it here.</Text>
-        <Box as={Form} ref={formRef} display="flex" gap="2">
+        <Box as={Form} method="post" ref={formRef} display="flex" gap="2">
           <PinInput
             autoFocus
             onChange={() => setError(null)}
             onComplete={() => {
-              submit(formRef.current, { method: "post" });
+              submit(formRef.current);
             }}
             isInvalid={Boolean(error)}
             size="lg"
@@ -104,15 +104,17 @@ export const Home = () => {
         <Text>or</Text>
         <Divider />
       </Box>
-      <Button
-        size="lg"
-        disabled={state === "submitting"}
-        formMethod="post"
-        name="intent"
-        value="createRoom"
-      >
-        Start a New Room
-      </Button>
+      <Form method="post">
+        <Button
+          size="lg"
+          disabled={state === "submitting"}
+          name="intent"
+          value="createRoom"
+          type="submit"
+        >
+          Start a New Room
+        </Button>
+      </Form>
     </>
   );
 };

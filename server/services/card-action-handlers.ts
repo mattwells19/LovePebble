@@ -5,10 +5,13 @@ import {
   type GameStarted,
   type PlayedBaron,
   type PlayedChancellor,
+  type PlayedCountess,
   type PlayedGuard,
   type PlayedHandmaid,
+  type PlayedKing,
   type PlayedPriest,
   type PlayedPrince,
+  type PlayedPrincess,
   type PlayedSpy,
   type PlayerId,
   type RoomData,
@@ -387,6 +390,106 @@ export function handlePlayedChancellor(roomCode: string, roomData: RoomData): Ou
       },
     };
   }
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
+  };
+}
+
+export function handlePlayedKing(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const [chosenPlayerId, chosenPlayer] = validators.validatePlayerSelection(roomData, Card.King);
+  const gameData = roomData.game as GameStarted & PlayedKing;
+
+  let updatedRoomData: RoomData | null = null;
+
+  if (chosenPlayerId && chosenPlayer) {
+    const playerCards = playingPlayer.cards;
+    const chosenPlayerCards = chosenPlayer.cards;
+
+    let updatedPlayers = updatePlayer(roomData.players, roomData.game.playerTurnId, { cards: chosenPlayerCards });
+    updatedPlayers = updatePlayer(updatedPlayers, chosenPlayerId, { cards: playerCards });
+
+    updatedRoomData = {
+      deck: roomData.deck,
+      discard: roomData.discard,
+      players: updatedPlayers,
+      game: {
+        ...gameData,
+        lastMoveDescription:
+          `${playingPlayer.name} played the King and decided to swap cards with ${chosenPlayer.name}.`,
+      },
+    };
+  } else {
+    updatedRoomData = {
+      deck: roomData.deck,
+      discard: roomData.discard,
+      players: roomData.players,
+      game: {
+        ...gameData,
+        lastMoveDescription:
+          `${playingPlayer.name} played the King, but there were no players to select so the card has no effect.`,
+      },
+    };
+  }
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
+  };
+}
+
+export function handlePlayedCountess(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const gameData = roomData.game as GameStarted & PlayedCountess;
+
+  const updatedRoomData: RoomData = {
+    deck: roomData.deck,
+    discard: roomData.discard,
+    players: roomData.players,
+    game: {
+      ...gameData,
+      lastMoveDescription: `Oooooo, ${playingPlayer.name} played the Countess!`,
+    },
+  };
+
+  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
+  Rooms.set(roomCode, roomDataForNextTurn);
+
+  return {
+    deckCount: roomDataForNextTurn.deck.length,
+    discard: roomDataForNextTurn.discard,
+    game: roomDataForNextTurn.game,
+    players: Array.from(roomDataForNextTurn.players),
+  };
+}
+
+export function handlePlayedPrincess(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const gameData = roomData.game as GameStarted & PlayedPrincess;
+
+  let updatedRoomData = knockPlayerOutOfRound(roomData, roomData.game.playerTurnId);
+
+  updatedRoomData = {
+    deck: updatedRoomData.deck,
+    discard: updatedRoomData.discard,
+    players: updatedRoomData.players,
+    game: {
+      ...gameData,
+      lastMoveDescription: `${playingPlayer.name} played the Princess so they are out of the round!`,
+    },
+  };
 
   const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
   Rooms.set(roomCode, roomDataForNextTurn);

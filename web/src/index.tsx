@@ -41,7 +41,7 @@ root.render(
   <React.StrictMode>
     <ChakraProvider
       theme={theme}
-      toastOptions={{ defaultOptions: { position: "top-right" } }}
+      toastOptions={{ defaultOptions: { position: "top" } }}
     >
       <Layout />
     </ChakraProvider>

@@ -5,7 +5,7 @@ import { Deck } from "../../components/Deck.tsx";
 import PlayerHand from "../../components/PlayerHand.tsx";
 import { ActionHeading } from "../../components/ActionHeading.tsx";
 import { BigSubmitButton } from "../../components/BigSubmitButton.tsx";
-import { SocketIncoming } from "@lovepebble/server";
+import { Card, SocketIncoming } from "@lovepebble/server";
 import { ActionSelect } from "../../components/ActionSelection.tsx";
 import { Discard } from "../../components/Discard.tsx";
 
@@ -15,6 +15,11 @@ export const Game = () => {
 
   if (!gameState || !gameState.started) {
     throw new Error("No game state on the game screen.");
+  }
+
+  const currentPlayer = players.get(currentPlayerId);
+  if (!currentPlayer) {
+    throw new Error(`Where'd they go???`);
   }
 
   const confirmSelections = (formData: FormData) => {
@@ -30,7 +35,22 @@ export const Game = () => {
         });
         return;
       }
-      sendGameUpdate({ type: SocketIncoming.PlayCard, cardPlayed: parseInt(selectedCard, 10) });
+
+      const cardPlayed = parseInt(selectedCard, 10);
+      if (
+        currentPlayer.cards.includes(Card.Countess) &&
+        (currentPlayer.cards.includes(Card.Prince) || currentPlayer.cards.includes(Card.King)) &&
+        cardPlayed !== Card.Countess
+      ) {
+        toast({
+          title: "You must play the Countess if your other card is a King or Prince!",
+          variant: "solid",
+          status: "error",
+        });
+        return;
+      }
+
+      sendGameUpdate({ type: SocketIncoming.PlayCard, cardPlayed });
     } else if (gameState.details && "submitted" in gameState.details && gameState.details.submitted) {
       sendGameUpdate({ type: SocketIncoming.AcknowledgeAction });
     } else {
