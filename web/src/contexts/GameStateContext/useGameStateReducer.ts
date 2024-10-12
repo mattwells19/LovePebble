@@ -8,6 +8,7 @@ export interface RoomGameState {
   deckCount: number;
   discard: Array<Card>;
   gameState: GameData | null;
+  gameLog: Array<string>;
 }
 
 function gameStateContextReducer(currentState: RoomGameState, action: SocketMessage): RoomGameState {
@@ -29,6 +30,7 @@ function gameStateContextReducer(currentState: RoomGameState, action: SocketMess
         discard: action.data.discard,
         gameState: action.data.game,
         players: new Map(action.data.players),
+        gameLog: action.data.gameLog,
       };
   }
 }
@@ -40,5 +42,6 @@ export function useGameStateReducer() {
     discard: [],
     gameState: null,
     players: new Map(),
+    gameLog: [],
   });
 }

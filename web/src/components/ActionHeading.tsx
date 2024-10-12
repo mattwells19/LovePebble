@@ -4,17 +4,19 @@ import { useGameState } from "../contexts/GameStateContext/index.ts";
 import { Characters } from "./CharacterCard.tsx";
 
 export const ActionHeading = (): ReactElement | null => {
-  const { gameState, players, currentPlayerId } = useGameState();
+  const { gameState, gameLog, players, currentPlayerId } = useGameState();
 
   if (!gameState || !gameState.started) return null;
   const playerName = players.get(gameState.playerTurnId)?.name ?? "Someone";
 
+  const lastMove = gameLog.at(-1);
+
   return (
     <>
-      {gameState.lastMoveDescription
+      {lastMove
         ? (
           <Heading as="h2" textAlign="center">
-            {gameState.lastMoveDescription}
+            {lastMove}
           </Heading>
         )
         : null}

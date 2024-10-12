@@ -1,5 +1,3 @@
-import { Rooms } from "../repositories/Rooms.ts";
-import type { OutgoingGameStateUpdate } from "../types/socket.types.ts";
 import {
   Card,
   type GameStarted,
@@ -19,7 +17,7 @@ import {
 import { drawCardFromDeck, knockPlayerOutOfRound, prepRoomDataForNextTurn, updatePlayer } from "./gameFlow.ts";
 import * as validators from "./validators.ts";
 
-export function handlePlayedSpy(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedSpy(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const gameData = roomData.game as GameStarted & PlayedSpy;
 
@@ -29,24 +27,14 @@ export function handlePlayedSpy(roomCode: string, roomData: RoomData): OutgoingG
     deck: roomData.deck,
     discard: roomData.discard,
     players: updatedPlayers,
-    game: {
-      ...gameData,
-      lastMoveDescription: `${playingPlayer.name} played the Spy!`,
-    },
+    game: gameData,
+    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Spy!`],
   };
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedGuard(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedGuard(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const [playerIdBeingGuessed, playerBeingGuessed] = validators.validatePlayerSelection(roomData, Card.Guard);
   const gameData = roomData.game as GameStarted & PlayedGuard;
@@ -69,11 +57,11 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
         deck: updatedRoomData.deck,
         discard: updatedRoomData.discard,
         players: updatedRoomData.players,
-        game: {
-          ...gameData,
-          lastMoveDescription:
-            `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
-        },
+        game: gameData,
+        gameLog: [
+          ...updatedRoomData.gameLog,
+          `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
+        ],
       };
     } else {
       // guessed incorrectly
@@ -81,11 +69,11 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
         deck: roomData.deck,
         discard: roomData.discard,
         players: roomData.players,
-        game: {
-          ...gameData,
-          lastMoveDescription:
-            `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
-        },
+        game: gameData,
+        gameLog: [
+          ...roomData.gameLog,
+          `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
+        ],
       };
     }
   } else {
@@ -94,26 +82,18 @@ export function handlePlayedGuard(roomCode: string, roomData: RoomData): Outgoin
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
+      ],
     };
   }
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedPriest(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedPriest(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const [, playerBeingLookedAt] = validators.validatePlayerSelection(roomData, Card.Priest);
   const gameData = roomData.game as GameStarted & PlayedPriest;
@@ -131,37 +111,32 @@ export function handlePlayedPriest(roomCode: string, roomData: RoomData): Outgoi
           ...gameData.details,
           submitted: true,
         },
-        lastMoveDescription:
-          `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
       },
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
+      ],
     };
   } else {
     updatedRoomData = {
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
+      ],
     };
 
     updatedRoomData = prepRoomDataForNextTurn(updatedRoomData);
   }
 
   // don't prepRoomDataForNextTurn if selections were made since Priest requries an Acknowledge action
-  Rooms.set(roomCode, updatedRoomData);
-
-  return {
-    deckCount: updatedRoomData.deck.length,
-    discard: updatedRoomData.discard,
-    game: updatedRoomData.game,
-    players: Array.from(updatedRoomData.players),
-  };
+  return updatedRoomData;
 }
 
-export function handlePlayedBaron(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedBaron(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const [playerIdBeingChallenged, playerBeingChallenged] = validators.validatePlayerSelection(roomData, Card.Baron);
   const gameData = roomData.game as GameStarted & PlayedBaron;
@@ -203,37 +178,32 @@ export function handlePlayedBaron(roomCode: string, roomData: RoomData): Outgoin
           winningPlayerId,
           submitted: true,
         },
-        lastMoveDescription:
-          `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
       },
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
+      ],
     };
   } else {
     updatedRoomData = {
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
+      ],
     };
 
     updatedRoomData = prepRoomDataForNextTurn(updatedRoomData);
   }
 
   // don't prepRoomDataForNextTurn if selections were made since Baron requries an Acknowledge action
-  Rooms.set(roomCode, updatedRoomData);
-
-  return {
-    deckCount: updatedRoomData.deck.length,
-    discard: updatedRoomData.discard,
-    game: updatedRoomData.game,
-    players: Array.from(updatedRoomData.players),
-  };
+  return updatedRoomData;
 }
 
-export function handlePlayedHandmaid(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedHandmaid(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const gameData = roomData.game as GameStarted & PlayedHandmaid;
 
@@ -243,24 +213,14 @@ export function handlePlayedHandmaid(roomCode: string, roomData: RoomData): Outg
     deck: roomData.deck,
     discard: roomData.discard,
     players: updatedPlayers,
-    game: {
-      ...gameData,
-      lastMoveDescription: `${playingPlayer.name} played the Handmaind. Hands off!`,
-    },
+    game: gameData,
+    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Handmaind. Hands off!`],
   };
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedPrince(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedPrince(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const [chosenPlayerId, chosenPlayer] = validators.validatePlayerSelection(roomData, Card.Prince);
   const gameData = roomData.game as GameStarted & PlayedPrince;
@@ -278,11 +238,11 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
         deck: updatedRoomData.deck,
         discard: updatedRoomData.discard,
         players: updatedRoomData.players,
-        game: {
-          ...gameData,
-          lastMoveDescription:
-            `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
-        },
+        game: gameData,
+        gameLog: [
+          ...updatedRoomData.gameLog,
+          `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
+        ],
       };
     } else {
       const { newDeck, cardDrawn } = drawCardFromDeck(roomData.deck);
@@ -309,12 +269,13 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
         deck: newDeck,
         discard: updatedDiscard,
         players: updatedPlayers,
-        game: {
-          ...gameData,
-          lastMoveDescription: `${playingPlayer.name} played the Prince, and made ${
+        game: gameData,
+        gameLog: [
+          ...roomData.gameLog,
+          `${playingPlayer.name} played the Prince, and made ${
             choseThemself ? "themselves" : chosenPlayer.name
           } discard their ${cardToDiscard}.`,
-        },
+        ],
       };
     }
   } else {
@@ -322,26 +283,18 @@ export function handlePlayedPrince(roomCode: string, roomData: RoomData): Outgoi
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
+      ],
     };
   }
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedChancellor(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedChancellor(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const gameData = roomData.game as GameStarted & PlayedChancellor;
 
@@ -374,35 +327,26 @@ export function handlePlayedChancellor(roomCode: string, roomData: RoomData): Ou
       deck: newDeck,
       discard: roomData.discard,
       players: updatedPlayers,
-      game: {
-        ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Chancellor.`,
-      },
+      game: gameData,
+      gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Chancellor.`],
     };
   } else {
     updatedRoomData = {
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription: `${playingPlayer.name} played the Chancellor. The deck was empty so there is no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the Chancellor. The deck was empty so there is no effect.`,
+      ],
     };
   }
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedKing(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedKing(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const [chosenPlayerId, chosenPlayer] = validators.validatePlayerSelection(roomData, Card.King);
   const gameData = roomData.game as GameStarted & PlayedKing;
@@ -420,37 +364,29 @@ export function handlePlayedKing(roomCode: string, roomData: RoomData): Outgoing
       deck: roomData.deck,
       discard: roomData.discard,
       players: updatedPlayers,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the King and decided to swap cards with ${chosenPlayer.name}.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the King and decided to swap cards with ${chosenPlayer.name}.`,
+      ],
     };
   } else {
     updatedRoomData = {
       deck: roomData.deck,
       discard: roomData.discard,
       players: roomData.players,
-      game: {
-        ...gameData,
-        lastMoveDescription:
-          `${playingPlayer.name} played the King, but there were no players to select so the card has no effect.`,
-      },
+      game: gameData,
+      gameLog: [
+        ...roomData.gameLog,
+        `${playingPlayer.name} played the King, but there were no players to select so the card has no effect.`,
+      ],
     };
   }
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedCountess(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedCountess(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const gameData = roomData.game as GameStarted & PlayedCountess;
 
@@ -458,24 +394,14 @@ export function handlePlayedCountess(roomCode: string, roomData: RoomData): Outg
     deck: roomData.deck,
     discard: roomData.discard,
     players: roomData.players,
-    game: {
-      ...gameData,
-      lastMoveDescription: `Oooooo, ${playingPlayer.name} played the Countess!`,
-    },
+    game: gameData,
+    gameLog: [...roomData.gameLog, `Oooooo, ${playingPlayer.name} played the Countess!`],
   };
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }
 
-export function handlePlayedPrincess(roomCode: string, roomData: RoomData): OutgoingGameStateUpdate {
+export function handlePlayedPrincess(roomData: RoomData): RoomData {
   const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
   const gameData = roomData.game as GameStarted & PlayedPrincess;
 
@@ -485,19 +411,9 @@ export function handlePlayedPrincess(roomCode: string, roomData: RoomData): Outg
     deck: updatedRoomData.deck,
     discard: updatedRoomData.discard,
     players: updatedRoomData.players,
-    game: {
-      ...gameData,
-      lastMoveDescription: `${playingPlayer.name} played the Princess so they are out of the round!`,
-    },
+    game: gameData,
+    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Princess so they are out of the round!`],
   };
 
-  const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
-  Rooms.set(roomCode, roomDataForNextTurn);
-
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return prepRoomDataForNextTurn(updatedRoomData);
 }

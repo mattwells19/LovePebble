@@ -108,7 +108,6 @@ export type GameNotStarted = { started: false; playerTurnId: null };
 export type GameStarted = {
   started: true;
   playerTurnId: PlayerId;
-  lastMoveDescription: string | null;
 };
 
 export type GameData =
@@ -132,6 +131,7 @@ export interface RoomData {
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
   game: GameData;
+  gameLog: Array<string>;
 }
 
 export interface RoomDataGameNotStarted {

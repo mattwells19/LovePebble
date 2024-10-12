@@ -80,10 +80,10 @@ export const prepRoomDataForNextTurn = (roomData: RoomData): RoomData => {
     deck: newDeck,
     discard: roomData.discard,
     players: updatedPlayers,
+    gameLog: roomData.gameLog,
     game: {
       cardPlayed: null,
       details: null,
-      lastMoveDescription: roomData.game.lastMoveDescription,
       playerTurnId: nextPlayerTurnId,
       started: true,
     },

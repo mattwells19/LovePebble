@@ -2,6 +2,9 @@
 // https://deno.land/x/denodash@0.1.3
 // https://github.com/brianboyko/denodash
 
+import type { OutgoingGameStateUpdate } from "./types/socket.types.ts";
+import type { RoomData } from "./types/types.ts";
+
 export const randomOf = (max: number): number => Math.floor(Math.random() * max);
 
 export const sample = <T>(array: T[], sampleSize = 1): T[] => {
@@ -31,3 +34,11 @@ export const shuffle = <T>(array: T[]): T[] => {
   }
   return clone;
 };
+
+export const roomDataToGameStateUpdate = (roomData: RoomData): OutgoingGameStateUpdate => ({
+  deckCount: roomData.deck.length,
+  discard: roomData.discard,
+  game: roomData.game,
+  players: Array.from(roomData.players),
+  gameLog: roomData.gameLog,
+});

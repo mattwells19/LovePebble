@@ -9,7 +9,7 @@ import {
   type RoomDataGameNotStarted,
   StandardDeck,
 } from "../types/types.ts";
-import { shuffle } from "../utils.ts";
+import { roomDataToGameStateUpdate, shuffle } from "../utils.ts";
 import type { SocketData } from "./socket.ts";
 import * as cardActionHandlers from "./card-action-handlers.ts";
 import { knockPlayerOutOfRound, prepRoomDataForNextTurn } from "./gameFlow.ts";
@@ -44,7 +44,6 @@ export function startGame(roomCode: string, room: RoomDataGameNotStarted): Outgo
     details: null,
     playerTurnId: room.players.keys().next().value!,
     started: true,
-    lastMoveDescription: null,
   };
 
   const deck = shuffle(StandardDeck.slice());
@@ -85,17 +84,11 @@ export function startGame(roomCode: string, room: RoomDataGameNotStarted): Outgo
     discard,
     game: updatedGameState,
     players: updatedPlayers,
+    gameLog: ["Game started!"],
   };
   Rooms.set(roomCode, updatedRoomData);
 
-  const gameData: OutgoingGameStateUpdate = {
-    deckCount: deck.length,
-    discard,
-    game: updatedGameState,
-    players: Array.from(updatedPlayers),
-  };
-
-  return gameData;
+  return roomDataToGameStateUpdate(updatedRoomData);
 }
 
 export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed: Card): OutgoingGameStateUpdate {
@@ -132,10 +125,7 @@ export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed:
   })();
 
   const newGameData: GameData = (() => {
-    const genericRoomUpdates: GameData = {
-      ...roomDataWithCardPlayed.game,
-      lastMoveDescription: null,
-    };
+    const genericRoomUpdates: GameData = roomDataWithCardPlayed.game;
 
     switch (cardPlayed) {
       case Card.Guard:
@@ -209,12 +199,7 @@ export function handlePlayCard(roomCode: string, roomData: RoomData, cardPlayed:
 
   Rooms.set(roomCode, updatedRoomData);
 
-  return {
-    deckCount: roomDataWithCardPlayed.deck.length,
-    discard: roomDataWithCardPlayed.discard,
-    players: Array.from(roomDataWithCardPlayed.players),
-    game: newGameData,
-  };
+  return roomDataToGameStateUpdate(updatedRoomData);
 }
 
 export function handleSelectPlayer(roomCode: string, room: RoomData, playerSelected: string): OutgoingGameStateUpdate {
@@ -227,12 +212,7 @@ export function handleSelectPlayer(roomCode: string, room: RoomData, playerSelec
   roomCopy.game.details.chosenPlayerId = playerSelected;
   Rooms.set(roomCode, roomCopy);
 
-  return {
-    deckCount: roomCopy.deck.length,
-    discard: roomCopy.discard,
-    game: roomCopy.game,
-    players: Array.from(roomCopy.players),
-  };
+  return roomDataToGameStateUpdate(roomCopy);
 }
 
 export function handleSelectCard(roomCode: string, room: RoomData, cardSelected: Card): OutgoingGameStateUpdate {
@@ -269,39 +249,39 @@ export function handleSelectCard(roomCode: string, room: RoomData, cardSelected:
 
   Rooms.set(roomCode, updatedRoomData);
 
-  return {
-    deckCount: updatedRoomData.deck.length,
-    discard: updatedRoomData.discard,
-    game: updatedRoomData.game,
-    players: Array.from(updatedRoomData.players),
-  };
+  return roomDataToGameStateUpdate(updatedRoomData);
 }
 
 export function handleSubmitSelection(roomCode: string, room: RoomData): OutgoingGameStateUpdate {
-  switch (room.game.cardPlayed) {
-    case Card.Spy:
-      return cardActionHandlers.handlePlayedSpy(roomCode, room);
-    case Card.Guard:
-      return cardActionHandlers.handlePlayedGuard(roomCode, room);
-    case Card.Priest:
-      return cardActionHandlers.handlePlayedPriest(roomCode, room);
-    case Card.Baron:
-      return cardActionHandlers.handlePlayedBaron(roomCode, room);
-    case Card.Handmaid:
-      return cardActionHandlers.handlePlayedHandmaid(roomCode, room);
-    case Card.Prince:
-      return cardActionHandlers.handlePlayedPrince(roomCode, room);
-    case Card.Chancellor:
-      return cardActionHandlers.handlePlayedChancellor(roomCode, room);
-    case Card.King:
-      return cardActionHandlers.handlePlayedKing(roomCode, room);
-    case Card.Countess:
-      return cardActionHandlers.handlePlayedCountess(roomCode, room);
-    case Card.Princess:
-      return cardActionHandlers.handlePlayedPrincess(roomCode, room);
-    default:
-      throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
-  }
+  const newRoomData = (() => {
+    switch (room.game.cardPlayed) {
+      case Card.Spy:
+        return cardActionHandlers.handlePlayedSpy(room);
+      case Card.Guard:
+        return cardActionHandlers.handlePlayedGuard(room);
+      case Card.Priest:
+        return cardActionHandlers.handlePlayedPriest(room);
+      case Card.Baron:
+        return cardActionHandlers.handlePlayedBaron(room);
+      case Card.Handmaid:
+        return cardActionHandlers.handlePlayedHandmaid(room);
+      case Card.Prince:
+        return cardActionHandlers.handlePlayedPrince(room);
+      case Card.Chancellor:
+        return cardActionHandlers.handlePlayedChancellor(room);
+      case Card.King:
+        return cardActionHandlers.handlePlayedKing(room);
+      case Card.Countess:
+        return cardActionHandlers.handlePlayedCountess(room);
+      case Card.Princess:
+        return cardActionHandlers.handlePlayedPrincess(room);
+      default:
+        throw new Error(`Action not yet implemented for ${room.game.cardPlayed}.`);
+    }
+  })();
+
+  Rooms.set(roomCode, newRoomData);
+  return roomDataToGameStateUpdate(newRoomData);
 }
 
 export function handleAcknowledgeAction(roomCode: string, room: RoomData): OutgoingGameStateUpdate {
@@ -321,10 +301,5 @@ export function handleAcknowledgeAction(roomCode: string, room: RoomData): Outgo
   const roomDataForNextTurn = prepRoomDataForNextTurn(updatedRoomData);
   Rooms.set(roomCode, roomDataForNextTurn);
 
-  return {
-    deckCount: roomDataForNextTurn.deck.length,
-    discard: roomDataForNextTurn.discard,
-    game: roomDataForNextTurn.game,
-    players: Array.from(roomDataForNextTurn.players),
-  };
+  return roomDataToGameStateUpdate(roomDataForNextTurn);
 }

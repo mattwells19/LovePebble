@@ -21,6 +21,7 @@ export interface OutgoingGameStateUpdate {
   discard: Array<Card>;
   players: [PlayerId, Player][];
   game: GameData;
+  gameLog: Array<string>;
 }
 
 export interface SocketEvent {
