@@ -1,7 +1,7 @@
+import type { PropsWithChildren, ReactElement } from "react";
 import { Box, Button } from "@chakra-ui/react";
-import { ReactElement } from "react";
 
-export const BigSubmitButton = (): ReactElement => {
+export const BigSubmitButton = ({ children = "Ok" }: PropsWithChildren): ReactElement => {
   return (
     <Box
       display="flex"
@@ -14,7 +14,7 @@ export const BigSubmitButton = (): ReactElement => {
       bg="main.lightPurple"
     >
       <Button type="submit" size="lg" textTransform="uppercase" width="xs">
-        Ok
+        {children}
       </Button>
     </Box>
   );

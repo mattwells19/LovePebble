@@ -1,6 +1,6 @@
 import { sample } from "jsr:@std/collections@1.0.7";
 import { Rooms } from "../repositories/Rooms.ts";
-import type { Player, PlayerId, RoomDataGameNotStarted } from "../types/types.ts";
+import type { Player, PlayerId, RoomData } from "../types/types.ts";
 
 export function getNewRoomCode(): string {
   let newRoomCode = "";
@@ -16,17 +16,16 @@ export function getNewRoomCode(): string {
   return newRoomCode;
 }
 
-export function createRoomWithCode(roomCode: string): RoomDataGameNotStarted {
+export function createRoomWithCode(roomCode: string): RoomData {
   if (Rooms.has(roomCode)) {
     throw new Error(`Cannot create a room with code ${roomCode} as a room with that code already exists.`);
   } else {
-    const newRoomData: RoomDataGameNotStarted = {
+    const newRoomData: RoomData = {
       deck: [],
       discard: [],
-      game: {
-        started: false,
-        playerTurnId: null,
-      },
+      round: null,
+      roundLog: [],
+      gameStarted: false,
       players: new Map<PlayerId, Player>(),
     };
     Rooms.set(roomCode, newRoomData);

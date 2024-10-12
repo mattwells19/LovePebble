@@ -4,6 +4,7 @@ import { useSetAppbarText } from "../../contexts/AppbarContext.tsx";
 import { DocTitle } from "../../components/DocTitle.tsx";
 import { Game } from "./Game.tsx";
 import { Lobby } from "./Lobby.tsx";
+import { RoundEnd } from "./RoundEnd.tsx";
 
 export const roomLoader = ({ params }: LoaderFunctionArgs) => {
   if (!params.roomCode) {
@@ -19,13 +20,13 @@ export const roomLoader = ({ params }: LoaderFunctionArgs) => {
 
 const RoomUnwrapped = () => {
   const roomCode = useLoaderData() as string;
-  const { gameState } = useGameState();
   useSetAppbarText(roomCode);
+  const { round, gameStarted } = useGameState();
 
   return (
     <>
       <DocTitle>{roomCode}</DocTitle>
-      {gameState?.started ? <Game /> : <Lobby roomCode={roomCode} />}
+      {!gameStarted ? <Lobby roomCode={roomCode} /> : round ? <Game /> : <RoundEnd />}
     </>
   );
 };

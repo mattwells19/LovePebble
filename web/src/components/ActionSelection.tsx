@@ -15,37 +15,37 @@ interface ActionSelectProps {
 export const ActionSelect = (
   { playerCards }: ActionSelectProps,
 ): ReactElement | null => {
-  const { gameState, sendGameUpdate, currentPlayerId } = useGameState();
-  if (!gameState || !gameState.started || !gameState.details) {
+  const { round, sendGameUpdate, currentPlayerId } = useGameState();
+  if (!round || !round.details) {
     return null;
   }
 
-  if ("submitted" in gameState.details === false || gameState.details.submitted === false) {
+  if ("submitted" in round.details === false || round.details.submitted === false) {
     return (
       <>
-        {"chosenPlayerId" in gameState.details
+        {"chosenPlayerId" in round.details
           ? (
             <PlayerPicker
-              value={gameState.details.chosenPlayerId}
+              value={round.details.chosenPlayerId}
             />
           )
           : null}
-        {gameState.cardPlayed === Card.Guard
+        {round.cardPlayed === Card.Guard
           ? (
             <CardPicker
-              value={gameState.details.card}
+              value={round.details.card}
             />
           )
           : null}
-        {gameState.playerTurnId === currentPlayerId && gameState.cardPlayed === Card.Chancellor
+        {round.playerTurnId === currentPlayerId && round.cardPlayed === Card.Chancellor
           ? (
             <Box display="flex" flexDirection="column" gap="1" justifyContent="center">
               <Label>Pick one to keep</Label>
               <CardSelection
-                cardOptions={[...gameState.details.deckOptions, ...playerCards]}
+                cardOptions={[...round.details.deckOptions, ...playerCards]}
                 htmlName="chancellor-choice"
                 onChange={(cardSelection) => {
-                  if (gameState.playerTurnId !== currentPlayerId) return;
+                  if (round.playerTurnId !== currentPlayerId) return;
                   sendGameUpdate({ type: SocketIncoming.SelectCard, cardSelected: cardSelection });
                 }}
               />

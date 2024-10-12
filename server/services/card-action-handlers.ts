@@ -1,6 +1,5 @@
 import {
   Card,
-  type GameStarted,
   type PlayedBaron,
   type PlayedChancellor,
   type PlayedCountess,
@@ -13,36 +12,38 @@ import {
   type PlayedSpy,
   type PlayerId,
   type RoomData,
+  type RoundStarted,
 } from "../types/types.ts";
 import { drawCardFromDeck, knockPlayerOutOfRound, prepRoomDataForNextTurn, updatePlayer } from "./gameFlow.ts";
 import * as validators from "./validators.ts";
 
 export function handlePlayedSpy(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
-  const gameData = roomData.game as GameStarted & PlayedSpy;
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedSpy>(roomData);
 
-  const updatedPlayers = updatePlayer(roomData.players, gameData.playerTurnId, { playedSpy: true });
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
+
+  const updatedPlayers = updatePlayer(roomData.players, roundData.playerTurnId, { playedSpy: true });
 
   const updatedRoomData: RoomData = {
-    deck: roomData.deck,
-    discard: roomData.discard,
+    ...roomData,
     players: updatedPlayers,
-    game: gameData,
-    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Spy!`],
+    round: roundData,
+    roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Spy!`],
   };
 
   return prepRoomDataForNextTurn(updatedRoomData);
 }
 
 export function handlePlayedGuard(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedGuard>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
   const [playerIdBeingGuessed, playerBeingGuessed] = validators.validatePlayerSelection(roomData, Card.Guard);
-  const gameData = roomData.game as GameStarted & PlayedGuard;
 
   let updatedRoomData: RoomData | null = null;
 
   if (playerIdBeingGuessed && playerBeingGuessed) {
-    const cardGuessed = gameData.details.card;
+    const cardGuessed = roundData.details.card;
     if (cardGuessed === null) {
       throw new Error(`Didn't guess a card when processing Guard action.`);
     }
@@ -54,24 +55,20 @@ export function handlePlayedGuard(roomData: RoomData): RoomData {
       updatedRoomData = knockPlayerOutOfRound(roomData, playerIdBeingGuessed);
 
       updatedRoomData = {
-        deck: updatedRoomData.deck,
-        discard: updatedRoomData.discard,
-        players: updatedRoomData.players,
-        game: gameData,
-        gameLog: [
-          ...updatedRoomData.gameLog,
+        ...updatedRoomData,
+        round: roundData,
+        roundLog: [
+          ...updatedRoomData.roundLog,
           `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
         ],
       };
     } else {
       // guessed incorrectly
       updatedRoomData = {
-        deck: roomData.deck,
-        discard: roomData.discard,
-        players: roomData.players,
-        game: gameData,
-        gameLog: [
-          ...roomData.gameLog,
+        ...roomData,
+        round: roundData,
+        roundLog: [
+          ...roomData.roundLog,
           `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
         ],
       };
@@ -79,12 +76,10 @@ export function handlePlayedGuard(roomData: RoomData): RoomData {
   } else {
     // no options to guess
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
       ],
     };
@@ -94,37 +89,34 @@ export function handlePlayedGuard(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedPriest(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedPriest>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
   const [, playerBeingLookedAt] = validators.validatePlayerSelection(roomData, Card.Priest);
-  const gameData = roomData.game as GameStarted & PlayedPriest;
 
   let updatedRoomData: RoomData | null = null;
 
   if (playerBeingLookedAt) {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: {
-        ...gameData,
+      ...roomData,
+      round: {
+        ...roundData,
         details: {
-          ...gameData.details,
+          ...roundData.details,
           submitted: true,
         },
       },
-      gameLog: [
-        ...roomData.gameLog,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
       ],
     };
   } else {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
       ],
     };
@@ -137,9 +129,10 @@ export function handlePlayedPriest(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedBaron(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedBaron>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
   const [playerIdBeingChallenged, playerBeingChallenged] = validators.validatePlayerSelection(roomData, Card.Baron);
-  const gameData = roomData.game as GameStarted & PlayedBaron;
 
   let updatedRoomData: RoomData | null = null;
 
@@ -149,7 +142,7 @@ export function handlePlayedBaron(roomData: RoomData): RoomData {
       const challengedPlayersCard = playerBeingChallenged.cards[0];
 
       if (currentPlayersCard > challengedPlayersCard) {
-        return gameData.playerTurnId;
+        return roundData.playerTurnId;
       } else if (challengedPlayersCard > currentPlayersCard) {
         return playerIdBeingChallenged;
       } else {
@@ -158,7 +151,7 @@ export function handlePlayedBaron(roomData: RoomData): RoomData {
     })();
 
     const resultText = (() => {
-      if (winningPlayerId === gameData.playerTurnId) {
+      if (winningPlayerId === roundData.playerTurnId) {
         return `${playingPlayer.name} wins the challenge! ${playerBeingChallenged.name} is out of the round.`;
       } else if (winningPlayerId === playerIdBeingChallenged) {
         return `${playingPlayer.name} lost the challenge and is out of the round.`;
@@ -168,30 +161,26 @@ export function handlePlayedBaron(roomData: RoomData): RoomData {
     })();
 
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: {
-        ...gameData,
+      ...roomData,
+      round: {
+        ...roundData,
         details: {
-          ...gameData.details,
+          ...roundData.details,
           winningPlayerId,
           submitted: true,
         },
       },
-      gameLog: [
-        ...roomData.gameLog,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
       ],
     };
   } else {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
       ],
     };
@@ -204,26 +193,27 @@ export function handlePlayedBaron(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedHandmaid(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
-  const gameData = roomData.game as GameStarted & PlayedHandmaid;
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedHandmaid>(roomData);
 
-  const updatedPlayers = updatePlayer(roomData.players, gameData.playerTurnId, { handmaidProtected: true });
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
+
+  const updatedPlayers = updatePlayer(roomData.players, roundData.playerTurnId, { handmaidProtected: true });
 
   const updatedRoomData: RoomData = {
-    deck: roomData.deck,
-    discard: roomData.discard,
+    ...roomData,
     players: updatedPlayers,
-    game: gameData,
-    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Handmaind. Hands off!`],
+    round: roundData,
+    roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Handmaind. Hands off!`],
   };
 
   return prepRoomDataForNextTurn(updatedRoomData);
 }
 
 export function handlePlayedPrince(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedPrince>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
   const [chosenPlayerId, chosenPlayer] = validators.validatePlayerSelection(roomData, Card.Prince);
-  const gameData = roomData.game as GameStarted & PlayedPrince;
 
   let updatedRoomData: RoomData | null = null;
 
@@ -235,12 +225,10 @@ export function handlePlayedPrince(roomData: RoomData): RoomData {
       updatedRoomData = knockPlayerOutOfRound(roomData, chosenPlayerId);
 
       updatedRoomData = {
-        deck: updatedRoomData.deck,
-        discard: updatedRoomData.discard,
-        players: updatedRoomData.players,
-        game: gameData,
-        gameLog: [
-          ...updatedRoomData.gameLog,
+        ...updatedRoomData,
+        round: roundData,
+        roundLog: [
+          ...updatedRoomData.roundLog,
           `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
         ],
       };
@@ -263,15 +251,16 @@ export function handlePlayedPrince(roomData: RoomData): RoomData {
         playedSpy: cardToDiscard === Card.Spy ? true : chosenPlayer.playedSpy,
       });
 
-      const choseThemself = roomData.game.playerTurnId === chosenPlayerId;
+      const choseThemself = roundData.playerTurnId === chosenPlayerId;
 
       updatedRoomData = {
+        ...roomData,
         deck: newDeck,
         discard: updatedDiscard,
         players: updatedPlayers,
-        game: gameData,
-        gameLog: [
-          ...roomData.gameLog,
+        round: roundData,
+        roundLog: [
+          ...roomData.roundLog,
           `${playingPlayer.name} played the Prince, and made ${
             choseThemself ? "themselves" : chosenPlayer.name
           } discard their ${cardToDiscard}.`,
@@ -280,12 +269,10 @@ export function handlePlayedPrince(roomData: RoomData): RoomData {
     }
   } else {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
       ],
     };
@@ -295,18 +282,19 @@ export function handlePlayedPrince(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedChancellor(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
-  const gameData = roomData.game as GameStarted & PlayedChancellor;
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedChancellor>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
 
   let updatedRoomData: RoomData | null = null;
 
   // details will be null if there were no deck options to choose from.
   // in that case this card should have no effect
 
-  if (gameData.details) {
-    const cardOptions = [...gameData.details.deckOptions, ...playingPlayer.cards];
+  if (roundData.details) {
+    const cardOptions = [...roundData.details.deckOptions, ...playingPlayer.cards];
 
-    const chosenCard = gameData.details.card;
+    const chosenCard = roundData.details.card;
     if (chosenCard === null) {
       throw new Error(`Didn't choose a card when processing Chancellor action.`);
     }
@@ -315,29 +303,27 @@ export function handlePlayedChancellor(roomData: RoomData): RoomData {
     }
 
     let newDeck = [...roomData.deck];
-    if (gameData.details.deckOptions.includes(chosenCard)) {
+    if (roundData.details.deckOptions.includes(chosenCard)) {
       // if they chose a card from the deck, remove the chosen card and add the card from their hand
       const cardDeckIndex = newDeck.indexOf(chosenCard);
       newDeck = newDeck.toSpliced(cardDeckIndex, 1, playingPlayer.cards[0]);
     }
 
-    const updatedPlayers = updatePlayer(roomData.players, gameData.playerTurnId, { cards: [chosenCard] });
+    const updatedPlayers = updatePlayer(roomData.players, roundData.playerTurnId, { cards: [chosenCard] });
 
     updatedRoomData = {
+      ...roomData,
       deck: newDeck,
-      discard: roomData.discard,
       players: updatedPlayers,
-      game: gameData,
-      gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Chancellor.`],
+      round: roundData,
+      roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Chancellor.`],
     };
   } else {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the Chancellor. The deck was empty so there is no effect.`,
       ],
     };
@@ -347,9 +333,10 @@ export function handlePlayedChancellor(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedKing(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedKing>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
   const [chosenPlayerId, chosenPlayer] = validators.validatePlayerSelection(roomData, Card.King);
-  const gameData = roomData.game as GameStarted & PlayedKing;
 
   let updatedRoomData: RoomData | null = null;
 
@@ -357,27 +344,24 @@ export function handlePlayedKing(roomData: RoomData): RoomData {
     const playerCards = playingPlayer.cards;
     const chosenPlayerCards = chosenPlayer.cards;
 
-    let updatedPlayers = updatePlayer(roomData.players, roomData.game.playerTurnId, { cards: chosenPlayerCards });
+    let updatedPlayers = updatePlayer(roomData.players, roundData.playerTurnId, { cards: chosenPlayerCards });
     updatedPlayers = updatePlayer(updatedPlayers, chosenPlayerId, { cards: playerCards });
 
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
+      ...roomData,
       players: updatedPlayers,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the King and decided to swap cards with ${chosenPlayer.name}.`,
       ],
     };
   } else {
     updatedRoomData = {
-      deck: roomData.deck,
-      discard: roomData.discard,
-      players: roomData.players,
-      game: gameData,
-      gameLog: [
-        ...roomData.gameLog,
+      ...roomData,
+      round: roundData,
+      roundLog: [
+        ...roomData.roundLog,
         `${playingPlayer.name} played the King, but there were no players to select so the card has no effect.`,
       ],
     };
@@ -387,32 +371,30 @@ export function handlePlayedKing(roomData: RoomData): RoomData {
 }
 
 export function handlePlayedCountess(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
-  const gameData = roomData.game as GameStarted & PlayedCountess;
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedCountess>(roomData);
+
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
 
   const updatedRoomData: RoomData = {
-    deck: roomData.deck,
-    discard: roomData.discard,
-    players: roomData.players,
-    game: gameData,
-    gameLog: [...roomData.gameLog, `Oooooo, ${playingPlayer.name} played the Countess!`],
+    ...roomData,
+    round: roundData,
+    roundLog: [...roomData.roundLog, `Oooooo, ${playingPlayer.name} played the Countess!`],
   };
 
   return prepRoomDataForNextTurn(updatedRoomData);
 }
 
 export function handlePlayedPrincess(roomData: RoomData): RoomData {
-  const playingPlayer = validators.validatePlayerExists(roomData, roomData.game.playerTurnId);
-  const gameData = roomData.game as GameStarted & PlayedPrincess;
+  const roundData = validators.validateRoundStarted<RoundStarted & PlayedPrincess>(roomData);
 
-  let updatedRoomData = knockPlayerOutOfRound(roomData, roomData.game.playerTurnId);
+  const playingPlayer = validators.validatePlayerExists(roomData, roundData.playerTurnId);
+
+  let updatedRoomData = knockPlayerOutOfRound(roomData, roundData.playerTurnId);
 
   updatedRoomData = {
-    deck: updatedRoomData.deck,
-    discard: updatedRoomData.discard,
-    players: updatedRoomData.players,
-    game: gameData,
-    gameLog: [...roomData.gameLog, `${playingPlayer.name} played the Princess so they are out of the round!`],
+    ...updatedRoomData,
+    round: roundData,
+    roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Princess so they are out of the round!`],
   };
 
   return prepRoomDataForNextTurn(updatedRoomData);

@@ -10,11 +10,11 @@ import { ActionSelect } from "../../components/ActionSelection.tsx";
 import { Discard } from "../../components/Discard.tsx";
 
 export const Game = () => {
-  const { currentPlayerId, gameState, players, sendGameUpdate } = useGameState();
+  const { currentPlayerId, round, players, sendGameUpdate } = useGameState();
   const toast = useToast();
 
-  if (!gameState || !gameState.started) {
-    throw new Error("No game state on the game screen.");
+  if (!round) {
+    throw new Error("No round state on the game screen.");
   }
 
   const currentPlayer = players.get(currentPlayerId);
@@ -23,9 +23,9 @@ export const Game = () => {
   }
 
   const confirmSelections = (formData: FormData) => {
-    if (currentPlayerId !== gameState.playerTurnId) return;
+    if (currentPlayerId !== round.playerTurnId) return;
 
-    if (!gameState.cardPlayed) {
+    if (!round.cardPlayed) {
       const selectedCard = formData.get("card-to-play")?.toString();
       if (!selectedCard) {
         toast({
@@ -51,7 +51,7 @@ export const Game = () => {
       }
 
       sendGameUpdate({ type: SocketIncoming.PlayCard, cardPlayed });
-    } else if (gameState.details && "submitted" in gameState.details && gameState.details.submitted) {
+    } else if (round.details && "submitted" in round.details && round.details.submitted) {
       sendGameUpdate({ type: SocketIncoming.AcknowledgeAction });
     } else {
       sendGameUpdate({ type: SocketIncoming.SubmitSelection });
@@ -76,8 +76,8 @@ export const Game = () => {
         {players.get(currentPlayerId)!.cards.length > 0
           ? (
             <PlayerHand
-              isPlayersTurn={gameState.playerTurnId === currentPlayerId}
-              hasPlayedCard={!!gameState.cardPlayed}
+              isPlayersTurn={round.playerTurnId === currentPlayerId}
+              hasPlayedCard={!!round.cardPlayed}
               playerCards={players.get(currentPlayerId)?.cards ?? []}
             />
           )
@@ -85,7 +85,7 @@ export const Game = () => {
         <ActionSelect
           playerCards={players.get(currentPlayerId)?.cards ?? []}
         />
-        {currentPlayerId === gameState.playerTurnId ? <BigSubmitButton /> : null}
+        {currentPlayerId === round.playerTurnId ? <BigSubmitButton /> : null}
       </chakra.form>
     </>
   );

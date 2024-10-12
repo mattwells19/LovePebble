@@ -36,9 +36,10 @@ export const shuffle = <T>(array: T[]): T[] => {
 };
 
 export const roomDataToGameStateUpdate = (roomData: RoomData): OutgoingGameStateUpdate => ({
+  gameStarted: roomData.gameStarted,
   deckCount: roomData.deck.length,
   discard: roomData.discard,
-  game: roomData.game,
+  round: roomData.round,
   players: Array.from(roomData.players),
-  gameLog: roomData.gameLog,
+  roundLog: roomData.roundLog,
 });

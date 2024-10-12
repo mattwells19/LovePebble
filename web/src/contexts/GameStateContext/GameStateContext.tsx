@@ -63,7 +63,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
   const discardWithHidden: Array<Card | "Hidden"> = useMemo(() => {
     const roomSize = roomGameState.players.size;
 
-    if (roomGameState.gameState?.started && roomSize < 2) {
+    if (roomGameState.round && roomSize < 2) {
       throw new Error("Game started with less than 2 players which should be impossible.");
     }
 
@@ -83,7 +83,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
          */
         .reverse()
     );
-  }, [Boolean(roomGameState.gameState?.started), roomGameState.discard]);
+  }, [Boolean(roomGameState.round), roomGameState.discard]);
 
   return (
     <GameStateContext.Provider value={{ ...roomGameState, discard: discardWithHidden, sendGameUpdate }}>
@@ -95,7 +95,7 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
 export const useGameState = (): GameStateContextValue => {
   const context = useContext(GameStateContext);
   if (!context) {
-    throw new Error("Cannot use Gamestate context outside of GameStateProvider.");
+    throw new Error("Cannot use round context outside of GameStateProvider.");
   } else {
     return context;
   }

@@ -103,15 +103,12 @@ export type WaitingForChoice = {
   details: null;
 };
 
-export type GameNotStarted = { started: false; playerTurnId: null };
-
-export type GameStarted = {
-  started: true;
+export type RoundStarted = {
   playerTurnId: PlayerId;
 };
 
-export type GameData =
-  & GameStarted
+export type RoundData =
+  & RoundStarted
   & (
     | PlayedSpy
     | PlayedGuard
@@ -127,16 +124,10 @@ export type GameData =
   );
 
 export interface RoomData {
+  gameStarted: boolean;
   deck: Array<Card>;
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
-  game: GameData;
-  gameLog: Array<string>;
-}
-
-export interface RoomDataGameNotStarted {
-  deck: [];
-  discard: [];
-  players: Map<PlayerId, Player>;
-  game: GameNotStarted;
+  round: RoundData | null;
+  roundLog: Array<string>;
 }

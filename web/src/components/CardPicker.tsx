@@ -21,6 +21,15 @@ const cardOptionClass = css`
     background-color: var(--chakra-colors-main-darkPurple);
   }
 
+  &:has(input[readonly]) {
+    cursor: not-allowed;
+
+    &:hover,
+    &:focus-visible {
+      background-color: inherit;
+    }
+  }
+
   &:has(input:disabled) {
     cursor: not-allowed;
     background-color: var(--chakra-colors-main-greyAccent);
@@ -112,10 +121,12 @@ interface CardPickerProps {
 }
 
 export const CardPicker = ({ value }: CardPickerProps) => {
-  const { sendGameUpdate, currentPlayerId, gameState } = useGameState();
+  const { sendGameUpdate, currentPlayerId, players, round } = useGameState();
+
+  const playerTurnName = (round ? players.get(round.playerTurnId)?.name : null) ?? "Someone";
 
   const handleChange = (selectedCard: Card) => {
-    if (gameState?.playerTurnId !== currentPlayerId) return;
+    if (round?.playerTurnId !== currentPlayerId) return;
 
     sendGameUpdate({ type: SocketIncoming.SelectCard, cardSelected: selectedCard });
   };
@@ -123,7 +134,13 @@ export const CardPicker = ({ value }: CardPickerProps) => {
   return (
     <Box as="fieldset">
       <Label as="legend" display="block" margin="auto" marginBottom="1">
-        Choose a Card
+        {round?.playerTurnId === currentPlayerId
+          ? (
+            "Choose a player"
+          )
+          : (
+            `${playerTurnName} is choosing a card to guess`
+          )}
       </Label>
       <Box
         display="flex"
@@ -142,7 +159,7 @@ export const CardPicker = ({ value }: CardPickerProps) => {
             value={cardValue}
             onChange={(e) => (e.target.checked ? handleChange(cardValue) : null)}
             checked={cardValue === value}
-            readOnly={currentPlayerId !== gameState?.playerTurnId}
+            readOnly={currentPlayerId !== round?.playerTurnId}
             disabled={character === "Guard"}
           >
             {character}

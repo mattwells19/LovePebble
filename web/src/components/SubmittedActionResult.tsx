@@ -6,21 +6,21 @@ import { Label } from "./Label.tsx";
 import { CharacterCard } from "./CharacterCard.tsx";
 
 export const SubmittedActionResult = (): ReactElement | null => {
-  const { currentPlayerId, gameState, players } = useGameState();
+  const { currentPlayerId, round, players } = useGameState();
 
   if (
-    !gameState ||
-    (gameState.cardPlayed !== Card.Priest && gameState.cardPlayed !== Card.Baron) ||
-    !gameState.details.chosenPlayerId ||
-    !gameState.details.submitted
+    !round ||
+    (round.cardPlayed !== Card.Priest && round.cardPlayed !== Card.Baron) ||
+    !round.details.chosenPlayerId ||
+    !round.details.submitted
   ) {
     return null;
   }
 
-  const currentPlayer = players.get(gameState.playerTurnId)!;
-  const chosenPlayer = players.get(gameState.details.chosenPlayerId)!;
+  const currentPlayer = players.get(round.playerTurnId)!;
+  const chosenPlayer = players.get(round.details.chosenPlayerId)!;
 
-  if (gameState.cardPlayed === Card.Priest && currentPlayerId === gameState.playerTurnId) {
+  if (round.cardPlayed === Card.Priest && currentPlayerId === round.playerTurnId) {
     return (
       <Box display="flex" flexDirection="column" gap="1" alignItems="center">
         <Label>{chosenPlayer.name}'s card</Label>
@@ -28,13 +28,17 @@ export const SubmittedActionResult = (): ReactElement | null => {
       </Box>
     );
   } else if (
-    gameState.cardPlayed === Card.Baron &&
-    (currentPlayerId === gameState.playerTurnId || currentPlayerId === gameState.details.chosenPlayerId)
+    round.cardPlayed === Card.Baron &&
+    (currentPlayerId === round.playerTurnId || currentPlayerId === round.details.chosenPlayerId)
   ) {
     return (
       <Box display="flex" flexDirection="column" gap="1">
         <Label>
-          {gameState.details.winningPlayerId === currentPlayerId ? "You won!" : "You lost."}
+          {round.details.winningPlayerId === currentPlayerId
+            ? "You won!"
+            : round.details.winningPlayerId === null
+            ? "It's a tie!"
+            : "You lost."}
         </Label>
         <Box display="flex" gap="3" margin="auto">
           <CharacterCard character={currentPlayer.cards[0]} />

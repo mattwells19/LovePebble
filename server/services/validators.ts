@@ -1,4 +1,11 @@
-import { Card, type Player, type PlayerId, type RoomData } from "../types/types.ts";
+import { Card, type Player, type PlayerId, type RoomData, type RoundData } from "../types/types.ts";
+
+export function validateRoundStarted<TRoundData extends RoundData = RoundData>(roomData: RoomData): TRoundData {
+  if (roomData.round === null) {
+    throw new Error("Round not started.");
+  }
+  return roomData.round as TRoundData;
+}
 
 export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Player {
   const player = roomData.players.get(playerId);
@@ -14,21 +21,23 @@ export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Pl
  * @returns The player ID and player object for the chosen player
  */
 export function validatePlayerSelection(roomData: RoomData, card: Card): [PlayerId, Player] | [null, null] {
-  if (roomData.game.cardPlayed !== card) {
-    throw new Error(`Card played isn't a ${card}. Card played: ${roomData.game.cardPlayed}.`);
+  const roundData = validateRoundStarted(roomData);
+
+  if (roundData.cardPlayed !== card) {
+    throw new Error(`Card played isn't a ${card}. Card played: ${roundData.cardPlayed}.`);
   }
 
-  if (!roomData.game.details || "chosenPlayerId" in roomData.game.details === false) {
-    throw new Error(`Did not ask for player selection. Game state: ${JSON.stringify(roomData.game)}`);
+  if (!roundData.details || "chosenPlayerId" in roundData.details === false) {
+    throw new Error(`Did not ask for player selection. Game state: ${JSON.stringify(roundData)}`);
   }
 
-  const chosenPlayerId = roomData.game.details.chosenPlayerId;
+  const chosenPlayerId = roundData.details.chosenPlayerId;
 
   const choosablePlayerIds = roomData.players.entries().reduce((acc, [playerId, player]) => {
     if (player.outOfRound || player.handmaidProtected) {
       return acc;
     }
-    if (playerId === roomData.game.playerTurnId && card !== Card.Prince) {
+    if (playerId === roundData.playerTurnId && card !== Card.Prince) {
       return acc;
     }
 

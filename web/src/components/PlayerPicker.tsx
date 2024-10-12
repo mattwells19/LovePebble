@@ -19,6 +19,15 @@ const playerOpionClass = css`
     background-color: var(--chakra-colors-main-darkPurple);
   }
 
+  &:has(input[readonly]) {
+    cursor: not-allowed;
+
+    &:hover,
+    &:focus-visible {
+      background-color: inherit;
+    }
+  }
+
   &:has(input:disabled) {
     cursor: not-allowed;
     background-color: var(--chakra-colors-main-greyAccent);
@@ -101,10 +110,12 @@ const PlayerOption = ({ children, isOutOfRound, isProtected, ...inputProps }: Pl
 };
 
 export const PlayerPicker = ({ value }: { value: PlayerId | null }) => {
-  const { players, sendGameUpdate, currentPlayerId, gameState } = useGameState();
+  const { players, sendGameUpdate, currentPlayerId, round } = useGameState();
+
+  const playerTurnName = (round ? players.get(round.playerTurnId)?.name : null) ?? "Someone";
 
   const handleChange = (selectedPlayerId: PlayerId) => {
-    if (gameState?.playerTurnId !== currentPlayerId) return;
+    if (round?.playerTurnId !== currentPlayerId) return;
 
     sendGameUpdate({ playerSelected: selectedPlayerId, type: SocketIncoming.SelectPlayer });
   };
@@ -112,7 +123,13 @@ export const PlayerPicker = ({ value }: { value: PlayerId | null }) => {
   return (
     <Box as="fieldset">
       <Label as="legend" display="block" margin="auto" marginBottom="1">
-        Choose a player
+        {round?.playerTurnId === currentPlayerId
+          ? (
+            "Choose a player"
+          )
+          : (
+            `${playerTurnName} is choosing a player`
+          )}
       </Label>
       <Box
         display="flex"
@@ -132,9 +149,9 @@ export const PlayerPicker = ({ value }: { value: PlayerId | null }) => {
             value={player.name}
             onChange={(e) => (e.target.checked ? handleChange(playerId) : null)}
             checked={playerId === value}
-            readOnly={currentPlayerId !== gameState?.playerTurnId}
+            readOnly={currentPlayerId !== round?.playerTurnId}
             // You can only pick yourself when playing a Prince
-            disabled={playerId === gameState?.playerTurnId && gameState.cardPlayed !== Card.Prince}
+            disabled={playerId === round?.playerTurnId && round.cardPlayed !== Card.Prince}
             isOutOfRound={player.outOfRound}
             isProtected={player.handmaidProtected}
           >

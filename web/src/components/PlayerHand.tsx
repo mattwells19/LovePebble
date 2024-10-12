@@ -14,7 +14,7 @@ interface PlayerHandProps {
 const PlayerHand = ({ isPlayersTurn, hasPlayedCard, playerCards }: PlayerHandProps): ReactElement => {
   return (
     <Box display="flex" flexDirection="column" gap="1">
-      <Label>Your cards</Label>
+      <Label>{isPlayersTurn ? "Choose a card to play" : "Your cards"}</Label>
       <Box display="flex" gap="3" margin="auto">
         {isPlayersTurn && !hasPlayedCard ? <CardSelection cardOptions={playerCards} htmlName="card-to-play" /> : (
           playerCards.map((card) => <CharacterCard key={card} character={card} />)
