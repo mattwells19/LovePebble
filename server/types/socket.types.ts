@@ -13,10 +13,8 @@ export const enum SocketIncoming {
 }
 
 export const enum SocketOutgoing {
-  PlayerUpdate = "playersUpdate",
   Connected = "connected",
   GameUpdate = "gameUpdate",
-  RoundOver = "roundOver",
 }
 
 export interface OutgoingGameStateUpdate {
@@ -42,7 +40,6 @@ export interface StartRoundEvent extends SocketEvent {
 
 export interface JoinEvent extends SocketEvent {
   type: SocketIncoming.Join;
-  roomCode: string;
   playerName: string;
 }
 
@@ -82,4 +79,5 @@ export type SocketMessage =
   | SelectPlayerEvent
   | SubmitSelectionEvent
   | AcknowledgeActionEvent
-  | ResetGameEvent;
+  | ResetGameEvent
+  | "PING";

@@ -1,6 +1,7 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@hono/hono@*": "4.6.4",
     "jsr:@std/assert@1.0.6": "1.0.6",
     "jsr:@std/collections@1.0.7": "1.0.7",
     "jsr:@std/internal@^1.0.4": "1.0.4",
@@ -20,6 +21,9 @@
     "npm:vite@5.4.8": "5.4.8"
   },
   "jsr": {
+    "@hono/hono@4.6.4": {
+      "integrity": "9bbd937653ab902405af33743561140f8883d27dc730eb9ceac665e2468c8bf6"
+    },
     "@std/assert@1.0.6": {
       "integrity": "1904c05806a25d94fe791d6d883b685c9e2dcd60e4f9fc30f4fc5cf010c72207",
       "dependencies": [
@@ -1274,6 +1278,13 @@
     ],
     "members": {
       "server": {
+        "dependencies": [
+          "jsr:@hono/hono@*",
+          "jsr:@std/assert@1.0.6",
+          "npm:@msgpack/msgpack@2.8.0"
+        ]
+      },
+      "sockets": {
         "dependencies": [
           "jsr:@std/assert@1.0.6",
           "npm:@msgpack/msgpack@2.8.0"

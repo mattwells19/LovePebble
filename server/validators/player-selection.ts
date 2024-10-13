@@ -1,19 +1,6 @@
-import { Card, type Player, type PlayerId, type RoomData, type RoundData } from "../types/types.ts";
-
-export function validateRoundStarted<TRoundData extends RoundData = RoundData>(roomData: RoomData): TRoundData {
-  if (roomData.round === null) {
-    throw new Error("Round not started.");
-  }
-  return roomData.round as TRoundData;
-}
-
-export function validatePlayerExists(roomData: RoomData, playerId: PlayerId): Player {
-  const player = roomData.players.get(playerId);
-  if (!player) {
-    throw new Error(`Player with ID ${playerId} disappeared.`);
-  }
-  return player;
-}
+import { Card, type Player, type PlayerId, type RoomData } from "../types/types.ts";
+import { validatePlayerExists } from "./player-exists.ts";
+import { validateRoundStarted } from "./round-started.ts";
 
 /**
  * @param roomData The current state of the room

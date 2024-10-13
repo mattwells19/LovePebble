@@ -17,12 +17,7 @@ function gameStateContextReducer(currentState: RoomGameState, action: SocketMess
     case SocketOutgoing.Connected:
       return {
         ...currentState,
-        currentPlayerId: action.data,
-      };
-    case SocketOutgoing.PlayerUpdate:
-      return {
-        ...currentState,
-        players: new Map(action.data),
+        currentPlayerId: action.data.userId,
       };
     case SocketOutgoing.GameUpdate:
       return {

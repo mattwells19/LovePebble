@@ -1,7 +1,13 @@
 import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { decodeAsync, encode } from "@msgpack/msgpack";
-import { type Card, SocketIncoming, type SocketMessage as OutboundSocketMessage } from "@lovepebble/server";
+import { useToast } from "@chakra-ui/react";
+import {
+  type Card,
+  SocketIncoming,
+  type SocketMessage as OutboundSocketMessage,
+  SocketOutgoing,
+} from "@lovepebble/server";
 import type { SocketMessage } from "./GameStateContext.types.ts";
 import { type RoomGameState, useGameStateReducer } from "./useGameStateReducer.ts";
 
@@ -12,8 +18,10 @@ interface GameStateContextValue extends Omit<RoomGameState, "discard"> {
 
 const GameStateContext = createContext<GameStateContextValue | null>(null);
 
-export const GameStateProvider = ({ children }: PropsWithChildren) => {
+export const GameStateProvider = ({ children, playerName }: PropsWithChildren<{ playerName: string }>) => {
   const { roomCode = "" } = useParams();
+  const navigate = useNavigate();
+  const toast = useToast();
   const [roomGameState, dispatch] = useGameStateReducer();
   const webscoketRef = useRef<WebSocket | null>(null);
 
@@ -27,25 +35,59 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
     }
 
     const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
-    webscoketRef.current = new WebSocket(`${wsProtocol}://${location.host}/socket`);
+    const wsUrl = new URL(`${wsProtocol}://${location.host}/ws/${roomCode}`);
+    const userId = sessionStorage.getItem("userId");
+    if (userId) {
+      wsUrl.searchParams.set("userId", userId);
+    }
+    webscoketRef.current = new WebSocket(wsUrl);
 
-    webscoketRef.current.addEventListener("open", () => {
-      webscoketRef.current?.send(
-        encode({
-          playerName: localStorage.getItem("playerName"),
-          roomCode,
-          type: SocketIncoming.Join,
-        }),
-      );
-    });
+    // webscoketRef.current.addEventListener("open", () => {
+    //   webscoketRef.current?.send(
+    //     encode({
+    //       playerName: localStorage.getItem("playerName"),
+    //       roomCode,
+    //       type: SocketIncoming.Join,
+    //     }),
+    //   );
+    // });
 
     webscoketRef.current.addEventListener("message", (msg: MessageEvent<Blob>) => {
       decodeAsync(msg.data.stream()).then((socketMsg) => {
-        dispatch(socketMsg as SocketMessage);
+        const msg = socketMsg as SocketMessage;
+
+        if (msg.type === SocketOutgoing.Connected) {
+          if (userId !== msg.data.userId) {
+            sessionStorage.setItem("userId", msg.data.userId);
+          }
+          if (msg.data.roomExists === false) {
+            toast({
+              title: "A room with that room code does not exist.",
+              variant: "solid",
+              status: "error",
+            });
+            navigate("/");
+          }
+
+          sendGameUpdate({
+            type: SocketIncoming.Join,
+            playerName,
+          });
+        }
+
+        dispatch(msg);
       });
     });
 
     webscoketRef.current.addEventListener("error", (e) => {
+      console.error("WS Error: ", e);
+    });
+
+    webscoketRef.current.addEventListener("close", (e) => {
+      // 1000 means it was closed normally
+      if (e.code !== 1000) {
+        // TODO: reconnect
+      }
       console.error("WS Error: ", e);
     });
 

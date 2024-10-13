@@ -17,7 +17,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://localhost:3001",
-      "/socket": {
+      "/ws": {
         secure: false,
         target: "http://localhost:3001",
         ws: true,

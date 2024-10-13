@@ -1,6 +1,7 @@
 {
   "workspace": [
     "./server",
+    "./sockets",
     "./web"
   ],
   "tasks": {
@@ -31,6 +32,7 @@
     "lineWidth": 120,
     "include": [
       "./server",
+      "./sockets",
       "./web"
     ],
     "exclude": [

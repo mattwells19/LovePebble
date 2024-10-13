@@ -1,3 +1,8 @@
-import type { PlayerId } from "../types/types.ts";
+import { SocketStore } from "@lovepebble/sockets";
+import { handleClose, handleMessage, handleOpen } from "../controllers/socket.controller.ts";
 
-export const Sockets = new Map<PlayerId, WebSocket>();
+export const Sockets = new SocketStore({
+  onClose: handleClose,
+  onMessage: handleMessage,
+  onOpen: handleOpen,
+});

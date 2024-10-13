@@ -16,36 +16,22 @@ export function getNewRoomCode(): string {
   return newRoomCode;
 }
 
-export function createRoomWithCode(roomCode: string): RoomData {
-  if (Rooms.has(roomCode)) {
-    throw new Error(`Cannot create a room with code ${roomCode} as a room with that code already exists.`);
-  } else {
-    const newRoomData: RoomData = {
-      deck: [],
-      discard: [],
-      round: null,
-      roundLog: [],
-      gameStarted: false,
-      players: new Map<PlayerId, Player>(),
-    };
-    Rooms.set(roomCode, newRoomData);
-    return newRoomData;
-  }
+export function createNewRoom(): string {
+  const roomCode = getNewRoomCode();
+  const newRoomData: RoomData = {
+    deck: [],
+    discard: [],
+    round: null,
+    roundLog: [],
+    gameStarted: false,
+    players: new Map<PlayerId, Player>(),
+  };
+  Rooms.set(roomCode, newRoomData);
+  return roomCode;
 }
 
 export function checkRoomCode(roomCode: string): boolean {
   return Rooms.has(roomCode);
-}
-
-export function removePlayerFromRoom(roomCode: string, playerId: PlayerId) {
-  if (Rooms.has(roomCode)) {
-    const room = Rooms.get(roomCode)!;
-    room.players.delete(playerId);
-
-    if (room.players.size === 0) {
-      Rooms.delete(roomCode);
-    }
-  }
 }
 
 const alphabet: Array<string> = [

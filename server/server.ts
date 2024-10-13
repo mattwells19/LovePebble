@@ -1,56 +1,47 @@
-import { registerSocketHandlers } from "./services/socket.ts";
-import { checkRoomCode, getNewRoomCode } from "./services/rooms.ts";
-import { serveStatic } from "./static.ts";
+import { Hono } from "hono";
+import { serveStatic } from "hono/deno";
+import { checkRoomCode, createNewRoom } from "./controllers/room.controller.ts";
+import { Sockets } from "./repositories/Sockets.ts";
 
-const PORT = Number(Deno.env.get("PORT")) || 3001;
+const app = new Hono();
 
-function handleRequest(req: Request): Response | Promise<Response> {
-  try {
-    return handle(req);
-  } catch (e) {
-    if (e instanceof Error) {
-      console.error(e);
-      return new Response(JSON.stringify({ message: e.message }), { status: 500 });
-    }
+app.notFound((c) => c.text("Resource not found.", 404));
+
+app.onError((e, c) => {
+  console.error(e);
+
+  if (e instanceof Error) {
+    return c.json({ message: e.message }, 500);
   }
 
-  return new Response(null, { status: 404 });
-}
+  return c.json({ message: "Unknown Error" }, 500);
+});
 
-async function handle(req: Request): Promise<Response> {
-  const url = new URL(req.url);
+app.get("/api/rooms/:roomCode", (c) => {
+  const roomCode = c.req.param("roomCode");
+  return c.text(`${checkRoomCode(roomCode)}`);
+});
 
-  if (url.pathname === "/socket" && req.headers.get("upgrade") === "websocket") {
-    const { socket, response } = Deno.upgradeWebSocket(req);
-    registerSocketHandlers(socket);
+app.post("/api/rooms", (c) => {
+  const roomCode = createNewRoom();
+  return c.text(roomCode);
+});
 
+app.get("/ws/:roomCode", (c) => {
+  const roomCode = c.req.param("roomCode");
+  const userId = c.req.query("userId");
+
+  if (c.req.header("upgrade") === "websocket") {
+    const { socket, response } = Deno.upgradeWebSocket(c.req.raw);
+    Sockets.add(socket, roomCode, userId);
     return response;
-  } else if (req.method === "GET") {
-    // check if request was for a static file
-    const staticFileResponse = await serveStatic(url);
-    if (staticFileResponse) {
-      return staticFileResponse;
-    }
-
-    switch (url.pathname) {
-      case "/api/checkRoom": {
-        const roomCode = url.searchParams.get("roomCode");
-        if (!roomCode) {
-          return new Response(null, {
-            status: 400,
-            statusText: "'roomCode' was not provided.",
-          });
-        }
-
-        return new Response(JSON.stringify(checkRoomCode(roomCode)));
-      }
-      case "/api/newRoom": {
-        const roomCode = getNewRoomCode();
-        return new Response(roomCode);
-      }
-    }
   }
-  return new Response(null, { status: 404 });
-}
 
-Deno.serve({ port: PORT }, handleRequest);
+  return c.notFound();
+});
+
+app.get("/", serveStatic({ root: "./build" }));
+
+app.use("*", (c) => Promise.resolve(c.notFound()));
+
+Deno.serve({ port: Number(Deno.env.get("PORT")) || 3001 }, app.fetch);

@@ -10,7 +10,7 @@ export const homeAction: ActionFunction = async ({ request }) => {
 
   try {
     if (formData.get("intent")?.toString() === "createRoom") {
-      const newRoomCode = await get<string>("/api/newRoom");
+      const newRoomCode = await get<string>("/api/rooms", { method: "post" });
       return redirect(`/room/${newRoomCode}`);
     } else {
       const roomCode = [
@@ -20,7 +20,7 @@ export const homeAction: ActionFunction = async ({ request }) => {
         formData.get("roomCode-4")?.toString(),
       ].join("").toUpperCase();
 
-      const isValidRoom = await get<boolean>(`/api/checkRoom?roomCode=${roomCode}`);
+      const isValidRoom = await get<boolean>(`/api/rooms/${roomCode}`);
       return isValidRoom
         ? redirect(`/room/${roomCode}`)
         : `There is no room with that room code. Try a different code or start a new room.`;

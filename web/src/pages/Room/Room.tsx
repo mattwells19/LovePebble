@@ -11,15 +11,16 @@ export const roomLoader = ({ params }: LoaderFunctionArgs) => {
     return redirect("/");
   }
 
-  if (!localStorage.getItem("playerName")) {
+  const playerName = localStorage.getItem("playerName");
+  if (!playerName) {
     return redirect(`/name?roomCode=${params.roomCode}`);
   }
 
-  return params.roomCode;
+  return { roomCode: params.roomCode, playerName };
 };
 
 const RoomUnwrapped = () => {
-  const roomCode = useLoaderData() as string;
+  const { roomCode } = useLoaderData() as { roomCode: string; playerName: string };
   useSetAppbarText(roomCode);
   const { round, gameStarted } = useGameState();
 
@@ -31,8 +32,12 @@ const RoomUnwrapped = () => {
   );
 };
 
-export const Room = () => (
-  <GameStateProvider>
-    <RoomUnwrapped />
-  </GameStateProvider>
-);
+export const Room = () => {
+  const { playerName } = useLoaderData() as { roomCode: string; playerName: string };
+
+  return (
+    <GameStateProvider playerName={playerName}>
+      <RoomUnwrapped />
+    </GameStateProvider>
+  );
+};
