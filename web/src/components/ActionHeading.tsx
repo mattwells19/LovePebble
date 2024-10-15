@@ -4,41 +4,30 @@ import { useGameState } from "../contexts/GameStateContext/index.ts";
 import { Characters } from "./CharacterCard.tsx";
 
 export const ActionHeading = (): ReactElement | null => {
-  const { round, roundLog, players, currentPlayerId } = useGameState();
+  const { round, players, currentPlayerId } = useGameState();
 
   if (!round) return null;
   const playerName = players.get(round.playerTurnId)?.name ?? "Someone";
 
-  const lastMove = roundLog.at(-1);
-
   return (
-    <>
-      {lastMove
+    <Heading as="h2" textAlign="center">
+      {round.cardPlayed
         ? (
-          <Heading as="h2" textAlign="center">
-            {lastMove}
-          </Heading>
+          <>
+            {playerName} played {Characters[round.cardPlayed]}
+          </>
         )
-        : null}
-      <Heading as="h2" textAlign="center">
-        {round.cardPlayed
-          ? (
-            <>
-              {playerName} played {Characters[round.cardPlayed]}
-            </>
-          )
-          : round.playerTurnId === currentPlayerId
-          ? (
-            <>
-              {"It's your turn!"}
-              <br />
-              {"Select a card to play"}
-            </>
-          )
-          : (
-            `It's ${playerName}'s turn.`
-          )}
-      </Heading>
-    </>
+        : round.playerTurnId === currentPlayerId
+        ? (
+          <>
+            {"It's your turn!"}
+            <br />
+            {"Select a card to play"}
+          </>
+        )
+        : (
+          `It's ${playerName}'s turn.`
+        )}
+    </Heading>
   );
 };

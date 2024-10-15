@@ -4,6 +4,7 @@ import { Label } from "../../components/Label.tsx";
 import { Deck } from "../../components/Deck.tsx";
 import PlayerHand from "../../components/PlayerHand.tsx";
 import { ActionHeading } from "../../components/ActionHeading.tsx";
+import { RoundLog } from "../../components/RoundLog.tsx";
 import { BigSubmitButton } from "../../components/BigSubmitButton.tsx";
 import { Card, SocketIncoming } from "@lovepebble/server";
 import { ActionSelect } from "../../components/ActionSelection.tsx";
@@ -60,6 +61,7 @@ export const Game = () => {
 
   return (
     <>
+      <RoundLog />
       <ActionHeading />
       <Box display="flex" gap="3">
         <Deck />

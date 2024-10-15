@@ -2,36 +2,50 @@ import type { ReactElement } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { Label } from "./Label.tsx";
 import { useGameState } from "../contexts/GameStateContext/index.ts";
+import { CharacterCard } from "./CharacterCard.tsx";
 
 export const Deck = (): ReactElement => {
   const { deckCount } = useGameState();
-  // TODO: when we get art for the cards, see if there's a way to share this card container with CharacterCard
+
   return (
     <Box display="flex" flexDirection="column" gap="1">
       <Label>Deck</Label>
-      <Box
-        width="157px"
-        height="220px"
-        borderRadius="4px"
-        background="gray.500"
-        position="relative"
-        overflow="hidden"
-      >
+      <Box position="relative">
+        {deckCount > 0
+          ? (
+            <CharacterCard
+              position="absolute"
+              boxShadow="-6px -6px 30px 0px rgba(0,0,0,0.3)"
+              marginTop="1"
+              marginLeft="1"
+              role="presentation"
+            />
+          )
+          : null}
+        <CharacterCard />
         <Box
-          clipPath="polygon(0 0, 0 25%, 33% 0)"
-          width="100%"
-          height="100%"
-          backgroundColor="main.primaryOrange"
-          borderRadius="4px"
           position="absolute"
-          top="-1px"
-          left="-1px"
-          padding="6px 0 0 6px"
+          inset="0"
+          margin="auto"
+          width="14"
+          height="14"
+          backgroundColor="gray.900"
+          padding="4"
+          borderRadius="md"
+          opacity="0.5"
+          role="presentation"
+        />
+        <Text
+          as="p"
+          position="absolute"
+          inset="0"
+          margin="auto"
+          width="fit-content"
+          height="fit-content"
+          fontSize="xl"
         >
-          <Text as="span" color="main.darkPurple">
-            {deckCount}
-          </Text>
-        </Box>
+          {deckCount}
+        </Text>
       </Box>
     </Box>
   );

@@ -6,7 +6,13 @@ import { Game } from "./Game.tsx";
 import { Lobby } from "./Lobby.tsx";
 import { RoundEnd } from "./RoundEnd.tsx";
 
-export const roomLoader = ({ params }: LoaderFunctionArgs) => {
+export interface RoomLoaderResult {
+  roomCode: string;
+  playerName: string;
+  userId: string | null;
+}
+
+export const roomLoader = ({ params }: LoaderFunctionArgs): RoomLoaderResult | Response => {
   if (!params.roomCode) {
     return redirect("/");
   }
@@ -16,11 +22,13 @@ export const roomLoader = ({ params }: LoaderFunctionArgs) => {
     return redirect(`/name?roomCode=${params.roomCode}`);
   }
 
-  return { roomCode: params.roomCode, playerName };
+  const userId = sessionStorage.getItem("userId");
+
+  return { roomCode: params.roomCode, playerName, userId };
 };
 
 const RoomUnwrapped = () => {
-  const { roomCode } = useLoaderData() as { roomCode: string; playerName: string };
+  const { roomCode } = useLoaderData() as RoomLoaderResult;
   useSetAppbarText(roomCode);
   const { round, gameStarted } = useGameState();
 
@@ -33,10 +41,8 @@ const RoomUnwrapped = () => {
 };
 
 export const Room = () => {
-  const { playerName } = useLoaderData() as { roomCode: string; playerName: string };
-
   return (
-    <GameStateProvider playerName={playerName}>
+    <GameStateProvider>
       <RoomUnwrapped />
     </GameStateProvider>
   );

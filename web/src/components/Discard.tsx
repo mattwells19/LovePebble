@@ -16,19 +16,38 @@ export const Discard = (): ReactElement => {
   const { discard } = useGameState();
   const { isOpen, onClose, getButtonProps, getDisclosureProps } = useDisclosure();
 
+  /**
+   * We don't want to show which card was set aside from the deck when a game starts.
+   *
+   * Discard pile is reversed when sent from the backend so the most recent discard
+   * is on the bottom (last index). Reverse the order so that the top card is the most
+   * recently played. Makes it easier when displaying the discard pile
+   */
+  const discardWitHidden = ["Hidden" as const, ...discard.slice(1)].reverse();
+
   return (
     <>
       <Box display="flex" flexDirection="column" gap="1">
         <Label>Discard</Label>
-        <CharacterCard
-          button
-          title="Show discard pile."
-          character={discard[0]}
-          {...getButtonProps()}
-        />
+        <Box as="button" {...getButtonProps()} title="Show discard pile." position="relative">
+          {discardWitHidden.length > 0
+            ? (
+              <CharacterCard
+                character={discardWitHidden[0]}
+                position="absolute"
+                boxShadow="-6px -6px 30px 0px rgba(0,0,0,0.3)"
+                marginTop="1"
+                marginLeft="1"
+              />
+            )
+            : null}
+          <CharacterCard
+            character={discardWitHidden[0]}
+          />
+        </Box>
       </Box>
 
-      <Drawer isOpen={isOpen} onClose={onClose} placement="right" closeOnOverlayClick={false} {...getDisclosureProps()}>
+      <Drawer isOpen={isOpen} onClose={onClose} placement="right" {...getDisclosureProps()}>
         <DrawerContent backgroundColor="main.lightPurple">
           <DrawerCloseButton right="auto" left="3" />
           <DrawerHeader paddingBottom="3">
@@ -43,7 +62,7 @@ export const Discard = (): ReactElement => {
             alignItems="center"
             overflow="auto"
           >
-            {discard.map((character, index) => <CharacterCard key={index} character={character} />)}
+            {discardWitHidden.map((character, index) => <CharacterCard key={index} character={character} />)}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

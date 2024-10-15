@@ -2,6 +2,7 @@ import { Box, Heading, Table, TableCaption, TableContainer, Tbody, Td, Th, Thead
 import { SocketIncoming } from "@lovepebble/server";
 import { useGameState } from "../../contexts/GameStateContext/index.ts";
 import { BigSubmitButton } from "../../components/BigSubmitButton.tsx";
+import { RoundLog } from "../../components/RoundLog.tsx";
 
 const getWinCount = (playerCount: number): number => {
   switch (playerCount) {
@@ -20,7 +21,7 @@ const getWinCount = (playerCount: number): number => {
 };
 
 export const RoundEnd = () => {
-  const { players, sendGameUpdate, roundLog } = useGameState();
+  const { players, sendGameUpdate } = useGameState();
   const pebblesNeededToWin = getWinCount(players.size);
 
   const gameWinningPlayer = Array.from(players.values()).find((player) => player.gameScore === pebblesNeededToWin);
@@ -33,16 +34,14 @@ export const RoundEnd = () => {
     }
   };
 
-  const lastMove = roundLog.at(-1);
-
   return (
     <>
       <Box as="form" action={handleAction} display="flex" flexDir="column" gap="10" minWidth="xs">
         {gameWinningPlayer ? <Heading as="h2">{gameWinningPlayer.name} Wins!</Heading> : null}
-        {lastMove ? <Heading as="h2">{lastMove}</Heading> : null}
+        <RoundLog />
         <TableContainer>
           <Table>
-            <TableCaption>First to {pebblesNeededToWin} wins!</TableCaption>
+            <TableCaption>First to {pebblesNeededToWin} pebbles wins!</TableCaption>
             <Thead>
               <Tr>
                 <Th>Name</Th>
@@ -53,12 +52,8 @@ export const RoundEnd = () => {
               {Array.from(players).map(([playerId, player]) => (
                 <Tr key={playerId}>
                   <Td>{player.name}</Td>
-                  <Td>
-                    {Array.from({ length: player.gameScore }).map(() => (
-                      <span>
-                        🪨&nbsp;
-                      </span>
-                    ))}
+                  <Td title={`${player.gameScore} pebbles`}>
+                    {Array.from({ length: player.gameScore }).fill("🪨").join(" ")}
                   </Td>
                 </Tr>
               ))}

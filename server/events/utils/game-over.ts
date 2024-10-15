@@ -28,14 +28,18 @@ export function gameOver(roomData: RoomData): RoomData {
 
   let updatedPlayers: RoomData["players"] = roomData.players;
 
-  const logMessages = [];
+  let logMessage = "";
 
   for (const [winningPlayerId, winningPlayer] of winningPlayers) {
     updatedPlayers = updatePlayer(updatedPlayers, winningPlayerId, { gameScore: winningPlayer.gameScore + 1 });
   }
-  logMessages.push(
-    `${winningPlayers.map(([, player]) => player.name).join(", ")} all get pebbles for winning the round!`,
-  );
+  if (winningPlayers.length > 1) {
+    logMessage += `${
+      winningPlayers.map(([, player]) => player.name).join(", ")
+    } all get pebbles for winning the round!`;
+  } else {
+    logMessage += `${winningPlayers[0][1].name} gets a pebble for winning the round!`;
+  }
 
   const playersInRoundWithSpy = playersStillInRound.filter(([, player]) => player.playedSpy);
   if (playersInRoundWithSpy.length === 1) {
@@ -43,7 +47,7 @@ export function gameOver(roomData: RoomData): RoomData {
     const player = updatedPlayers.get(playerId)!;
     updatedPlayers = updatePlayer(updatedPlayers, playerId, { gameScore: player.gameScore + 1 });
 
-    logMessages.push(`${player.name} gets a pebble for being the last Spy standing!`);
+    logMessage += `\n\n${player.name} gets a pebble for being the last Spy standing!`;
   }
 
   return {
@@ -52,6 +56,6 @@ export function gameOver(roomData: RoomData): RoomData {
     discard: [],
     players: updatedPlayers,
     round: null,
-    roundLog: [...roomData.roundLog, logMessages.join("\n\n")],
+    roundLog: [...roomData.roundLog, logMessage],
   };
 }
