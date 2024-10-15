@@ -68,9 +68,9 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
     });
 
     webscoketRef.current.addEventListener("close", (e) => {
-      console.error("WS Closed: ", e.code, e.reason);
       // 1000 means it was closed normally
       if (e.code !== 1000) {
+        console.info("WS Closed: ", e.code, e.reason);
         // TODO: reconnect
       }
     });

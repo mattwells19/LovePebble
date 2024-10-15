@@ -40,7 +40,7 @@ app.get("/ws/:roomCode", (c) => {
   return c.notFound();
 });
 
-app.get("/", serveStatic({ root: "./build" }));
+app.get("/*", serveStatic({ root: "./build" }));
 
 app.use("*", (c) => Promise.resolve(c.notFound()));
 
