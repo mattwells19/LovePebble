@@ -28,6 +28,8 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
     if (webscoketRef.current) {
       return;
     }
+    let lastResponseTimestamp: number | null = null;
+    let ponged = true;
 
     const wsProtocol = location.protocol === "https:" ? "wss" : "ws";
     const wsUrl = new URL(`${wsProtocol}://${location.host}/ws/${roomCode}`);
@@ -38,6 +40,12 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
 
     webscoketRef.current.addEventListener("message", (msg: MessageEvent<Blob>) => {
       decodeAsync(msg.data.stream()).then((socketMsg) => {
+        lastResponseTimestamp = Date.now();
+        if (socketMsg === "PONG") {
+          ponged = true;
+          return;
+        }
+
         const msg = socketMsg as SocketMessage;
 
         if (msg.type === SocketOutgoing.Connected) {
@@ -75,9 +83,25 @@ export const GameStateProvider = ({ children }: PropsWithChildren) => {
       }
     });
 
+    const pingInterval = setInterval(() => {
+      if (
+        !lastResponseTimestamp ||
+        Date.now() - lastResponseTimestamp > 30 * 1000
+      ) {
+        // if our last ping didn't get a pong then we must've disconnected
+        if (!ponged) {
+          webscoketRef.current?.close(3002, "Ping didn't receive a pong.");
+        } else {
+          ponged = false;
+          webscoketRef.current?.send(encode("PING"));
+        }
+      }
+    }, 30 * 1000);
+
     return () => {
       webscoketRef.current?.close();
       webscoketRef.current = null;
+      clearInterval(pingInterval);
     };
   }, []);
 
