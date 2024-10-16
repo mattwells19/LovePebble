@@ -7,5 +7,6 @@ export const roomDataToGameStateUpdate = (roomData: RoomData): OutgoingGameState
   discard: roomData.discard,
   round: roomData.round,
   players: Array.from(roomData.players),
+  spectators: Array.from(roomData.spectators),
   roundLog: roomData.roundLog,
 });

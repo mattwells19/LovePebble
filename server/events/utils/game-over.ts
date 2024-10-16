@@ -55,6 +55,7 @@ export function gameOver(roomData: RoomData): RoomData {
     deck: [],
     discard: [],
     players: updatedPlayers,
+    spectators: roomData.spectators,
     round: null,
     roundLog: [...roomData.roundLog, logMessage],
   };

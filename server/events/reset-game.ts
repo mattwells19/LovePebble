@@ -21,6 +21,7 @@ export function resetGame(roomCode: string, roomData: RoomData): RoomData {
     roundLog: [],
     gameStarted: false,
     players: updatedPlayers,
+    spectators: roomData.spectators,
   };
 
   Rooms.set(roomCode, updatedRoomData);

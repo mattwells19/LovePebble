@@ -1,16 +1,12 @@
-import { Box, chakra, useToast } from "@chakra-ui/react";
-import { useGameState } from "../../contexts/GameStateContext/index.ts";
-import { Label } from "../../components/Label.tsx";
-import { Deck } from "../../components/Deck.tsx";
-import PlayerHand from "../../components/PlayerHand.tsx";
-import { ActionHeading } from "../../components/ActionHeading.tsx";
-import { RoundLog } from "../../components/RoundLog.tsx";
-import { BigSubmitButton } from "../../components/BigSubmitButton.tsx";
+import { chakra, useToast } from "@chakra-ui/react";
+import { useGameState } from "../../../../contexts/GameStateContext/index.ts";
+import { Label } from "../../../../components/Label.tsx";
+import PlayerHand from "../../../../components/PlayerHand.tsx";
+import { BigSubmitButton } from "../../../../components/BigSubmitButton.tsx";
 import { Card, SocketIncoming } from "@lovepebble/server";
-import { ActionSelect } from "../../components/ActionSelection.tsx";
-import { Discard } from "../../components/Discard.tsx";
+import { ActionSelect } from "../../../../components/ActionSelection.tsx";
 
-export const Game = () => {
+export const PlayerView = () => {
   const { currentPlayerId, round, players, sendGameUpdate } = useGameState();
   const toast = useToast();
 
@@ -60,35 +56,27 @@ export const Game = () => {
   };
 
   return (
-    <>
-      <RoundLog />
-      <ActionHeading />
-      <Box display="flex" gap="3">
-        <Deck />
-        <Discard />
-      </Box>
-      <chakra.form
-        action={confirmSelections}
-        width="full"
-        display="flex"
-        flexDir="column"
-        gap="inherit"
-        paddingBottom="20"
-      >
-        {players.get(currentPlayerId)!.cards.length > 0
-          ? (
-            <PlayerHand
-              isPlayersTurn={round.playerTurnId === currentPlayerId}
-              hasPlayedCard={!!round.cardPlayed}
-              playerCards={players.get(currentPlayerId)?.cards ?? []}
-            />
-          )
-          : <Label>{`Sit tight. You're out of this round.`}</Label>}
-        <ActionSelect
-          playerCards={players.get(currentPlayerId)?.cards ?? []}
-        />
-        {currentPlayerId === round.playerTurnId ? <BigSubmitButton /> : null}
-      </chakra.form>
-    </>
+    <chakra.form
+      action={confirmSelections}
+      width="full"
+      display="flex"
+      flexDir="column"
+      gap="inherit"
+      paddingBottom="20"
+    >
+      {currentPlayer.cards.length > 0
+        ? (
+          <PlayerHand
+            isPlayersTurn={round.playerTurnId === currentPlayerId}
+            hasPlayedCard={!!round.cardPlayed}
+            playerCards={currentPlayer.cards}
+          />
+        )
+        : <Label>{`Sit tight. You're out of this round.`}</Label>}
+      <ActionSelect
+        playerCards={currentPlayer.cards}
+      />
+      {currentPlayerId === round.playerTurnId ? <BigSubmitButton /> : null}
+    </chakra.form>
   );
 };

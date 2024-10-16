@@ -12,6 +12,7 @@ export function startGame(roomCode: string, roomData: RoomData): RoomData {
     round: null,
     gameStarted: true,
     players: roomData.players,
+    spectators: roomData.spectators,
     roundLog: [],
   };
 

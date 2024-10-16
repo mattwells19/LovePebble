@@ -7,15 +7,18 @@ import { roomDataToGameStateUpdate } from "../events/utils/mod.ts";
 import * as eventHandlers from "../events/mod.ts";
 
 function sendMessageToRoom(roomCode: string, updatedRoomData: RoomData) {
-  const allPlayerIds = Array.from(updatedRoomData.players.keys());
+  const allUserIds = [
+    ...Array.from(updatedRoomData.players.keys()),
+    ...Array.from(updatedRoomData.spectators.keys()),
+  ];
 
-  const allPlayerSockets = allPlayerIds
-    .map((playerId) => Sockets.get(playerId, roomCode));
+  const allUserSockets = allUserIds
+    .map((allUserIds) => Sockets.get(allUserIds, roomCode));
 
   const data = { type: SocketOutgoing.GameUpdate, data: roomDataToGameStateUpdate(updatedRoomData) };
 
-  for (const playerSocket of allPlayerSockets) {
-    playerSocket?.send(data);
+  for (const userSocket of allUserSockets) {
+    userSocket?.send(data);
   }
 }
 
@@ -52,13 +55,18 @@ export const handleClose = (userSocket: UserSocket) => {
     const roomData = Rooms.get(roomCode);
     if (!roomData) return;
 
-    const updatedRoomData = eventHandlers.leave(roomCode, roomData, playerLeavingId);
+    try {
+      const updatedRoomData = eventHandlers.leave(roomCode, roomData, playerLeavingId);
 
-    if (updatedRoomData) {
-      Rooms.set(roomCode, updatedRoomData);
-      sendMessageToRoom(roomCode, updatedRoomData);
-    } else {
-      Rooms.delete(roomCode);
+      if (updatedRoomData) {
+        Rooms.set(roomCode, updatedRoomData);
+        sendMessageToRoom(roomCode, updatedRoomData);
+      } else {
+        Rooms.delete(roomCode);
+      }
+    } catch (err) {
+      console.error("Leave room error", err);
+      console.error("Room data", roomData);
     }
     // socket is left alive for 3 seconds to allow user to rejoin
   }, 3000);
@@ -79,12 +87,12 @@ export const handleMessage = (
     const roomCode = userSocket.roomCode;
     const roomData = Rooms.get(roomCode);
     if (!roomData) {
-      throw new Error(`Room does not exist ${userSocket.roomCode}.`);
+      return;
     }
 
     switch (data.type) {
       case SocketIncoming.Join: {
-        const userAlreadyInRoom = roomData.players.has(userSocket.userId);
+        const userAlreadyInRoom = roomData.players.has(userSocket.userId) || roomData.spectators.has(userSocket.userId);
         // if they're already in the room, no need to add them again just send an update
         if (userAlreadyInRoom) {
           userSocket.send({
@@ -110,6 +118,13 @@ export const handleMessage = (
 
         const startRoundResult = eventHandlers.startRound(roomCode, roomData);
         sendMessageToRoom(roomCode, startRoundResult);
+        break;
+      }
+      case SocketIncoming.SwitchRole: {
+        if (roomData.gameStarted) break;
+
+        const switchRoleResult = eventHandlers.switchRole(roomCode, roomData, data.playerId);
+        sendMessageToRoom(roomCode, switchRoleResult);
         break;
       }
       case SocketIncoming.PlayCard: {

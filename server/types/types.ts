@@ -128,6 +128,7 @@ export interface RoomData {
   deck: Array<Card>;
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
+  spectators: Map<PlayerId, string>;
   round: RoundData | null;
   roundLog: Array<string>;
 }

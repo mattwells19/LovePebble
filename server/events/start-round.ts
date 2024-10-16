@@ -72,6 +72,7 @@ export function startRound(roomCode: string, roomData: RoomData): RoomData {
     discard,
     round: updatedRound,
     players: updatedPlayers,
+    spectators: roomData.spectators,
     roundLog: ["Game started!"],
     gameStarted: true,
   };

@@ -7,6 +7,7 @@ export interface RoomGameState {
   deckCount: number;
   discard: Array<Card>;
   players: Map<PlayerId, Player>;
+  spectators: Map<PlayerId, string>;
   round: RoundData | null;
   roundLog: Array<string>;
   currentPlayerId: PlayerId;
@@ -27,6 +28,7 @@ function gameStateContextReducer(currentState: RoomGameState, action: SocketMess
         discard: action.data.discard,
         round: action.data.round,
         players: new Map(action.data.players),
+        spectators: new Map(action.data.spectators),
         roundLog: action.data.roundLog,
       };
   }
@@ -40,6 +42,7 @@ export function useGameStateReducer() {
     discard: [],
     round: null,
     players: new Map(),
+    spectators: new Map(),
     roundLog: [],
   });
 }

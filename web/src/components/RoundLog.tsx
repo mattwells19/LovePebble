@@ -32,9 +32,7 @@ export const RoundLog = (): ReactElement | null => {
           whiteSpace="normal"
           height="auto"
         >
-          <Text as="pre" fontFamily="body">
-            {lastMove}
-          </Text>
+          {lastMove}
         </Button>
 
         <Drawer

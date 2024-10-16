@@ -12,13 +12,27 @@ export function join(roomCode: string, roomData: RoomData, playerId: PlayerId, n
     outOfRound: false,
   };
 
-  const newPlayers = new Map(roomData.players);
-  newPlayers.set(playerId, newPlayer);
+  let updatedRoomData: RoomData | null = null;
 
-  const updatedRoomData: RoomData = {
-    ...roomData,
-    players: newPlayers,
-  };
+  if (roomData.players.size >= 6 || roomData.gameStarted) {
+    const newSpectators = new Map(roomData.spectators);
+    newSpectators.set(playerId, name);
+
+    updatedRoomData = {
+      ...roomData,
+      spectators: newSpectators,
+      roundLog: [...roomData.roundLog, `${name} joined the room as a spectator.`],
+    };
+  } else {
+    const newPlayers = new Map(roomData.players);
+    newPlayers.set(playerId, newPlayer);
+
+    updatedRoomData = {
+      ...roomData,
+      players: newPlayers,
+      roundLog: [...roomData.roundLog, `${name} joined the room.`],
+    };
+  }
 
   Rooms.set(roomCode, updatedRoomData);
 

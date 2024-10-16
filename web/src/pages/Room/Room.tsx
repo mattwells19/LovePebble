@@ -2,8 +2,8 @@ import { type LoaderFunctionArgs, redirect, useLoaderData } from "react-router-d
 import { GameStateProvider, useGameState } from "../../contexts/GameStateContext/index.ts";
 import { useSetAppbarText } from "../../contexts/AppbarContext.tsx";
 import { DocTitle } from "../../components/DocTitle.tsx";
-import { Game } from "./Game.tsx";
-import { Lobby } from "./Lobby.tsx";
+import { Game } from "./Game/index.ts";
+import { Lobby } from "./Lobby/index.ts";
 import { RoundEnd } from "./RoundEnd.tsx";
 
 export interface RoomLoaderResult {

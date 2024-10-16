@@ -1,27 +1,36 @@
 import { getNextPlayerTurnId } from "../events/utils/mod.ts";
-import type { PlayerId, RoomData } from "../types/types.ts";
+import type { Card, PlayerId, RoomData } from "../types/types.ts";
 import { resetGame } from "./reset-game.ts";
 
 export function leave(roomCode: string, roomData: RoomData, playerLeavingId: PlayerId): RoomData | undefined {
-  const playerLeaving = roomData.players.get(playerLeavingId);
-  if (!playerLeaving) {
-    throw new Error(`Player with ID ${playerLeavingId} wasn't in ${roomCode}.`);
-  }
-
-  const newDiscard = [...roomData.discard, ...playerLeaving.cards];
+  let playerLeavingName: string | null = null;
+  let newDiscard: Array<Card> = [...roomData.discard];
 
   const newPlayers = new Map(roomData.players);
-  newPlayers.delete(playerLeavingId);
+  if (newPlayers.has(playerLeavingId)) {
+    const playerLeaving = newPlayers.get(playerLeavingId)!;
+    playerLeavingName = playerLeaving.name;
+    newDiscard = [...newDiscard, ...playerLeaving.cards];
+
+    newPlayers.delete(playerLeavingId);
+  }
 
   if (newPlayers.size === 0) {
     return;
   }
 
+  const newSpectators = new Map(roomData.spectators);
+  if (newSpectators.has(playerLeavingId)) {
+    playerLeavingName = newSpectators.get(playerLeavingId)!;
+    newSpectators.delete(playerLeavingId);
+  }
+
   const updatedRoomData: RoomData = {
     ...roomData,
     players: newPlayers,
+    spectators: newSpectators,
     discard: newDiscard,
-    roundLog: [...roomData.roundLog, `${playerLeaving.name} left the room.`],
+    roundLog: [...roomData.roundLog, `${playerLeavingName} left the room.`],
   };
 
   if (newPlayers.size === 1) {

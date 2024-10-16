@@ -25,6 +25,7 @@ export function createNewRoom(): string {
     roundLog: [],
     gameStarted: false,
     players: new Map<PlayerId, Player>(),
+    spectators: new Map<PlayerId, string>(),
   };
   Rooms.set(roomCode, newRoomData);
   return roomCode;

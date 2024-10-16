@@ -2,6 +2,7 @@ import type { Card, Player, PlayerId, RoundData } from "./types.ts";
 
 export const enum SocketIncoming {
   Join = "join",
+  SwitchRole = "switchRole",
   StartGame = "startGame",
   StartRound = "startRound",
   PlayCard = "playCard", // when a user chooses a card to play on their turn
@@ -22,6 +23,7 @@ export interface OutgoingGameStateUpdate {
   deckCount: number;
   discard: Array<Card>;
   players: [PlayerId, Player][];
+  spectators: [PlayerId, string][];
   round: RoundData | null;
   roundLog: Array<string>;
 }
@@ -36,6 +38,11 @@ export interface StartGameEvent extends SocketEvent {
 
 export interface StartRoundEvent extends SocketEvent {
   type: SocketIncoming.StartRound;
+}
+
+export interface SwitchRoleEvent extends SocketEvent {
+  type: SocketIncoming.SwitchRole;
+  playerId: PlayerId;
 }
 
 export interface JoinEvent extends SocketEvent {
@@ -74,6 +81,7 @@ export type SocketMessage =
   | JoinEvent
   | StartGameEvent
   | StartRoundEvent
+  | SwitchRoleEvent
   | PlayCardEvent
   | SelectCardEvent
   | SelectPlayerEvent
