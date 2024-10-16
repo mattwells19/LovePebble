@@ -6,7 +6,7 @@
   ],
   "tasks": {
     "web:start": "deno task --cwd web start",
-    "server:start": "deno task --cwd server dev",
+    "server:start": "deno task --cwd server start",
     "start": "concurrently --kill-others-on-fail \"deno task server:start\"  \"deno task web:start\"",
     "web:build": "deno task --cwd web build",
     "build": "deno task web:build",

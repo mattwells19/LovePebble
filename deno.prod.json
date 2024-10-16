@@ -1,0 +1,9 @@
+{
+  "workspace": [
+    "./server",
+    "./sockets"
+  ],
+  "tasks": {
+    "prod": "deno task --cwd server prod"
+  }
+}
