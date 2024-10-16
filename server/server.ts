@@ -44,4 +44,4 @@ app.get("/*", serveStatic({ root: "./build" }));
 
 app.use("*", (c) => Promise.resolve(c.notFound()));
 
-Deno.serve({ port: Number(Deno.env.get("PORT")) || 3001 }, app.fetch);
+Deno.serve({ port: 3001 }, app.fetch);

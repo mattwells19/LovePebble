@@ -1,28 +1,31 @@
 #
 # Stage for building the project
 #
-FROM node:current-alpine AS build
+FROM denoland/deno:alpine-2.0.0 AS build
 
 WORKDIR /usr/app
 
 # Copy over project files
-COPY yarn.lock package.json ./
+COPY deno.lock deno.json ./
 COPY ./server ./server
+COPY ./sockets ./sockets
 COPY ./web ./web
 
 # Install packages for all projects and build workspaces
-RUN yarn install && yarn web:build
+RUN deno install && deno task build
 
 #
 # Stage for starting the container
 #
-FROM denoland/deno AS run
+FROM denoland/deno:alpine-2.0.0 AS run
 
+EXPOSE 3001
 
 # Copy build output from 'build' stage
 COPY --from=build /usr/app/server /usr/app
 
 WORKDIR /usr/app
+RUN deno install
 
 # Run prod command when running container
 CMD ["deno", "run", "--allow-net", "--allow-read=./build", "--allow-env", "server.ts"]
