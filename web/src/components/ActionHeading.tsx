@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { Heading } from "@chakra-ui/react";
 import { useGameState } from "../contexts/GameStateContext/index.ts";
 import { Characters } from "./CharacterCard.tsx";
+import { CharacterBadge } from "./CharacterBadge.tsx";
 
 export const ActionHeading = (): ReactElement | null => {
   const { round, players, currentPlayerId } = useGameState();
@@ -14,7 +15,8 @@ export const ActionHeading = (): ReactElement | null => {
       {round.cardPlayed
         ? (
           <>
-            {playerName} played {Characters[round.cardPlayed]}
+            {playerName} played:<br />
+            <CharacterBadge character={Characters[round.cardPlayed]} fontSize="3xl" />
           </>
         )
         : round.playerTurnId === currentPlayerId

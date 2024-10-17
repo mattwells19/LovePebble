@@ -1,4 +1,4 @@
-import { prepRoomDataForNextTurn } from "../utils/mod.ts";
+import { LOG_MESSAGES, prepRoomDataForNextTurn } from "../utils/mod.ts";
 import { Card, type PlayedBaron, type PlayerId, type RoomData, type RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validatePlayerSelection, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -24,13 +24,13 @@ export function playedBaron(roomData: RoomData): RoomData {
       }
     })();
 
-    const resultText = (() => {
+    const challengeResult = (() => {
       if (winningPlayerId === roundData.playerTurnId) {
-        return `${playingPlayer.name} wins the challenge! ${playerBeingChallenged.name} is out of the round.`;
+        return "win";
       } else if (winningPlayerId === playerIdBeingChallenged) {
-        return `${playingPlayer.name} lost the challenge and is out of the round.`;
+        return "loss";
       } else {
-        return "The result is a tie! Both players remain in the round.";
+        return "tie";
       }
     })();
 
@@ -46,7 +46,7 @@ export function playedBaron(roomData: RoomData): RoomData {
       },
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Baron and challenged ${playerBeingChallenged.name}. ${resultText}`,
+        LOG_MESSAGES.baron.challenging(playingPlayer.name, playerBeingChallenged.name, challengeResult),
       ],
     };
   } else {
@@ -55,7 +55,7 @@ export function playedBaron(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Baron, but there were no players to challenge so the card has no effect.`,
+        LOG_MESSAGES.baron.noEffect(playingPlayer.name),
       ],
     };
 

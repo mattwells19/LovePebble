@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import { Layout } from "./Layout.tsx";
+import "./root.scss";
 
 const theme = extendTheme({
   colors: {

@@ -1,5 +1,6 @@
 import { Rooms } from "../repositories/Rooms.ts";
 import type { Player, PlayerId, RoomData } from "../types/types.ts";
+import { LOG_MESSAGES } from "./utils/mod.ts";
 
 export function join(roomCode: string, roomData: RoomData, playerId: PlayerId, name: string): RoomData {
   // add the new player to the room
@@ -21,7 +22,7 @@ export function join(roomCode: string, roomData: RoomData, playerId: PlayerId, n
     updatedRoomData = {
       ...roomData,
       spectators: newSpectators,
-      roundLog: [...roomData.roundLog, `${name} joined the room as a spectator.`],
+      roundLog: [...roomData.roundLog, LOG_MESSAGES.join.spectator(name)],
     };
   } else {
     const newPlayers = new Map(roomData.players);
@@ -30,7 +31,7 @@ export function join(roomCode: string, roomData: RoomData, playerId: PlayerId, n
     updatedRoomData = {
       ...roomData,
       players: newPlayers,
-      roundLog: [...roomData.roundLog, `${name} joined the room.`],
+      roundLog: [...roomData.roundLog, LOG_MESSAGES.join.player(name)],
     };
   }
 

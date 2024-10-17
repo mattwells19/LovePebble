@@ -8,6 +8,13 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: "../server/build",
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: "modern-compiler",
+      },
+    },
+  },
   plugins: [react()],
   resolve: {
     alias: {

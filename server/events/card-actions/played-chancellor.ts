@@ -1,4 +1,4 @@
-import { prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
+import { LOG_MESSAGES, prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
 import type { PlayedChancellor, RoomData, RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -37,7 +37,7 @@ export function playedChancellor(roomData: RoomData): RoomData {
       deck: newDeck,
       players: updatedPlayers,
       round: roundData,
-      roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Chancellor.`],
+      roundLog: [...roomData.roundLog, LOG_MESSAGES.chancellor.exchange(playingPlayer.name)],
     };
   } else {
     updatedRoomData = {
@@ -45,7 +45,7 @@ export function playedChancellor(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Chancellor. The deck was empty so there is no effect.`,
+        LOG_MESSAGES.chancellor.noEffect(playingPlayer.name),
       ],
     };
   }

@@ -1,4 +1,4 @@
-import { prepRoomDataForNextTurn } from "../utils/mod.ts";
+import { LOG_MESSAGES, prepRoomDataForNextTurn } from "../utils/mod.ts";
 import { Card, type PlayedPriest, type RoomData, type RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validatePlayerSelection, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -22,7 +22,7 @@ export function playedPriest(roomData: RoomData): RoomData {
       },
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Priest and decided to look at ${playerBeingLookedAt.name}'s card.`,
+        LOG_MESSAGES.priest.peak(playingPlayer.name, playerBeingLookedAt.name),
       ],
     };
   } else {
@@ -31,7 +31,7 @@ export function playedPriest(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Priest, but there were no players to select so the card has no effect.`,
+        LOG_MESSAGES.priest.noEffect(playingPlayer.name),
       ],
     };
 

@@ -1,4 +1,4 @@
-import { knockPlayerOutOfRound, prepRoomDataForNextTurn } from "../utils/mod.ts";
+import { knockPlayerOutOfRound, LOG_MESSAGES, prepRoomDataForNextTurn } from "../utils/mod.ts";
 import { Card, type PlayedGuard, type RoomData, type RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validatePlayerSelection, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -27,7 +27,7 @@ export function playedGuard(roomData: RoomData): RoomData {
         round: roundData,
         roundLog: [
           ...updatedRoomData.roundLog,
-          `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was correct! ${playerBeingGuessed.name} is out of the round.`,
+          LOG_MESSAGES.guard.guessedCorrect(playingPlayer.name, playerBeingGuessed.name, cardGuessed),
         ],
       };
     } else {
@@ -37,7 +37,7 @@ export function playedGuard(roomData: RoomData): RoomData {
         round: roundData,
         roundLog: [
           ...roomData.roundLog,
-          `${playingPlayer.name} played the Guard, guessed that ${playerBeingGuessed.name} had a ${cardGuessed} and was incorrect.`,
+          LOG_MESSAGES.guard.guessedWrong(playingPlayer.name, playerBeingGuessed.name, cardGuessed),
         ],
       };
     }
@@ -48,7 +48,7 @@ export function playedGuard(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Guard, but there were no players to select so the card has no effect.`,
+        LOG_MESSAGES.guard.noEffect(playingPlayer.name),
       ],
     };
   }

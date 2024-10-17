@@ -17,6 +17,7 @@
     "npm:react-dom@19.0.0-rc-1460d67c-20241003": "19.0.0-rc-1460d67c-20241003_react@19.0.0-rc-1460d67c-20241003",
     "npm:react-router-dom@6.26.2": "6.26.2_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:react@19.0.0-rc-1460d67c-20241003": "19.0.0-rc-1460d67c-20241003",
+    "npm:sass-embedded@1.80.0": "1.80.0",
     "npm:types-react-dom@rc": "19.0.0-rc.1",
     "npm:types-react@rc": "19.0.0-rc.1",
     "npm:vite@5.4.8": "5.4.8"
@@ -203,6 +204,9 @@
         "@babel/helper-validator-identifier",
         "to-fast-properties"
       ]
+    },
+    "@bufbuild/protobuf@2.2.0": {
+      "integrity": "sha512-+imAQkHf7U/Rwvu0wk1XWgsP3WnpCWmK7B48f0XqSNzgk64+grljTKC7pnO/xBiEMUziF7vKRfbBnOQhg126qQ=="
     },
     "@chakra-ui/anatomy@2.3.4": {
       "integrity": "sha512-fFIYN7L276gw0Q7/ikMMlZxP7mvnjRaWJ7f3Jsf9VtDOi6eAYIBRrhQe6+SZ0PGmoOkRaBc7gSE5oeIbgFFyrw=="
@@ -635,6 +639,9 @@
         "update-browserslist-db"
       ]
     },
+    "buffer-builder@0.2.0": {
+      "integrity": "sha512-7VPMEPuYznPSoR21NE1zvd2Xna6c/CloiZCfcMXR1Jny6PjX0N4Nsa38zcBFo/FMK+BlA+FLKbJCQ0i2yxp+Xg=="
+    },
     "callsites@3.1.0": {
       "integrity": "sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ=="
     },
@@ -684,6 +691,9 @@
     },
     "color2k@2.0.3": {
       "integrity": "sha512-zW190nQTIoXcGCaU08DvVNFTmQhUpnJfVuAKfWqUQkflXKpaDdpaYoM0iluLS9lgJNHyBF58KKA2FBEwkD7wog=="
+    },
+    "colorjs.io@0.5.2": {
+      "integrity": "sha512-twmVoizEW7ylZSN32OgKdXRmo1qg+wT5/6C3xu5b9QsWzSFAhHLn2xd8ro0diCsKfCj1RdaTP/nrcW+vAoQPIw=="
     },
     "concurrently@9.0.1": {
       "integrity": "sha512-wYKvCd/f54sTXJMSfV6Ln/B8UrfLBKOYa+lzc6CHay3Qek+LorVSBdMVfyewFhRbH0Rbabsk4D+3PL/VjQ5gzg==",
@@ -845,6 +855,9 @@
       "dependencies": [
         "react-is"
       ]
+    },
+    "immutable@4.3.7": {
+      "integrity": "sha512-1hqclzwYwjRDFLjcFxOM5AYkkG0rpFPpr1RLPMEuGczoS7YA8gLhy8SWXYRAA/XwfEHpfo3cw5JGioS32fnMRw=="
     },
     "import-fresh@3.3.0": {
       "integrity": "sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==",
@@ -1125,6 +1138,98 @@
         "tslib@2.7.0"
       ]
     },
+    "sass-embedded-android-arm64@1.80.0": {
+      "integrity": "sha512-GqvkqTPHuzYj5ODOns14KUDcASVAnKXZy0gve63SSz0CVk14mItmuKdiopA7EHIyVHjwWnbvSrh+p+EdATa2aw=="
+    },
+    "sass-embedded-android-arm@1.80.0": {
+      "integrity": "sha512-9S6pKsYpmFN0FpAXbQjCKaBfkXJ8ZlqfvuPm0ssP/sWN6JpNAJaP0HEJQlyRwaC+2fEl1Ooy1+us5SGapoWM+g=="
+    },
+    "sass-embedded-android-ia32@1.80.0": {
+      "integrity": "sha512-138KmQznTxSoPX30BWLbkfLO2DlkLLysxxGKkFaKpn0XyWf1XkabDo5u642dRT16ASlK7f7bKotsg4u9GDEpXA=="
+    },
+    "sass-embedded-android-riscv64@1.80.0": {
+      "integrity": "sha512-PVVh+FVR5jbGVDZXV8AkjIz7/fJtzJ2mErXwCKG4f95cFHJbyzhUMQk+JUJAk6RnUVGg684Xf5qwXjjH8VNCSg=="
+    },
+    "sass-embedded-android-x64@1.80.0": {
+      "integrity": "sha512-CTstX05KDYh/s6TGvGezoVwFy4bcDmaarV9CVpjcQImKtzX1PyJfz5n6OCnTSKg1zy6xIs4J+7iJVzC8DIyUkQ=="
+    },
+    "sass-embedded-darwin-arm64@1.80.0": {
+      "integrity": "sha512-3CYnsCvYyzaelEQUzuAZfxg9QUt2VK7Z+CsQknxdxcKr8DPUpzgN42AbCoWnnHgcHeMn5ltBCR8OiKo0UCneYA=="
+    },
+    "sass-embedded-darwin-x64@1.80.0": {
+      "integrity": "sha512-/GBb7Sw5GLgObloInJpBhc73yCo84wbFc1SNQOt1co1yGCmwlzZp/au80VXMzlFa+PuE7e3rj4kTGDca+k2i6A=="
+    },
+    "sass-embedded-linux-arm64@1.80.0": {
+      "integrity": "sha512-orCPq6t3z+nqvSyM5sNFNOntKOn7hAWo0PaaRqa75xt4aOCTxN9rBgejx22OfKTc/gfUtnXgf80QfrEO/R887A=="
+    },
+    "sass-embedded-linux-arm@1.80.0": {
+      "integrity": "sha512-+IDt6yeRv2qs6Wq46IgS3ae+H0/cjbDD5UTQIDfKpHu5y8OTx3LS5hdRgdmkXkIVmFhH50JdRV4ZZhgk4MRAhQ=="
+    },
+    "sass-embedded-linux-ia32@1.80.0": {
+      "integrity": "sha512-KA9LyWv3x8dJ4wZhyAIU+qYjOb1GkJxHGn0kyHSBX+pL6dcd1NRYBgsGCor3INbfILUVmPSN9qXUb76wyrsezA=="
+    },
+    "sass-embedded-linux-musl-arm64@1.80.0": {
+      "integrity": "sha512-sjx/XWKJ2MBkrzTe7sGBRDRsdtz8i3uInxO1BtHVbKGS/9nhAkpolDr2ggT9NXO2k3UNjdSyTW6qD0B+9IsKCA=="
+    },
+    "sass-embedded-linux-musl-arm@1.80.0": {
+      "integrity": "sha512-tXlwEUJ3WE6TgYu6K4sYSrAq19oRReHLakQZzmqr4uoG5UbVN42r9Wd9VJqLpuvwWlgcwxsXxxZVHM5hCZVIRg=="
+    },
+    "sass-embedded-linux-musl-ia32@1.80.0": {
+      "integrity": "sha512-KJTynvekn+j85YISVmgYwt+1HqbUYj3DB5pukwxCQmTowIopj+c2gZOWInMF/oDwlAA2Pg+VHEx9Qc6iFoe5Uw=="
+    },
+    "sass-embedded-linux-musl-riscv64@1.80.0": {
+      "integrity": "sha512-H74DTKFF/TI0pTbQLDgIzKOA/TkPieQbKn47S4hiFGEgD2dCtjVwDd9AAENswTrE6AD/97dRBoTXXVgr7IeP7w=="
+    },
+    "sass-embedded-linux-musl-x64@1.80.0": {
+      "integrity": "sha512-/MKlp3h0SjUJsxMdcjUtHdx117F7vbQhUXO92IxFWeNx9ouMLNrHBZWpHXg62oYdc4TZ0yjgOp8LUh8bjUIVlw=="
+    },
+    "sass-embedded-linux-riscv64@1.80.0": {
+      "integrity": "sha512-d6IXMwfo/h8q4j8svRtVLPf7EfrMrer2mhlEJVpP6s+BQdFAu7GCWQJeZ149GgZZAicTSjcFIrWSy7OVSf6ezw=="
+    },
+    "sass-embedded-linux-x64@1.80.0": {
+      "integrity": "sha512-0LQxjFUd3VYB5Le+6PPudOifXxI0RevmCEu722/RhXqNj6FtuxxlsAe+Arm3gVnjthe48AsQqVp+v51//i1g7g=="
+    },
+    "sass-embedded-win32-arm64@1.80.0": {
+      "integrity": "sha512-T55GRbkOaO6H6z5R25lLUyUlwJ1phh+vdEW9z97i8n0sdBhpo5xOA1+Ph7A1sxxPIAUQISap8byvS95bLmi8/A=="
+    },
+    "sass-embedded-win32-ia32@1.80.0": {
+      "integrity": "sha512-DPvWSk/Ok4p6qGSv/wsMJSdhcttzXTljwcHQlOtHfn215Dtpm4eaJY09+tf/wNpNUOxJ7lR7rOqlIlxNFE+zBQ=="
+    },
+    "sass-embedded-win32-x64@1.80.0": {
+      "integrity": "sha512-LwHAfu7O0YzGbPNmPrNui0jAevps5OYe0CEHfAmmjnjObgYlSSoDCV1+RuzJgpZm2vuvbOA2kgNPXGaOX2aeOg=="
+    },
+    "sass-embedded@1.80.0": {
+      "integrity": "sha512-Y6kJlbhUW1F/34c120Lrp+SGjLwT/d/zTqhpVsL+IPDXZmjRhAp1WYjw5b8e+V1r5dT6aFbYW9NF4NMFZ6YLSA==",
+      "dependencies": [
+        "@bufbuild/protobuf",
+        "buffer-builder",
+        "colorjs.io",
+        "immutable",
+        "rxjs",
+        "sass-embedded-android-arm",
+        "sass-embedded-android-arm64",
+        "sass-embedded-android-ia32",
+        "sass-embedded-android-riscv64",
+        "sass-embedded-android-x64",
+        "sass-embedded-darwin-arm64",
+        "sass-embedded-darwin-x64",
+        "sass-embedded-linux-arm",
+        "sass-embedded-linux-arm64",
+        "sass-embedded-linux-ia32",
+        "sass-embedded-linux-musl-arm",
+        "sass-embedded-linux-musl-arm64",
+        "sass-embedded-linux-musl-ia32",
+        "sass-embedded-linux-musl-riscv64",
+        "sass-embedded-linux-musl-x64",
+        "sass-embedded-linux-riscv64",
+        "sass-embedded-linux-x64",
+        "sass-embedded-win32-arm64",
+        "sass-embedded-win32-ia32",
+        "sass-embedded-win32-x64",
+        "supports-color@8.1.1",
+        "varint"
+      ]
+    },
     "scheduler@0.23.2": {
       "integrity": "sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==",
       "dependencies": [
@@ -1237,6 +1342,9 @@
         "tslib@2.7.0"
       ]
     },
+    "varint@6.0.0": {
+      "integrity": "sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg=="
+    },
     "vite@5.4.8": {
       "integrity": "sha512-FqrItQ4DT1NC4zCUqMB4c4AZORMKIa0m8/URVCZ77OZ/QSNeJ54bU1vrFADbDsuwfIPcgknRkmqakQcgnL4GiQ==",
       "dependencies": [
@@ -1309,6 +1417,7 @@
           "npm:react-dom@19.0.0-rc-1460d67c-20241003",
           "npm:react-router-dom@6.26.2",
           "npm:react@19.0.0-rc-1460d67c-20241003",
+          "npm:sass-embedded@1.80.0",
           "npm:types-react-dom@rc",
           "npm:types-react@rc",
           "npm:vite@5.4.8"

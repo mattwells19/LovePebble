@@ -1,4 +1,10 @@
-import { drawCardFromDeck, knockPlayerOutOfRound, prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
+import {
+  drawCardFromDeck,
+  knockPlayerOutOfRound,
+  LOG_MESSAGES,
+  prepRoomDataForNextTurn,
+  updatePlayer,
+} from "../utils/mod.ts";
 import { Card, type PlayedPrince, type RoomData, type RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validatePlayerSelection, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -22,7 +28,7 @@ export function playedPrince(roomData: RoomData): RoomData {
         round: roundData,
         roundLog: [
           ...updatedRoomData.roundLog,
-          `${playingPlayer.name} played the Prince, and made ${chosenPlayer.name} discard their Princess! ${chosenPlayer.name} is out of the round.`,
+          LOG_MESSAGES.prince.discardPrincess(playingPlayer.name, chosenPlayer.name),
         ],
       };
     } else {
@@ -54,9 +60,9 @@ export function playedPrince(roomData: RoomData): RoomData {
         round: roundData,
         roundLog: [
           ...roomData.roundLog,
-          `${playingPlayer.name} played the Prince, and made ${
-            choseThemself ? "themselves" : chosenPlayer.name
-          } discard their ${cardToDiscard}.`,
+          choseThemself
+            ? LOG_MESSAGES.prince.discardThemself(playingPlayer.name, cardToDiscard)
+            : LOG_MESSAGES.prince.discardOther(playingPlayer.name, chosenPlayer.name, cardToDiscard),
         ],
       };
     }
@@ -66,7 +72,7 @@ export function playedPrince(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the Prince, but there were no players to choose so the card has no effect.`,
+        LOG_MESSAGES.prince.noEffect(playingPlayer.name),
       ],
     };
   }

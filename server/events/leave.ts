@@ -1,4 +1,4 @@
-import { getNextPlayerTurnId } from "../events/utils/mod.ts";
+import { getNextPlayerTurnId, LOG_MESSAGES } from "../events/utils/mod.ts";
 import type { Card, PlayerId, RoomData } from "../types/types.ts";
 import { resetGame } from "./reset-game.ts";
 
@@ -30,7 +30,7 @@ export function leave(roomCode: string, roomData: RoomData, playerLeavingId: Pla
     players: newPlayers,
     spectators: newSpectators,
     discard: newDiscard,
-    roundLog: [...roomData.roundLog, `${playerLeavingName} left the room.`],
+    roundLog: playerLeavingName ? [...roomData.roundLog, LOG_MESSAGES.leave(playerLeavingName)] : roomData.roundLog,
   };
 
   if (newPlayers.size === 1) {

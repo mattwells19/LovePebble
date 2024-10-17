@@ -1,5 +1,5 @@
 import { Rooms } from "../repositories/Rooms.ts";
-import { updatePlayer } from "../events/utils/mod.ts";
+import { LOG_MESSAGES, updatePlayer } from "../events/utils/mod.ts";
 import { type Card, type Player, type PlayerId, type RoomData, type RoundData, StandardDeck } from "../types/types.ts";
 
 export const randomOf = (max: number): number => Math.floor(Math.random() * max);
@@ -73,7 +73,7 @@ export function startRound(roomCode: string, roomData: RoomData): RoomData {
     round: updatedRound,
     players: updatedPlayers,
     spectators: roomData.spectators,
-    roundLog: ["Game started!"],
+    roundLog: [LOG_MESSAGES.startRound],
     gameStarted: true,
   };
   Rooms.set(roomCode, updatedRoomData);

@@ -29,7 +29,7 @@ export const handleOpen = (userSocket: UserSocket) => {
   const roomExists = Rooms.has(userSocket.roomCode);
   userSocket.send({
     type: SocketOutgoing.Connected,
-    data: { userId: userSocket.userId, roomExists: roomExists },
+    data: { userId: userSocket.userId, roomExists },
   });
 };
 

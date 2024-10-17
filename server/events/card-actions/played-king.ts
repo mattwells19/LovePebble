@@ -1,4 +1,4 @@
-import { prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
+import { LOG_MESSAGES, prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
 import { Card, type PlayedKing, type RoomData, type RoundStarted } from "../../types/types.ts";
 import { validatePlayerExists, validatePlayerSelection, validateRoundStarted } from "../../validators/mod.ts";
 
@@ -23,7 +23,7 @@ export function playedKing(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the King and decided to swap cards with ${chosenPlayer.name}.`,
+        LOG_MESSAGES.king.swapped(playingPlayer.name, chosenPlayer.name),
       ],
     };
   } else {
@@ -32,7 +32,7 @@ export function playedKing(roomData: RoomData): RoomData {
       round: roundData,
       roundLog: [
         ...roomData.roundLog,
-        `${playingPlayer.name} played the King, but there were no players to select so the card has no effect.`,
+        LOG_MESSAGES.king.noEffect(playingPlayer.name),
       ],
     };
   }

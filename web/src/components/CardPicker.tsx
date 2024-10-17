@@ -57,23 +57,23 @@ const CardOption = ({ children, ...inputProps }: InputHTMLAttributes<HTMLInputEl
   const { color, count } = (() => {
     switch (inputProps.value) {
       case Card.Spy:
-        return { color: "#535353", count: 2 };
+        return { color: "var(--spy)", count: 2 };
       case Card.Priest:
-        return { color: "#BABD3F", count: 2 };
+        return { color: "var(--priest)", count: 2 };
       case Card.Baron:
-        return { color: "#3FBD4C", count: 2 };
+        return { color: "var(--baron)", count: 2 };
       case Card.Handmaid:
-        return { color: "#3FBDB6", count: 2 };
+        return { color: "var(--handmaid)", count: 2 };
       case Card.Prince:
-        return { color: "#3F71BD", count: 2 };
+        return { color: "var(--prince)", count: 2 };
       case Card.Chancellor:
-        return { color: "#BD7B3F", count: 2 };
+        return { color: "var(--chancellor)", count: 2 };
       case Card.King:
-        return { color: "#423FBD", count: 1 };
+        return { color: "var(--king)", count: 1 };
       case Card.Countess:
-        return { color: "#BD3FB8", count: 1 };
+        return { color: "var(--countess)", count: 1 };
       case Card.Princess:
-        return { color: "#BD3F3F", count: 1 };
+        return { color: "var(--princess)", count: 1 };
       default:
         throw new Error("Unidentified card");
     }

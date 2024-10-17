@@ -1,5 +1,5 @@
 import type { PlayedSpy, RoomData, RoundStarted } from "../../types/types.ts";
-import { prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
+import { LOG_MESSAGES, prepRoomDataForNextTurn, updatePlayer } from "../utils/mod.ts";
 import { validatePlayerExists, validateRoundStarted } from "../../validators/mod.ts";
 
 export function playedSpy(roomData: RoomData): RoomData {
@@ -13,7 +13,7 @@ export function playedSpy(roomData: RoomData): RoomData {
     ...roomData,
     players: updatedPlayers,
     round: roundData,
-    roundLog: [...roomData.roundLog, `${playingPlayer.name} played the Spy!`],
+    roundLog: [...roomData.roundLog, LOG_MESSAGES.spy(playingPlayer.name)],
   };
 
   return prepRoomDataForNextTurn(updatedRoomData);
