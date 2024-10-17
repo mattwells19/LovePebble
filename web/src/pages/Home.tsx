@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { type ActionFunction, Form, redirect, useActionData, useNavigation, useSubmit } from "react-router-dom";
-import { Alert, AlertIcon, Box, Button, Collapse, Divider, PinInput, PinInputField, Text } from "@chakra-ui/react";
+import {
+  Alert,
+  AlertIcon,
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  PinInput,
+  PinInputField,
+  Text,
+  useToken,
+} from "@chakra-ui/react";
+import { RiGroupFill } from "@remixicon/react";
 import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
 import { get } from "../utils/get.ts";
 import { DocTitle } from "../components/DocTitle.tsx";
@@ -35,6 +47,7 @@ export const Home = () => {
   const submit = useSubmit();
   const actionResponse = useActionData() as string | undefined;
   const { state } = useNavigation();
+  const orange200 = useToken("colors", "orange.200");
 
   useSetAppbarText("Love Pebble");
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -50,9 +63,32 @@ export const Home = () => {
   return (
     <>
       <DocTitle />
-      <Text textAlign="left" width="full">
-        Content
-      </Text>
+      <Box display="flex" flexDirection="column" gap="4" alignItems="start" fontSize="lg" px="4">
+        <Text textAlign="left" width="full">
+          Welcome! This is an online, 6 player version of the popular card game Love Letter.
+        </Text>
+        <Text textAlign="left" width="full">
+          The rules play just like the card game you'd buy in the store so grab your friends and get to loving!
+        </Text>
+        <Box
+          display="flex"
+          justifyContent="space-evenly"
+          alignItems="center"
+          paddingX="3"
+          paddingY="1"
+          gridGap="3"
+          color="orange.200"
+          border="1px solid"
+          borderColor="orange.200"
+          borderRadius="md"
+          backgroundColor={`${orange200}10`}
+          mt="1"
+          mb="-5"
+        >
+          <RiGroupFill size="20px" />
+          <Text>2 - 6 players</Text>
+        </Box>
+      </Box>
       <Divider />
       <Box display="flex" flexDirection="column" alignItems="center" gap="4">
         <Text>Already have a room code? Type/paste it here.</Text>
