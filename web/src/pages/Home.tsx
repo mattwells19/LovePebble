@@ -5,6 +5,7 @@ import {
   AlertIcon,
   Box,
   Button,
+  chakra,
   Collapse,
   Divider,
   PinInput,
@@ -61,7 +62,7 @@ export const Home = () => {
   }, [state === "idle", actionResponse]);
 
   return (
-    <>
+    <chakra.main display="flex" flexDir="column" gap="6" py="6" alignItems="center" width="sm" margin="auto">
       <DocTitle />
       <Box display="flex" flexDirection="column" gap="4" alignItems="start" fontSize="lg" px="4">
         <Text textAlign="left" width="full">
@@ -76,14 +77,13 @@ export const Home = () => {
           alignItems="center"
           paddingX="3"
           paddingY="1"
-          gridGap="3"
+          gap="3"
           color="orange.200"
           border="1px solid"
           borderColor="orange.200"
           borderRadius="md"
           backgroundColor={`${orange200}10`}
           mt="1"
-          mb="-5"
         >
           <RiGroupFill size="20px" />
           <Text>2 - 6 players</Text>
@@ -140,7 +140,7 @@ export const Home = () => {
         <Text>or</Text>
         <Divider />
       </Box>
-      <Form method="post">
+      <Box as={Form} method="post" width="fit-content">
         <Button
           size="lg"
           disabled={state === "submitting"}
@@ -150,7 +150,7 @@ export const Home = () => {
         >
           Start a New Room
         </Button>
-      </Form>
-    </>
+      </Box>
+    </chakra.main>
   );
 };

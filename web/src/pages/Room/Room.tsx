@@ -1,4 +1,5 @@
 import { type LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom";
+import { chakra } from "@chakra-ui/react";
 import { GameStateProvider, useGameState } from "../../contexts/GameStateContext/index.ts";
 import { useSetAppbarText } from "../../contexts/AppbarContext.tsx";
 import { DocTitle } from "../../components/DocTitle.tsx";
@@ -35,7 +36,9 @@ const RoomUnwrapped = () => {
   return (
     <>
       <DocTitle>{roomCode}</DocTitle>
-      {!gameStarted ? <Lobby roomCode={roomCode} /> : round ? <Game /> : <RoundEnd />}
+      <chakra.main display="flex" flexDir="column" alignItems="center" gap="6" py="6" px="4" width="sm" margin="auto">
+        {!gameStarted ? <Lobby roomCode={roomCode} /> : round ? <Game /> : <RoundEnd />}
+      </chakra.main>
     </>
   );
 };

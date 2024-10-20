@@ -24,20 +24,38 @@ export const RoundEnd = () => {
   const { players, sendGameUpdate } = useGameState();
   const pebblesNeededToWin = getWinCount(players.size);
 
-  const gameWinningPlayer = Array.from(players.values()).find((player) => player.gameScore === pebblesNeededToWin);
+  const gameWinningPlayers = Array.from(players.values()).filter((player) => player.gameScore >= pebblesNeededToWin);
 
   const handleAction = () => {
-    if (gameWinningPlayer) {
+    if (gameWinningPlayers.length > 0) {
       sendGameUpdate({ type: SocketIncoming.ResetGame });
     } else {
       sendGameUpdate({ type: SocketIncoming.StartRound });
     }
   };
 
+  const winnerDeclaration: string | null = (() => {
+    if (gameWinningPlayers.length === 0) return null;
+
+    if (gameWinningPlayers.length === 1) return `${gameWinningPlayers[0].name} Wins!`;
+
+    const winningPlayerNames = gameWinningPlayers.slice(0, -1).map((p) => p.name).join(", ");
+    const lastWinningPlayerName = gameWinningPlayers.at(-1)!.name;
+
+    return `${winningPlayerNames} and ${lastWinningPlayerName} Win!`;
+  })();
+
   return (
     <>
       <Box as="form" action={handleAction} display="flex" flexDir="column" gap="10" minWidth="xs">
-        {gameWinningPlayer ? <Heading as="h2">{gameWinningPlayer.name} Wins!</Heading> : null}
+        {winnerDeclaration
+          ? (
+            <Heading as="h2" textAlign="center">
+              Game over!<br />
+              {winnerDeclaration} 🥳
+            </Heading>
+          )
+          : null}
         <RoundLog />
         <TableContainer>
           <Table>
@@ -51,7 +69,7 @@ export const RoundEnd = () => {
             <Tbody>
               {Array.from(players).map(([playerId, player]) => (
                 <Tr key={playerId}>
-                  <Td>{player.name}</Td>
+                  <Td>{`${player.name} ${player.gameScore >= pebblesNeededToWin ? "🏆" : ""}`}</Td>
                   <Td title={`${player.gameScore} pebbles`}>
                     {Array.from({ length: player.gameScore }).fill("🪨").join(" ")}
                   </Td>
@@ -61,7 +79,7 @@ export const RoundEnd = () => {
           </Table>
         </TableContainer>
         <BigSubmitButton>
-          {gameWinningPlayer ? "Back to Lobby" : "Next Round"}
+          {gameWinningPlayers.length > 0 ? "Back to Lobby" : "Next Round"}
         </BigSubmitButton>
       </Box>
     </>

@@ -38,15 +38,13 @@ export function startRound(roomCode: string, roomData: RoomData): RoomData {
   const deck = shuffle(StandardDeck.slice());
   const discard: Array<Card> = [];
 
-  switch (roomData.players.size) {
-    // since this is the start of the game, we are guaranteed to have enough cards
-    // for even the max number of players so pop is always safe here
-    case 2:
-      discard.push(deck.pop()!);
-      discard.push(deck.pop()!);
-    /* falls through */
-    default:
-      discard.push(deck.pop()!);
+  // since this is the start of the game, we are guaranteed to have enough cards
+  // for even the max number of players so pop is always safe here
+  discard.push(deck.pop()!);
+  if (roomData.players.size === 2) {
+    discard.push(deck.pop()!);
+    discard.push(deck.pop()!);
+    discard.push(deck.pop()!);
   }
 
   updatedPlayers.forEach((player: Player, id: PlayerId) => {

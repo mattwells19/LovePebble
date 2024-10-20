@@ -1,4 +1,3 @@
-import { chakra } from "@chakra-ui/react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AppbarProvider } from "./contexts/AppbarContext.tsx";
 import { Appbar } from "./components/Appbar.tsx";
@@ -29,17 +28,7 @@ export const Layout = () => {
   return (
     <AppbarProvider>
       <Appbar />
-      <chakra.main
-        display="flex"
-        flexDirection="column"
-        gap="12"
-        alignItems="center"
-        width="sm"
-        marginX="auto"
-        paddingY="10"
-      >
-        <RouterProvider router={router} />
-      </chakra.main>
+      <RouterProvider router={router} />
     </AppbarProvider>
   );
 };

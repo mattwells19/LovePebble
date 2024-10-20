@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import {
   Box,
   Button,
+  chakra,
   FormControl,
   FormLabel,
   Input,
@@ -55,9 +56,9 @@ export const PlayerName = () => {
   }, [badName]);
 
   return (
-    <>
+    <chakra.main pt="12" pb="6" px="4" width="sm" margin="auto">
       <DocTitle>Player Name</DocTitle>
-      <Box as={Form} method="post" marginX="auto" marginY="8" width="sm">
+      <Box as={Form} method="post" width="fit-content">
         <FormControl isRequired id="playerName">
           <FormLabel>Your Name</FormLabel>
           <InputGroup gap="3">
@@ -83,6 +84,6 @@ export const PlayerName = () => {
           </InputGroup>
         </FormControl>
       </Box>
-    </>
+    </chakra.main>
   );
 };

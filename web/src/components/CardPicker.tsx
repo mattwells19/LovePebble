@@ -93,7 +93,7 @@ const CardOption = ({ children, ...inputProps }: InputHTMLAttributes<HTMLInputEl
         title={`${children} which has a value of ${inputProps.value} and appears ${count} times in the deck.`}
         {...inputProps}
       />
-      <Box padding="1" display="flex" justifyContent="space-between">
+      <Box padding="1.5" display="flex" justifyContent="space-between">
         <Box display="flex" gap="3">
           <Box
             display="grid"

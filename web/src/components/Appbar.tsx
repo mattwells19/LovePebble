@@ -14,7 +14,6 @@ export const Appbar = () => {
       alignItems="center"
       gap="5"
     >
-      <Box as="span" role="presentation" fontSize="4xl">💕</Box>
       <Heading
         as="h1"
         fontSize="5xl"
@@ -23,7 +22,6 @@ export const Appbar = () => {
       >
         {appBarText}
       </Heading>
-      <Box as="span" role="presentation" fontSize="4xl">🪨</Box>
     </Box>
   );
 };

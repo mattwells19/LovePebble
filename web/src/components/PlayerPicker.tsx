@@ -77,7 +77,7 @@ const PlayerOption = ({ children, isOutOfRound, isProtected, ...inputProps }: Pl
         {...inputProps}
         disabled={inputProps.disabled || isOutOfRound || isProtected}
       />
-      <Box paddingY="1" position="relative">
+      <Box paddingY="1.5" position="relative">
         <Text
           as="span"
           aria-hidden="true"
