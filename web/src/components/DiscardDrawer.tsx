@@ -4,7 +4,7 @@ import { Label } from "./Label.tsx";
 import type { Card } from "@lovepebble/server";
 
 interface DiscardDrawerProps extends Omit<DrawerProps, "children"> {
-  discard: Array<Card | "Hidden">;
+  discard: Array<Card | null>;
 }
 
 export const DiscardDrawer = (

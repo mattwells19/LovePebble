@@ -30,5 +30,10 @@ export default defineConfig({
         ws: true,
       },
     },
+    // https://github.com/denoland/deno/issues/17757
+    watch: {
+      useFsEvents: false,
+      usePolling: true,
+    },
   },
 });

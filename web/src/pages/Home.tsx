@@ -71,6 +71,10 @@ export const Home = () => {
         <Text textAlign="left" width="full">
           The rules play just like the card game you'd buy in the store so grab your friends and get to loving!
         </Text>
+        <Text textAlign="left" width="full">
+          In Love Pebble, suitors compete to have their pebble delivered to the kingdom's princess, who is in need of a
+          mate for the upcoming mating season.
+        </Text>
         <Box
           display="flex"
           justifyContent="space-evenly"

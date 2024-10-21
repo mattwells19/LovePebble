@@ -23,14 +23,14 @@ export const Discard = (): ReactElement => {
    * is on the bottom (last index). Reverse the order so that the top card is the most
    * recently played. Makes it easier when displaying the discard pile
    */
-  const discardWitHidden = ["Hidden" as const, ...discard.slice(1)].reverse();
+  const discardWitHidden = [null, ...discard.slice(1)].reverse();
 
   return (
     <>
       <Box display="flex" flexDirection="column" gap="1">
         <Label>Discard</Label>
         <Box as="button" {...getButtonProps()} title="Show discard pile." position="relative">
-          {discardWitHidden.length > 0
+          {discardWitHidden.length > 1
             ? (
               <CharacterCard
                 character={discardWitHidden[0]}

@@ -11,7 +11,7 @@ export const Deck = (): ReactElement => {
     <Box display="flex" flexDirection="column" gap="1">
       <Label>Deck</Label>
       <Box position="relative">
-        {deckCount > 0
+        {deckCount > 1
           ? (
             <CharacterCard
               position="absolute"
@@ -29,10 +29,10 @@ export const Deck = (): ReactElement => {
           margin="auto"
           width="14"
           height="14"
-          backgroundColor="gray.900"
+          backgroundColor="main.lightPurple"
           padding="4"
           borderRadius="md"
-          opacity="0.5"
+          opacity="0.7"
           role="presentation"
         />
         <Text
