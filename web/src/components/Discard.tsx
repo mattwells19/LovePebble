@@ -11,6 +11,7 @@ import {
 import { useGameState } from "../contexts/GameStateContext/index.ts";
 import { Label } from "./Label.tsx";
 import { CharacterCard } from "./CharacterCard.tsx";
+import { StackCards } from "./StackCards.tsx";
 
 export const Discard = (): ReactElement => {
   const { discard } = useGameState();
@@ -29,21 +30,8 @@ export const Discard = (): ReactElement => {
     <>
       <Box display="flex" flexDirection="column" gap="1">
         <Label>Discard</Label>
-        <Box as="button" {...getButtonProps()} title="Show discard pile." position="relative">
-          {discardWitHidden.length > 1
-            ? (
-              <CharacterCard
-                character={discardWitHidden[0]}
-                position="absolute"
-                boxShadow="-6px -6px 30px 0px rgba(0,0,0,0.3)"
-                marginTop="1"
-                marginLeft="1"
-              />
-            )
-            : null}
-          <CharacterCard
-            character={discardWitHidden[0]}
-          />
+        <Box as="button" type="button" {...getButtonProps()} title="Show discard pile." position="relative">
+          <StackCards cards={discard} />
         </Box>
       </Box>
 

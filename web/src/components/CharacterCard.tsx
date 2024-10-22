@@ -51,6 +51,8 @@ const CharacterDescriptions = [
 ];
 
 export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps) => {
+  const cardColor = character ? `var(--${Characters[character].toLowerCase()})` : "main.darkPurple";
+
   return (
     <Box
       as={button ? "button" : undefined}
@@ -58,7 +60,7 @@ export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps
       flexShrink={0}
       position="relative"
       border="2px solid"
-      borderColor="main.darkPurple"
+      borderColor={cardColor}
       width="160px"
       height="236.6px"
       backgroundImage={BackOfCard}
@@ -72,7 +74,7 @@ export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps
             <Box
               display="flex"
               justifyContent="space-between"
-              backgroundColor="main.darkPurple"
+              backgroundColor={cardColor}
               paddingX="3"
               fontWeight="bold"
               color="white"
@@ -92,7 +94,7 @@ export const CharacterCard = ({ character, button, ...rest }: CharacterCardProps
               width="full"
             />
             <Box
-              backgroundColor="main.darkPurple"
+              backgroundColor={cardColor}
               position="absolute"
               bottom="0"
               width="full"

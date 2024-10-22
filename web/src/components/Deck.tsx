@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { Label } from "./Label.tsx";
 import { useGameState } from "../contexts/GameStateContext/index.ts";
-import { CharacterCard } from "./CharacterCard.tsx";
+import { StackCards } from "./StackCards.tsx";
 
 export const Deck = (): ReactElement => {
   const { deckCount } = useGameState();
@@ -11,18 +11,7 @@ export const Deck = (): ReactElement => {
     <Box display="flex" flexDirection="column" gap="1">
       <Label>Deck</Label>
       <Box position="relative">
-        {deckCount > 1
-          ? (
-            <CharacterCard
-              position="absolute"
-              boxShadow="-6px -6px 30px 0px rgba(0,0,0,0.3)"
-              marginTop="1"
-              marginLeft="1"
-              role="presentation"
-            />
-          )
-          : null}
-        <CharacterCard />
+        <StackCards cards={Array.from({ length: deckCount })} />
         <Box
           position="absolute"
           inset="0"
