@@ -11,7 +11,13 @@ export const Deck = (): ReactElement => {
     <Box display="flex" flexDirection="column" gap="1">
       <Label>Deck</Label>
       <Box position="relative">
-        <StackCards cards={Array.from({ length: deckCount })} />
+        {deckCount > 0 ? <StackCards cards={Array.from({ length: deckCount })} /> : (
+          <Box
+            // should be same width/height as CharacterCard
+            width="160px"
+            height="236.6px"
+          />
+        )}
         <Box
           position="absolute"
           inset="0"
