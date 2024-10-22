@@ -1396,6 +1396,7 @@
         "dependencies": [
           "jsr:@hono/hono@*",
           "jsr:@std/assert@1.0.6",
+          "jsr:@std/collections@1.0.7",
           "npm:@msgpack/msgpack@2.8.0"
         ]
       },

@@ -10,7 +10,7 @@ export function join(roomCode: string, roomData: RoomData, playerId: PlayerId, n
     handmaidProtected: false,
     playedSpy: false,
     name,
-    outOfRound: false,
+    outOfRound: true,
   };
 
   let updatedRoomData: RoomData | null = null;

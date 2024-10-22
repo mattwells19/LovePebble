@@ -10,7 +10,8 @@
   "imports": {
     "assert": "jsr:@std/assert@1.0.6",
     "@msgpack/msgpack": "npm:@msgpack/msgpack@2.8.0",
-    "hono": "jsr:@hono/hono"
+    "hono": "jsr:@hono/hono",
+    "@std/collections": "jsr:@std/collections@1.0.7"
   },
   "fmt": {
     "singleQuote": false,

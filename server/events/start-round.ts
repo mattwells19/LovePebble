@@ -1,6 +1,8 @@
+import { sample } from "@std/collections";
 import { Rooms } from "../repositories/Rooms.ts";
 import { LOG_MESSAGES, updatePlayer } from "../events/utils/mod.ts";
 import { type Card, type Player, type PlayerId, type RoomData, type RoundData, StandardDeck } from "../types/types.ts";
+import { getRoundWinningPlayers } from "./utils/game-over.ts";
 
 export const randomOf = (max: number): number => Math.floor(Math.random() * max);
 
@@ -19,10 +21,25 @@ export const shuffle = <T>(array: T[]): T[] => {
 };
 
 export function startRound(roomCode: string, roomData: RoomData): RoomData {
+  const roundWinningPlayers = getRoundWinningPlayers(roomData);
+
+  const startingPlayerTurnId = (() => {
+    const winningPlayerIds = Array.from(roundWinningPlayers.keys());
+
+    if (winningPlayerIds.length === 0) {
+      return Array.from(roomData.players.keys())[0];
+    }
+    if (winningPlayerIds.length === 1) {
+      return winningPlayerIds[0];
+    }
+
+    return sample(winningPlayerIds)!;
+  })();
+
   const updatedRound: RoundData = {
     cardPlayed: null,
     details: null,
-    playerTurnId: roomData.players.keys().next().value!,
+    playerTurnId: startingPlayerTurnId,
   };
 
   let updatedPlayers: RoomData["players"] = new Map(roomData.players);

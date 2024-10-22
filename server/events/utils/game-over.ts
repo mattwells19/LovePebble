@@ -2,17 +2,22 @@ import type { Player, PlayerId, RoomData } from "../../types/types.ts";
 import { LOG_MESSAGES } from "./mod.ts";
 import { updatePlayer } from "./update-player.ts";
 
-export function gameOver(roomData: RoomData): RoomData {
-  let winningPlayers: Array<[PlayerId, Player]> = [];
-
+export function getRoundWinningPlayers(roomData: RoomData): Map<PlayerId, Player> {
   const playersStillInRound: Array<[PlayerId, Player]> = Array.from(roomData.players).filter(([, player]) =>
     !player.outOfRound
   );
 
+  // this function is used in start-round, so this can be true when starting a new game
+  if (playersStillInRound.length === 0) {
+    return new Map();
+  }
+
   if (playersStillInRound.length === 1) {
-    winningPlayers = [...playersStillInRound];
-  } else {
-    winningPlayers = playersStillInRound.reduce((playersWinByValue, [playerId, player]) => {
+    return new Map(playersStillInRound);
+  }
+
+  const winningPlayers: Array<[PlayerId, Player]> = playersStillInRound.reduce(
+    (playersWinByValue, [playerId, player]) => {
       if (playersWinByValue.length === 0) {
         return [[playerId, player]];
       }
@@ -24,8 +29,19 @@ export function gameOver(roomData: RoomData): RoomData {
       }
 
       return playersWinByValue;
-    }, [] as Array<[PlayerId, Player]>);
-  }
+    },
+    [] as Array<[PlayerId, Player]>,
+  );
+
+  return new Map(winningPlayers);
+}
+
+export function gameOver(roomData: RoomData): RoomData {
+  const winningPlayers = getRoundWinningPlayers(roomData);
+
+  const playersStillInRound: Array<[PlayerId, Player]> = Array.from(roomData.players).filter(([, player]) =>
+    !player.outOfRound
+  );
 
   let updatedPlayers: RoomData["players"] = roomData.players;
 
@@ -51,7 +67,7 @@ export function gameOver(roomData: RoomData): RoomData {
     round: null,
     roundLog: [
       ...roomData.roundLog,
-      LOG_MESSAGES.gameOver(winningPlayers.map(([, player]) => player.name), spyWinningPlayer?.name),
+      LOG_MESSAGES.gameOver(Array.from(winningPlayers).map(([, player]) => player.name), spyWinningPlayer?.name),
     ],
   };
 }
