@@ -51,43 +51,43 @@ export const SpectatorView = () => {
       gap="inherit"
       paddingBottom="20"
     >
-      <Box position="relative">
-        <IconButton
-          aria-label="View previous player."
-          icon={<RiArrowLeftFill />}
-          colorScheme="gray"
-          variant="ghost"
-          onClick={handlePreviousPlayer}
-          position="absolute"
-          inset={0}
-          width="fit-content"
-          margin="auto auto auto 0"
-        />
-        <IconButton
-          aria-label="View next player."
-          icon={<RiArrowRightFill />}
-          colorScheme="gray"
-          variant="ghost"
-          onClick={handleNextPlayer}
-          position="absolute"
-          inset={0}
-          width="fit-content"
-          margin="auto 0px auto auto"
-        />
-        {spectatingPlayer.cards.length > 0
-          ? (
-            <Box display="flex" flexDirection="column" gap="1">
-              <Label>
-                [Spectator Mode]<br />
-                {`${spectatingPlayer.name}'s cards`}
-              </Label>
-              <Box display="flex" gap="3" margin="auto">
-                {spectatingPlayer.cards.map((card) => <CharacterCard key={card} character={card} />)}
-              </Box>
+      {spectatingPlayer.cards.length > 0
+        ? (
+          <Box display="flex" flexDirection="column" gap="1" position="relative">
+            <IconButton
+              aria-label="View previous player."
+              icon={<RiArrowLeftFill color="var(--chakra-colors-main-greyText)" />}
+              colorScheme="gray"
+              variant="ghost"
+              onClick={handlePreviousPlayer}
+              position="absolute"
+              top={0}
+              left={0}
+              width="fit-content"
+              margin="auto auto auto 0"
+            />
+            <IconButton
+              aria-label="View next player."
+              icon={<RiArrowRightFill color="var(--chakra-colors-main-greyText)" />}
+              colorScheme="gray"
+              variant="ghost"
+              onClick={handleNextPlayer}
+              position="absolute"
+              top={0}
+              right={0}
+              width="fit-content"
+              margin="auto 0px auto auto"
+            />
+            <Label>
+              [Spectator Mode]<br />
+              {`${spectatingPlayer.name}'s cards`}
+            </Label>
+            <Box display="flex" gap="3" margin="auto">
+              {spectatingPlayer.cards.map((card) => <CharacterCard key={card} character={card} />)}
             </Box>
-          )
-          : <Label>{`${spectatingPlayer.name} is out of this round.`}</Label>}
-      </Box>
+          </Box>
+        )
+        : <Label>{`${spectatingPlayer.name} is out of this round.`}</Label>}
       <ActionSelect
         playerCards={spectatingPlayer.cards}
       />

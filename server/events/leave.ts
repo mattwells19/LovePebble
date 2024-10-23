@@ -15,14 +15,14 @@ export function leave(roomCode: string, roomData: RoomData, playerLeavingId: Pla
     newPlayers.delete(playerLeavingId);
   }
 
-  if (newPlayers.size === 0) {
-    return;
-  }
-
   const newSpectators = new Map(roomData.spectators);
   if (newSpectators.has(playerLeavingId)) {
     playerLeavingName = newSpectators.get(playerLeavingId)!;
     newSpectators.delete(playerLeavingId);
+  }
+
+  if (newPlayers.size === 0 && newSpectators.size === 0) {
+    return;
   }
 
   const updatedRoomData: RoomData = {

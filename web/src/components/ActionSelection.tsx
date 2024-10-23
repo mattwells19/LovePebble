@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import { type ReactElement, useLayoutEffect } from "react";
 import { Box } from "@chakra-ui/react";
 import { Card, SocketIncoming } from "@lovepebble/server";
 import { PlayerPicker } from "./PlayerPicker.tsx";
@@ -16,6 +16,13 @@ export const ActionSelect = (
   { playerCards }: ActionSelectProps,
 ): ReactElement | null => {
   const { round, sendGameUpdate, currentPlayerId } = useGameState();
+
+  useLayoutEffect(() => {
+    if (round?.details) {
+      globalThis.scrollTo({ behavior: "smooth", top: document.body.scrollHeight });
+    }
+  }, [!!round?.details]);
+
   if (!round || !round.details) {
     return null;
   }

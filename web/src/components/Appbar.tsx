@@ -16,7 +16,7 @@ export const Appbar = () => {
     >
       <Heading
         as="h1"
-        fontSize="5xl"
+        fontSize="4xl"
         fontFamily="Nova Flat"
         transform="translateY(0.25rem)"
       >
