@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 import { checkRoomCode, createNewRoom } from "./controllers/room.controller.ts";
 import { Sockets } from "./repositories/Sockets.ts";
+import { cacheDocument, cacheResource, rateLimiter } from "./middlewares/mod.ts";
 
 const app = new Hono();
 
@@ -17,12 +18,12 @@ app.onError((e, c) => {
   return c.json({ message: "Unknown Error" }, 500);
 });
 
-app.get("/api/rooms/:roomCode", (c) => {
+app.get("/api/rooms/:roomCode", rateLimiter, (c) => {
   const roomCode = c.req.param("roomCode");
   return c.text(`${checkRoomCode(roomCode)}`);
 });
 
-app.post("/api/rooms", (c) => {
+app.post("/api/rooms", rateLimiter, (c) => {
   const roomCode = createNewRoom();
   return c.text(roomCode);
 });
@@ -40,9 +41,15 @@ app.get("/ws/:roomCode", (c) => {
   return c.notFound();
 });
 
-app.get("/name", serveStatic({ path: "./build/index.html" }));
-app.get("/room/*", serveStatic({ path: "./build/index.html" }));
-app.get("/*", serveStatic({ root: "./build" }));
+app.use((c, next) => {
+  c.res.headers.append("Referrer-Policy", "same-origin");
+  c.res.headers.append("X-Content-Type-Options", "nosniff");
+  return next();
+});
+
+app.on("GET", ["/", "/name", "/room/*"], cacheDocument, serveStatic({ path: "./build/index.html" }));
+
+app.get("/*", cacheResource, serveStatic({ root: "./build" }));
 
 app.use("*", (c) => Promise.resolve(c.notFound()));
 
