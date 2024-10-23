@@ -72,7 +72,7 @@ export const PlayerListItem = (
                   />
                 )}
               <PlayerOptionIconButton
-                aria-label="Edit name."
+                aria-label="Edit name"
                 as={Link}
                 to={`/name?roomCode=${roomCode}`}
                 icon={<RiPencilFill size="20px" />}

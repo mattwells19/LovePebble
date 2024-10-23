@@ -37,7 +37,7 @@ const CharacterImages = [
 
 const BackOfCard = "/character-images/back.jpg";
 
-const CharacterDescriptions = [
+export const CharacterDescriptions = [
   "Gain favor if no one else plays/discards a spy",
   "Guess a hand",
   "Look at a hand",
