@@ -9,4 +9,290 @@
   --king: #553c9a;
   --countess: #702459;
   --princess: #63171b;
+
+  --main-darkPurple: #232131;
+  --main-greyAccent: #4e4c60;
+  --main-greyText: #b9b9b9;
+  --main-lightPurple: #383651;
+  --main-primaryOrange: #ed9b60;
+  --main-regularPurple: #2c2a41;
+
+  /**
+   * Theme values referenced from the amazing people at Chakra
+   * https://github.com/chakra-ui/chakra-ui/tree/main/packages/react/src/theme
+  **/
+
+  --black: #000000;
+  --white: #ffffff;
+
+  --whiteAlpha-50: rgba(255, 255, 255, 0.04);
+  --whiteAlpha-100: rgba(255, 255, 255, 0.06);
+  --whiteAlpha-200: rgba(255, 255, 255, 0.08);
+  --whiteAlpha-300: rgba(255, 255, 255, 0.16);
+  --whiteAlpha-400: rgba(255, 255, 255, 0.24);
+  --whiteAlpha-500: rgba(255, 255, 255, 0.36);
+  --whiteAlpha-600: rgba(255, 255, 255, 0.48);
+  --whiteAlpha-700: rgba(255, 255, 255, 0.64);
+  --whiteAlpha-800: rgba(255, 255, 255, 0.8);
+  --whiteAlpha-900: rgba(255, 255, 255, 0.92);
+
+  --blackAlpha-50: rgba(0, 0, 0, 0.04);
+  --blackAlpha-100: rgba(0, 0, 0, 0.06);
+  --blackAlpha-200: rgba(0, 0, 0, 0.08);
+  --blackAlpha-300: rgba(0, 0, 0, 0.16);
+  --blackAlpha-400: rgba(0, 0, 0, 0.24);
+  --blackAlpha-500: rgba(0, 0, 0, 0.36);
+  --blackAlpha-600: rgba(0, 0, 0, 0.48);
+  --blackAlpha-700: rgba(0, 0, 0, 0.64);
+  --blackAlpha-800: rgba(0, 0, 0, 0.8);
+  --blackAlpha-900: rgba(0, 0, 0, 0.92);
+
+  --gray-50: #f7fafc;
+  --gray-100: #edf2f7;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e0;
+  --gray-400: #a0aec0;
+  --gray-500: #718096;
+  --gray-600: #4a5568;
+  --gray-700: #2d3748;
+  --gray-800: #1a202c;
+  --gray-900: #171923;
+
+  --red-50: #fff5f5;
+  --red-100: #fed7d7;
+  --red-200: #feb2b2;
+  --red-300: #fc8181;
+  --red-400: #f56565;
+  --red-500: #e53e3e;
+  --red-600: #c53030;
+  --red-700: #9b2c2c;
+  --red-800: #822727;
+  --red-900: #63171b;
+
+  --orange-50: #fffaf0;
+  --orange-100: #feebc8;
+  --orange-200: #fbd38d;
+  --orange-300: #f6ad55;
+  --orange-400: #ed8936;
+  --orange-500: #dd6b20;
+  --orange-600: #c05621;
+  --orange-700: #9c4221;
+  --orange-800: #7b341e;
+  --orange-900: #652b19;
+
+  --yellow-50: #fffff0;
+  --yellow-100: #fefcbf;
+  --yellow-200: #faf089;
+  --yellow-300: #f6e05e;
+  --yellow-400: #ecc94b;
+  --yellow-500: #d69e2e;
+  --yellow-600: #b7791f;
+  --yellow-700: #975a16;
+  --yellow-800: #744210;
+  --yellow-900: #5f370e;
+
+  --green-50: #f0fff4;
+  --green-100: #c6f6d5;
+  --green-200: #9ae6b4;
+  --green-300: #68d391;
+  --green-400: #48bb78;
+  --green-500: #38a169;
+  --green-600: #2f855a;
+  --green-700: #276749;
+  --green-800: #22543d;
+  --green-900: #1c4532;
+
+  --teal-50: #e6fffa;
+  --teal-100: #b2f5ea;
+  --teal-200: #81e6d9;
+  --teal-300: #4fd1c5;
+  --teal-400: #38b2ac;
+  --teal-500: #319795;
+  --teal-600: #2c7a7b;
+  --teal-700: #285e61;
+  --teal-800: #234e52;
+  --teal-900: #1d4044;
+
+  --blue-50: #ebf8ff;
+  --blue-100: #bee3f8;
+  --blue-200: #90cdf4;
+  --blue-300: #63b3ed;
+  --blue-400: #4299e1;
+  --blue-500: #3182ce;
+  --blue-600: #2b6cb0;
+  --blue-700: #2c5282;
+  --blue-800: #2a4365;
+  --blue-900: #1a365d;
+
+  --cyan-50: #edfdfd;
+  --cyan-100: #c4f1f9;
+  --cyan-200: #9decf9;
+  --cyan-300: #76e4f7;
+  --cyan-400: #0bc5ea;
+  --cyan-500: #00b5d8;
+  --cyan-600: #00a3c4;
+  --cyan-700: #0987a0;
+  --cyan-800: #086f83;
+  --cyan-900: #065666;
+
+  --purple-50: #faf5ff;
+  --purple-100: #e9d8fd;
+  --purple-200: #d6bcfa;
+  --purple-300: #b794f4;
+  --purple-400: #9f7aea;
+  --purple-500: #805ad5;
+  --purple-600: #6b46c1;
+  --purple-700: #553c9a;
+  --purple-800: #44337a;
+  --purple-900: #322659;
+
+  --pink-50: #fff5f7;
+  --pink-100: #fed7e2;
+  --pink-200: #fbb6ce;
+  --pink-300: #f687b3;
+  --pink-400: #ed64a6;
+  --pink-500: #d53f8c;
+  --pink-600: #b83280;
+  --pink-700: #97266d;
+  --pink-800: #702459;
+  --pink-900: #521b41;
+
+  --fonts-body: system-ui, sans-serif;
+  --fonts-heading: Georgia, serif;
+  --fonts-mono: Menlo, monospace;
+
+  --fontSizes-xs: 0.75rem;
+  --fontSizes-sm: 0.875rem;
+  --fontSizes-md: 1rem;
+  --fontSizes-lg: 1.125rem;
+  --fontSizes-xl: 1.25rem;
+  --fontSizes-2xl: 1.5rem;
+  --fontSizes-3xl: 1.875rem;
+  --fontSizes-4xl: 2.25rem;
+  --fontSizes-5xl: 3rem;
+  --fontSizes-6xl: 3.75rem;
+  --fontSizes-7xl: 4.5rem;
+  --fontSizes-8xl: 6rem;
+  --fontSizes-9xl: 8rem;
+
+  --fontWeights-hairline: 100;
+  --fontWeights-thin: 200;
+  --fontWeights-light: 300;
+  --fontWeights-normal: 400;
+  --fontWeights-medium: 500;
+  --fontWeights-semibold: 600;
+  --fontWeights-bold: 700;
+  --fontWeights-extrabold: 800;
+  --fontWeights-black: 900;
+
+  --lineHeights-normal: normal;
+  --lineHeights-none: 1;
+  --lineHeights-shorter: 1.25;
+  --lineHeights-short: 1.375;
+  --lineHeights-base: 1.5;
+  --lineHeights-tall: 1.625;
+  --lineHeights-taller: 2;
+  --lineHeights-3: 0.75rem;
+  --lineHeights-4: 1rem;
+  --lineHeights-5: 1.25rem;
+  --lineHeights-6: 1.5rem;
+  --lineHeights-7: 1.75rem;
+  --lineHeights-8: 2rem;
+  --lineHeights-9: 2.25rem;
+  --lineHeights-10: 2.5rem;
+
+  --letterSpacings-tighter: -0.05em;
+  --letterSpacings-tight: -0.025em;
+  --letterSpacings-normal: 0;
+  --letterSpacings-wide: 0.025em;
+  --letterSpacings-wider: 0.05em;
+  --letterSpacings-widest: 0.1em;
+
+  --breakpoints-base: 0em;
+  --breakpoints-sm: 30em;
+  --breakpoints-md: 48em;
+  --breakpoints-lg: 62em;
+  --breakpoints-xl: 80em;
+  --breakpoints-2xl: 96em;
+
+  --spacing-px: 1px;
+  --spacing-0_5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1_5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-2_5: 0.625rem;
+  --spacing-3: 0.75rem;
+  --spacing-3_5: 0.875rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-7: 1.75rem;
+  --spacing-8: 2rem;
+  --spacing-9: 2.25rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-14: 3.5rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-28: 7rem;
+  --spacing-32: 8rem;
+  --spacing-36: 9rem;
+  --spacing-40: 10rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+  --spacing-52: 13rem;
+  --spacing-56: 14rem;
+  --spacing-60: 15rem;
+  --spacing-64: 16rem;
+  --spacing-72: 18rem;
+  --spacing-80: 20rem;
+  --spacing-96: 24rem;
+
+  --spacing-max: max-content;
+  --spacing-min: min-content;
+  --spacing-full: 100%;
+  --spacing-3xs: 14rem;
+  --spacing-2xs: 16rem;
+  --spacing-xs: 20rem;
+  --spacing-sm: 24rem;
+  --spacing-md: 28rem;
+  --spacing-lg: 32rem;
+  --spacing-xl: 36rem;
+  --spacing-2xl: 42rem;
+  --spacing-3xl: 48rem;
+  --spacing-4xl: 56rem;
+  --spacing-5xl: 64rem;
+  --spacing-6xl: 72rem;
+  --spacing-7xl: 80rem;
+  --spacing-8xl: 90rem;
+
+  --radii-none: 0;
+  --radii-sm: 0.125rem;
+  --radii-base: 0.25rem;
+  --radii-md: 0.375rem;
+  --radii-lg: 0.5rem;
+  --radii-xl: 0.75rem;
+  --radii-2xl: 1rem;
+  --radii-3xl: 1.5rem;
+  --radii-full: 9999px;
+
+  --shadows-xs: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --shadows-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadows-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+    0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadows-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadows-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadows-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadows-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadows-outline: 0 0 0 3px rgba(66, 153, 225, 0.6);
+  --shadows-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadows-none: none;
+  --shadows-dark-lg: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0.2) 0px 5px 10px, rgba(0, 0, 0, 0.4) 0px 15px 40px;
+
+  --error: var(--red-300);
 }

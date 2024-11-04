@@ -1,22 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { type ActionFunction, Form, redirect, useActionData, useNavigation, useSubmit } from "react-router-dom";
-import {
-  Alert,
-  AlertIcon,
-  Box,
-  Button,
-  chakra,
-  Collapse,
-  Divider,
-  PinInput,
-  PinInputField,
-  Text,
-  useToken,
-} from "@chakra-ui/react";
-import { RiGroupFill } from "@remixicon/react";
-import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
+import { Button, Divider } from "@chakra-ui/react";
+import { PinInput } from "@ark-ui/react";
+import { RiErrorWarningFill, RiGroupFill } from "@remixicon/react";
+
 import { get } from "../utils/get.ts";
+import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
 import { DocTitle } from "../components/DocTitle.tsx";
+
+import styles from "../styles/pages/Home.module.scss";
 
 export const homeAction: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
@@ -48,7 +40,6 @@ export const Home = () => {
   const submit = useSubmit();
   const actionResponse = useActionData() as string | undefined;
   const { state } = useNavigation();
-  const orange200 = useToken("colors", "orange.200");
 
   useSetAppbarText("Love Pebble");
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -62,89 +53,79 @@ export const Home = () => {
   }, [state === "idle", actionResponse]);
 
   return (
-    <chakra.main display="flex" flexDir="column" gap="6" py="6" alignItems="center" width="sm" margin="auto">
+    <main className={styles.main}>
       <DocTitle />
-      <Box display="flex" flexDirection="column" gap="4" alignItems="start" fontSize="lg" px="4">
-        <Text textAlign="left" width="full">
+      <section className={styles.welcome_blurb}>
+        <p>
           Welcome! This is an online, 6 player version of the popular card game Love Letter.
-        </Text>
-        <Text textAlign="left" width="full">
+        </p>
+        <p>
           The rules play just like the card game you'd buy in the store so grab your friends and get to loving!
-        </Text>
-        <Text textAlign="left" width="full">
+        </p>
+        <p>
           In Love Pebble, suitors compete to have their pebble delivered to the kingdom's princess, who is in need of a
           mate for the upcoming mating season.
-        </Text>
-        <Box
-          display="flex"
-          justifyContent="space-evenly"
-          alignItems="center"
-          paddingX="3"
-          paddingY="1"
-          gap="3"
-          color="orange.200"
-          border="1px solid"
-          borderColor="orange.200"
-          borderRadius="md"
-          backgroundColor={`${orange200}10`}
-          mt="1"
-        >
+        </p>
+        <div className={styles.player_count_pill}>
           <RiGroupFill size="20px" />
-          <Text>2 - 6 players</Text>
-        </Box>
-      </Box>
+          <span>2 - 6 players</span>
+        </div>
+      </section>
       <Divider />
-      <Box display="flex" flexDirection="column" alignItems="center" gap="4">
-        <Text>Already have a room code? Type/paste it here.</Text>
-        <Box as={Form} method="post" ref={formRef} display="flex" gap="2">
-          <PinInput
+      <section className={styles.room_code_pin_inputs_container}>
+        <Form method="post" ref={formRef}>
+          <PinInput.Root
             autoFocus
             onChange={() => setError(null)}
-            onComplete={() => {
+            onValueComplete={() => {
               submit(formRef.current);
             }}
-            isInvalid={Boolean(error)}
-            size="lg"
+            invalid={Boolean(error)}
             type="alphanumeric"
           >
-            <PinInputField
-              aria-label="Room code, first letter."
-              textTransform="uppercase"
-              name="roomCode-1"
-            />
-            <PinInputField
-              aria-label="Room code, second letter."
-              textTransform="uppercase"
-              name="roomCode-2"
-            />
-            <PinInputField
-              aria-label="Room code, third letter."
-              textTransform="uppercase"
-              name="roomCode-3"
-            />
-            <PinInputField
-              aria-label="Room code, last letter."
-              textTransform="uppercase"
-              name="roomCode-4"
-            />
-          </PinInput>
-        </Box>
-        <Collapse in={Boolean(error)} animateOpacity>
-          <Alert
-            status={error === "networkError" ? "error" : "warning"}
-            width="sm"
-          >
-            <AlertIcon />
-            {error}
-          </Alert>
-        </Collapse>
-      </Box>
-      <Box display="flex" width="full" alignItems="center" gap="3">
+            <PinInput.Label>Already have a room code? Type/paste it here.</PinInput.Label>
+            <PinInput.Control>
+              <PinInput.Input
+                aria-label="Room code, first letter."
+                name="roomCode-1"
+                index={0}
+              />
+              <PinInput.Input
+                aria-label="Room code, second letter."
+                name="roomCode-2"
+                index={1}
+              />
+              <PinInput.Input
+                aria-label="Room code, third letter."
+                name="roomCode-3"
+                index={2}
+              />
+              <PinInput.Input
+                aria-label="Room code, last letter."
+                name="roomCode-4"
+                index={3}
+              />
+            </PinInput.Control>
+            <PinInput.HiddenInput />
+          </PinInput.Root>
+        </Form>
+        {error
+          ? (
+            <div role="alert" className={styles.alert_container}>
+              <RiErrorWarningFill size="24" />
+              <span>
+                {error}
+              </span>
+            </div>
+          )
+          : null}
+      </section>
+      <div className={styles.or_separator}>
         <Divider />
-        <Text>or</Text>
+        <span>or</span>
         <Divider />
-      </Box>
-      <Box as={Form} method="post" width="fit-content">
+      </div>
+      <Form method="post">
         <Button
           size="lg"
           disabled={state === "submitting"}
@@ -154,7 +135,7 @@ export const Home = () => {
         >
           Start a New Room
         </Button>
-      </Box>
-    </chakra.main>
+      </Form>
+    </main>
   );
 };
