@@ -1,11 +1,11 @@
 import { type LoaderFunctionArgs, redirect, useLoaderData } from "react-router-dom";
-import { chakra } from "@chakra-ui/react";
 import { GameStateProvider, useGameState } from "../../contexts/GameStateContext/index.ts";
 import { useSetAppbarText } from "../../contexts/AppbarContext.tsx";
 import { DocTitle } from "../../components/DocTitle.tsx";
 import { Game } from "./Game/index.ts";
 import { Lobby } from "./Lobby/index.ts";
 import { RoundEnd } from "./RoundEnd.tsx";
+import styles from "../../styles/pages/Room.module.scss";
 
 export interface RoomLoaderResult {
   roomCode: string;
@@ -36,9 +36,9 @@ const RoomUnwrapped = () => {
   return (
     <>
       <DocTitle>{roomCode}</DocTitle>
-      <chakra.main display="flex" flexDir="column" alignItems="center" gap="6" py="6" px="4" width="sm" margin="auto">
+      <main className={styles.main}>
         {!gameStarted ? <Lobby roomCode={roomCode} /> : round ? <Game /> : <RoundEnd />}
-      </chakra.main>
+      </main>
     </>
   );
 };

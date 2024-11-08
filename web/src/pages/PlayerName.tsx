@@ -1,15 +1,6 @@
 import { useEffect } from "react";
-import {
-  Box,
-  Button,
-  chakra,
-  FormControl,
-  FormLabel,
-  Input,
-  InputGroup,
-  useToast,
-  VisuallyHiddenInput,
-} from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
+import { Field } from "@ark-ui/react";
 import {
   type ActionFunction,
   Form,
@@ -20,6 +11,8 @@ import {
 } from "react-router-dom";
 import { useSetAppbarText } from "../contexts/AppbarContext.tsx";
 import { DocTitle } from "../components/DocTitle.tsx";
+import { toast } from "../components/Toaster.tsx";
+import styles from "../styles/pages/PlayerName.module.scss";
 
 export const playerNameLoader = ({ request }: LoaderFunctionArgs) => {
   const roomCode = new URL(request.url).searchParams.get("roomCode");
@@ -41,8 +34,7 @@ export const playerNameAction: ActionFunction = async ({ request }) => {
 };
 
 export const PlayerName = () => {
-  const toast = useToast();
-  useSetAppbarText("Player Name");
+  useSetAppbarText("Name");
   const { defaultName, roomCode } = useLoaderData() as ReturnType<typeof playerNameLoader>;
   const badName = useActionData() as string | undefined;
 
@@ -50,28 +42,30 @@ export const PlayerName = () => {
     if (typeof badName === "string") {
       toast({
         title: "Please enter a valid name. Max of 15 characters.",
-        status: "error",
+        type: "error",
       });
     }
   }, [badName]);
 
   return (
-    <chakra.main pt="12" pb="6" px="4" width="sm" margin="auto">
-      <DocTitle>Player Name</DocTitle>
-      <Box as={Form} method="post" width="fit-content">
-        <FormControl isRequired id="playerName">
-          <FormLabel>Your Name</FormLabel>
-          <InputGroup gap="3">
-            <Input
+    <main className={styles.main}>
+      <DocTitle>Name</DocTitle>
+      <Form method="post" className={styles.form}>
+        <Field.Root required id="playerName">
+          <Field.Label>Your Name</Field.Label>
+          <div className={styles.input_group}>
+            <Field.Input
               autoFocus
               defaultValue={badName ?? defaultName ?? undefined}
               maxLength={15}
-              textAlign="center"
               name="playerName"
+              type="text"
             />
             {roomCode
               ? (
-                <VisuallyHiddenInput
+                <input
+                  type="text"
+                  hidden
                   value={roomCode}
                   name="roomCode"
                   readOnly
@@ -81,9 +75,9 @@ export const PlayerName = () => {
             <Button type="submit" width="24">
               Save
             </Button>
-          </InputGroup>
-        </FormControl>
-      </Box>
-    </chakra.main>
+          </div>
+        </Field.Root>
+      </Form>
+    </main>
   );
 };

@@ -1,0 +1,31 @@
+.main {
+  padding: var(--spacing-12) var(--spacing-4) var(--spacing-6) var(--spacing-4);
+  width: var(--spacing-sm);
+  margin: auto;
+}
+
+.form {
+  label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+
+    &::after {
+      content: " *";
+      color: var(--error);
+    }
+  }
+
+  .input_group {
+    display: flex;
+    gap: var(--spacing-3);
+  }
+
+  input[type="text"] {
+    text-align: center;
+    background-color: transparent;
+    border: 1px solid var(--main-greyAccent);
+    border-radius: var(--radii-md);
+    padding-inline-start: var(--spacing-4);
+    padding-inline-end: var(--spacing-4);
+  }
+}

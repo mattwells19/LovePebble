@@ -1,0 +1,48 @@
+@keyframes drop-in {
+  0% {
+    transform: translateY(-100%);
+  }
+  80% {
+    transform: translateY(10%);
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes leave {
+  0% {
+    transform: translateY(0%);
+  }
+  20% {
+    transform: translateY(10%);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+.toast {
+  position: relative;
+  padding: var(--spacing-4);
+  padding-right: var(--spacing-12);
+  color: var(--black);
+  border-radius: var(--radii-md);
+
+  &[data-state="open"] {
+    animation: drop-in 250ms ease-out;
+  }
+  &[data-state="closed"] {
+    animation: leave 250ms ease-in;
+  }
+
+  &[data-type="error"] {
+    background-color: var(--red-400);
+  }
+
+  [data-part="close-trigger"] {
+    position: absolute;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
+  }
+}
