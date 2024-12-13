@@ -4,7 +4,6 @@ import { Appbar } from "./components/Appbar.tsx";
 import { Home, homeAction } from "./pages/Home.tsx";
 import { PlayerName, playerNameAction, playerNameLoader } from "./pages/PlayerName.tsx";
 import { Room, roomLoader } from "./pages/Room/index.ts";
-import { GameRules } from "./components/GameRules.tsx";
 
 const router = createBrowserRouter([
   {
@@ -30,7 +29,6 @@ export const Layout = () => {
     <AppbarProvider>
       <Appbar />
       <RouterProvider router={router} />
-      {/* <GameRules /> */}
     </AppbarProvider>
   );
 };

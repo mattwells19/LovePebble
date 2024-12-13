@@ -18,6 +18,8 @@
   "nodeModulesDir": "auto",
   "compilerOptions": {
     "jsx": "react-jsx",
+    "jsxImportSource": "npm:react@19.0.0",
+    "jsxImportSourceTypes": "npm:@types/react@19.0.1",
     "types": [
       "./react.d.ts"
     ],
